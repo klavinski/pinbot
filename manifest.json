@@ -19,7 +19,7 @@
     ],
     "web_accessible_resources": [
       {
-        "resources": ["src/sandbox.html"],
+        "resources": ["src/sandbox.html", "models/*"],
         "matches": ["https://*/*"]
       }
     ],

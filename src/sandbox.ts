@@ -1,5 +1,4 @@
 import { pipeline } from "@xenova/transformers"
-import '../models/onnx/quantized/distilbert-base-cased-distilled-squad/question-answering/tokenizer.json?url'
 
 const run = async () => {
 console.log(await pipeline('question-answering'))
