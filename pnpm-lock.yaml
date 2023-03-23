@@ -2,6 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@crxjs/vite-plugin': 2.0.0-beta.15
+  '@mozilla/readability': ^0.4.3
   '@types/react': ^18.0.28
   '@types/react-dom': ^18.0.11
   '@types/webextension-polyfill': ^0.10.0
@@ -15,6 +16,7 @@ specifiers:
   webextension-polyfill: ^0.10.0
 
 dependencies:
+  '@mozilla/readability': 0.4.3
   '@xenova/transformers': github.com/klavinski/transformers.js/126af698d2732580e639fc5a2bc08b8512ee33fa
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
@@ -963,6 +965,11 @@ packages:
   /@mdn/browser-compat-data/5.2.42:
     resolution: {integrity: sha512-CD/2ai1W45cDN/zN2AcYduDavU+nq9aStyQizi4MHxnwkRvS/H24WIjgc1qD8CISoqXa8AAIe+A+zpWxwV7a2Q==}
     dev: true
+
+  /@mozilla/readability/0.4.3:
+    resolution: {integrity: sha512-TQc/hBySDWT6GTtk5G3HU4TrnulRxmyZUWSBxXX+loYSoz028SUdRV+isy3axBkvm+vUot61Z9CPAqGrfpXp9Q==}
+    engines: {node: '>=14.0.0'}
+    dev: false
 
   /@nodelib/fs.scandir/2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}

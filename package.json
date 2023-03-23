@@ -6,9 +6,11 @@
   "scripts": {
     "dev": "vite build --watch",
     "build": "vite build",
+    "models": "git -C public/models/onnx config core.sparseCheckout true && cp models .git/modules/public/models/onnx/info/sparse-checkout && git submodule update --checkout --force public/models/onnx",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mozilla/readability": "^0.4.3",
     "@xenova/transformers": "github:klavinski/transformers.js",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

@@ -1,0 +1,4 @@
+quantized/distilbert-base-cased-distilled-squad/question-answering
+quantized/sentence-transformers/all-distilroberta-v1
+quantized/facebook/bart-large-cnn
+quantized/distilgpt2/causal-lm-with-past
