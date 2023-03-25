@@ -1,5 +1,5 @@
 {
-  "name": "valet4",
+  "name": "valet",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -18,12 +18,18 @@
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "2.0.0-beta.15",
-    "@types/react": "^18.0.28",
+    "@types/react": "^18.0.29",
     "@types/react-dom": "^18.0.11",
     "@types/webextension-polyfill": "^0.10.0",
+    "@typescript-eslint/eslint-plugin": "^5.56.0",
+    "@typescript-eslint/parser": "^5.56.0",
     "@vitejs/plugin-react": "^3.1.0",
-    "typescript": "^4.9.3",
-    "vite": "^4.2.0",
+    "autoprefixer": "^10.4.14",
+    "eslint": "^8.36.0",
+    "eslint-plugin-react": "^7.32.2",
+    "postcss": "^8.4.21",
+    "typescript": "^4.9.5",
+    "vite": "^4.2.1",
     "web-ext": "^7.6.0"
   }
 }

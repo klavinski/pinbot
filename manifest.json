@@ -1,15 +1,23 @@
 {
     "manifest_version": 3,
-    "name": "CRXJS React Vite Example",
+    "name": "Valet",
     "version": "1.0.0",
-    "action": { "default_popup": "index.html" },
+    "icons": {
+      "16": "white-icon.svg"
+    },
+    "action": {
+      "default_icon": {
+        "16": "white-icon.svg"
+      },
+      "default_popup": "src/popup.html"
+    },
     "background": {
       "service_worker": "src/background.ts",
       "type": "module"
     },
     "content_scripts": [
       {
-        "matches": ["https://*/*", "http://*/*"],
+        "matches": ["*://*/*"],
         "js": ["src/content-script.ts"],
         "run_at": "document_start",
         "all_frames": true,
@@ -19,8 +27,8 @@
     ],
     "web_accessible_resources": [
       {
-        "resources": ["src/sandbox.html", "public/models/*"],
-        "matches": ["https://*/*"]
+        "resources": ["src/sandbox.html", "public/*"],
+        "matches": ["*://*/*"]
       }
     ],
     "sandbox": {

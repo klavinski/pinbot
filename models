@@ -2,3 +2,5 @@ quantized/distilbert-base-cased-distilled-squad/question-answering
 quantized/sentence-transformers/all-distilroberta-v1
 quantized/facebook/bart-large-cnn
 quantized/distilgpt2/causal-lm-with-past
+quantized/google/mt5-small/seq2seq-lm-with-past
+quantized/EleutherAI/gpt-neo-125M/causal-lm-with-past
