@@ -1,31 +1,36 @@
+import { Readability } from "@mozilla/readability"
 import * as browser from "webextension-polyfill"
 const src = browser.runtime.getURL( "src/sandbox.html" )
-const sb = browser.runtime.getURL( "src/sandbox.ts" )
-console.log( sb )
-window.addEventListener( "message", message => {
-    console.log( message )
-    message.source?.postMessage( { from: "content-script" } )
-} )
+browser.runtime.getURL( "src/sandbox.ts" )
+
 const iframe = document.createElement( "iframe" )
 iframe.src = src
-iframe.className = "crx"
+iframe.style.display = "none"
 
-// iframe.style.display = "none"
-document.body.appendChild( iframe )
-console.log( iframe.contentWindow )
-iframe.onload = () => {
-    if ( iframe.contentWindow ) {
-        console.log( "content window", iframe )
-        iframe.contentWindow.postMessage( "test", "*" )
-    } else
-        console.log( "no content window", iframe )
-}
+const sandbox = new Promise<( message: unknown ) => void>( ( resolve, reject ) => {
+    document.body.appendChild( iframe )
+    window.addEventListener( "message", ( message ) => {
+        if ( message.data === "ready" ) {
+            console.log( "sandbox ready", message )
+            document.querySelectorAll( "iframe" ).forEach( node => {
+                const contentWindow = node.contentWindow
+                if ( node.src === src )
+                    if ( contentWindow )
+                        resolve( ( message: unknown ) => contentWindow.postMessage( message, "*" ) )
+                    else
+                        reject( "no contentWindow" )
+            } )
+        }
+    }, { once: true } )
+} )
 
+window.addEventListener( "message", ( message ) => {
+    console.log( "message from sandbox", message )
+    if ( message.data.result )
+        browser.runtime.sendMessage( message.data )
+} )
 
-import { Readability } from "@mozilla/readability"
-const doc = new Readability( document ).parse()
-console.log( doc )
-
-browser.runtime.onMessage.addListener( ( message, sender ) => {
-    console.log( message, sender )
+browser.runtime.onMessage.addListener( async message => {
+    console.log( "message from popup", message );
+    ( await sandbox )( { ...message, context: document.body.innerText } )
 } )

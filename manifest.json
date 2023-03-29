@@ -3,35 +3,34 @@
     "name": "Valet",
     "version": "1.0.0",
     "icons": {
-      "16": "white-icon.svg"
+      "16": "icons/white-icon.svg"
     },
     "action": {
-      "default_icon": {
-        "16": "white-icon.svg"
-      },
-      "default_popup": "src/popup.html"
+    "default_icon": {
+        "16": "icons/white-icon.svg"
+    },
+    "default_popup": "src/popup/index.html"
     },
     "background": {
-      "service_worker": "src/background.ts",
-      "type": "module"
+        "service_worker": "src/background.ts",
+        "type": "module"
     },
     "content_scripts": [
-      {
-        "matches": ["*://*/*"],
-        "js": ["src/content-script.ts"],
-        "run_at": "document_start",
-        "all_frames": true,
-        "match_about_blank": true,
-        "type": "module"
-      }
+        {
+            "matches": ["<all_urls>"],
+            "js": ["src/content-script.ts"],
+            "all_frames": true,
+            "match_about_blank": true,
+            "type": "module"
+        }
     ],
     "web_accessible_resources": [
-      {
-        "resources": ["src/sandbox.html", "public/*"],
-        "matches": ["*://*/*"]
-      }
+        {
+            "resources": ["src/sandbox.html", "public/*"],
+            "matches": ["<all_urls>"]
+        }
     ],
     "sandbox": {
-      "pages": ["src/sandbox.html"]
+    "pages": ["src/sandbox.html"]
     }
-  }
+}

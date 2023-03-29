@@ -1,36 +1,30 @@
 import { pipeline } from "@xenova/transformers"
+import winkNLP from "wink-nlp"
+import model from "wink-eng-lite-web-model"
+const { readDoc } = winkNLP( model )
 
-const phrases = [
-    "Canine nutrition",
-    "Dog mood",
-    "Hot dog",
-]
-const query = "Dog food"
+// const summarizationPipe = pipeline( "summarization", "facebook/bart-large-cnn" )
+// const summarize = async ( text: string ) => ( await summarizationPipe )( `summarize: ${ text }` )
 
-const run = async () => {
-    const qa = await pipeline( "question-answering", "distilbert-base-cased-distilled-squad" )
-    console.log( await qa( "Is X a man or a woman?", "X is Alice's father." ) )
-    // const textGeneration = await pipeline('text-generation', 'distilgpt2')
-    // console.log(await textGeneration('Who is sitting next to Bob?'))
-    // const embeddings = await pipeline('embeddings', 'sentence-transformers/all-distilroberta-v1')
-    // console.log(await embeddings('Who is sitting next to Bob?'))
-    // const summarization = await pipeline( "summarization", "facebook/bart-large-cnn" )
-    // console.log( await summarization( "In order to do something interesting with the sandboxed file, we need to load it in a context where it can be addressed by the extension's code. Here, sandbox.html has been loaded into the extension's Event Page (eventpage.html) via an iframe. eventpage.js contains code that sends a message into the sandbox whenever the browser action is clicked by finding the iframe on the page, and executing the postMessage method on its contentWindow. The message is an object containing two properties: context and command. We'll dive into both in a moment." ) )
-}
-window.addEventListener( "message", message => {
-    console.log( message, message.source === window, message.target === window, message.currentTarget === window )
-    // message.source?.postMessage({ from: "sandbox" })
+const embeddingsPipe = pipeline( "embeddings", "sentence-transformers/all-distilroberta-v1" )
+const embed = async ( text: string ) => ( await ( await embeddingsPipe )( text ) ).data
+
+window.addEventListener( "message", async ( { data } ) => {
+    console.log( "in sandbox", data )
+    if ( typeof data === "object" && data.query && data.context ) {
+        const queryEmbeddings = await embed( data.query )
+        const slices = readDoc( data.context ).sentences().out()
+        const slicesWithPreviousAndNext = Array.from( { length: slices.length - 2 } ).map( ( _, index ) => `${ slices[ index ] }${ slices[ index + 1 ] }${ slices[ index + 2 ] }` )
+        const result = ( await Promise.all( slicesWithPreviousAndNext.map( async ( slice, i ) => {
+            const embeddings = await embed( slice )
+            console.log( "Done", i, slicesWithPreviousAndNext.length, embeddings )
+            const similarity = embeddings.reduce( ( acc, val, index ) => acc + val * queryEmbeddings[ index ], 0 )
+            return { slice, similarity }
+        } ) ) ).sort( ( a, b ) => b.similarity - a.similarity )
+        parent.postMessage( { result }, "*" )
+    } else
+        console.log( "not a question" )
+
 } )
-run()
-if ( document ) {
-    let a: number
-    a = 6
-    console.log( "ok", a )
-    document.body.textContent = "Hello World"
-}
 
-setInterval( function() {
-    // Send the message "Hello" to the parent window
-    // ...if the domain is still "davidwalsh.name"
-    parent.postMessage( "Hello", "http://davidwalsh.name" )
-}, 3000 )
+parent.postMessage( "ready", "*" )
