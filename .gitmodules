@@ -1,3 +1,0 @@
-[submodule "public/models/onnx"]
-	path = public/models/onnx
-	url = https://huggingface.co/Xenova/transformers.js

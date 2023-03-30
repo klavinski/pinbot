@@ -7,15 +7,3 @@
     display: grid;
     grid-template-columns: auto auto 1fr auto auto;
 }
-
-.input {
-    border: calc( 2em / 18 ) solid #7774;
-    border-radius: calc( 4em / 18 );
-    background-color: #fff;
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-}
-
-.input:focus-within {
-    border-color: #4af;
-}

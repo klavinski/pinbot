@@ -6,16 +6,19 @@
   "scripts": {
     "dev": "vite build --watch",
     "build": "vite build",
-    "models": "git -C public/models/onnx config core.sparseCheckout true && cp models .git/modules/public/models/onnx/info/sparse-checkout && git submodule update --checkout --force public/models/onnx",
+    "models": "",
     "preview": "vite preview"
   },
   "dependencies": {
     "@mozilla/readability": "^0.4.3",
     "@tabler/icons-react": "^2.11.0",
     "@xenova/transformers": "github:klavinski/transformers.js",
+    "lucide-react": "^0.129.0",
     "pretendard": "^1.3.6",
     "react": "^18.2.0",
+    "react-calendar": "^4.1.0",
     "react-dom": "^18.2.0",
+    "untitled-ui-icons": "^1.0.14",
     "voy-search": "^0.1.3",
     "webextension-polyfill": "^0.10.0",
     "wink-eng-lite-web-model": "^1.5.0",

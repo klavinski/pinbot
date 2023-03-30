@@ -1,0 +1,7 @@
+.container {
+    all: inherit;
+    outline: none;
+    border: none;
+    border-radius: 0;
+    width: 100%;
+}

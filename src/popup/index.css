@@ -1,5 +1,9 @@
 @import "pretendard/dist/web/static/pretendard-dynamic-subset.css";
 
+:root {
+    --focus: #4af;
+}
+
 * {
     box-sizing: border-box;
     transition: all 0.2s ease-in-out;
@@ -12,10 +16,4 @@ body {
     line-height: calc( 24em / 18 );
     margin: 0;
     width: 400px;
-}
-
-input {
-    all: inherit;
-    outline: none;
-    border: none;
 }

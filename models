@@ -1,4 +1,1 @@
-quantized/sentence-transformers/all-distilroberta-v1
-quantized/distilgpt2/causal-lm-with-past
-quantized/EleutherAI/gpt-neo-125M/causal-lm-with-past
-quantized/facebook/bart-large-cnn
+quantized/sentence-transformers/all-MiniLM-L6-v2

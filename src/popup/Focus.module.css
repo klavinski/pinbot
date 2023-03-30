@@ -1,0 +1,10 @@
+.container {
+    border: calc( 2em / 18 ) solid #7774;
+    border-radius: calc( 4em / 18 );
+    display: grid;
+    background-color: #fff;
+}
+
+.container:focus-within {
+    border-color: var( --focus );
+}
