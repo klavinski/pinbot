@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import browser from "webextension-polyfill"
-import { IconArrowRight, IconFilter, IconMoodSmile, IconSearch, IconWorldWww } from "@tabler/icons-react"
-import { IconCalendar } from "untitled-ui-icons"
+import { AnimatePresence, motion } from "framer-motion"
+import { IconArrowRight, IconCalendar, IconDotsCircleHorizontal, IconFilter, IconFilterOff, IconMoodSmile, IconSearch, IconWorldWww } from "@tabler/icons-react"
 import icon from "../../icons/black-icon.svg"
 import { Input } from "./Input"
 import { Focus } from "./Focus"
@@ -19,6 +19,7 @@ export const Popup = () => {
     const [ input, setInput ] = useState( "" )
     const [ output, setOutput ] = useState( "" )
     const [ isLoading, setIsLoading ] = useState( false )
+    const [ isFiltered, setIsFiltered ] = useState( false )
     useEffect( () => {
         const handler = ( message: unknown ) => {
             if ( typeof message === "object" && message !== null && "result" in message && typeof message.result ) {
@@ -29,6 +30,7 @@ export const Popup = () => {
         browser.runtime.onMessage.addListener( handler )
         return () => browser.runtime.onMessage.removeListener( handler )
     }, [] )
+    const FilterButton = isFiltered ? IconFilterOff : IconFilter
     return <div className={ styles.container }>
         <div className={ styles.header }>
             <img src={ icon }/><div>Valet</div>
@@ -36,7 +38,7 @@ export const Popup = () => {
             <IconMoodSmile/><div>My account</div>
         </div>
         <Focus style={ { gridTemplateColumns: "auto 1fr auto" } }>
-            <IconFilter/>
+            <FilterButton onClick={ () => setIsFiltered( ! isFiltered ) }/>
             <Input
                 autoFocus
                 disabled={ isLoading }
@@ -51,16 +53,21 @@ export const Popup = () => {
             />
             <IconSearch onClick={ () => sendQuery( input ) }/>
         </Focus>
-        <Focus style={ { gridTemplateColumns: "auto 1fr" } }>
-            <IconWorldWww/>
-            <Input placeholder="Comma-separated URLs"/>
-        </Focus>
-        <Focus style={ { gridTemplateColumns: "auto 1fr auto 1fr" } }>
-            <IconCalendar/>
-            <Input placeholder="From"/>
-            <IconArrowRight/>
-            <Input placeholder="To"/>
-        </Focus>
+        { isFiltered && <>
+            <Focus style={ { gridTemplateColumns: "auto 1fr" } }>
+                <IconWorldWww/>
+                <Input placeholder="Comma-separated URLs"/>
+            </Focus>
+            <Focus style={ { gridTemplateColumns: "auto 1fr auto 1fr" } }>
+                <IconCalendar/>
+                <Input placeholder="From"/>
+                <IconArrowRight/>
+                <Input placeholder="To"/>
+            </Focus>
+        </> }
         { output }
+        <div>
+            Made by Kamil Szczerba — Leave feedback
+        </div>
     </div>
 }
