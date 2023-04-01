@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
 import browser from "webextension-polyfill"
-import { AnimatePresence, motion } from "framer-motion"
-import { IconArrowRight, IconCalendar, IconDotsCircleHorizontal, IconFilter, IconFilterOff, IconMoodSmile, IconSearch, IconWorldWww } from "@tabler/icons-react"
+import { IconArrowRight, IconCalendar, IconFilter, IconFilterOff, IconMoodSmile, IconSearch, IconWorldWww } from "@tabler/icons-react"
 import icon from "../../icons/black-icon.svg"
 import { Input } from "./Input"
 import { Focus } from "./Focus"

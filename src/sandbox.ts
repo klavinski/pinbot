@@ -4,7 +4,7 @@ import model from "wink-eng-lite-web-model"
 const { readDoc } = winkNLP( model )
 
 const embeddingsPipe = pipeline( "embeddings", "sentence-transformers/all-MiniLM-L6-v2" )
-const embed = async ( text: string ) => ( await ( await embeddingsPipe )( text ) ).data
+const embed = async ( ...texts: string[] ) => ( await ( await embeddingsPipe )( ...texts ) ).data
 
 window.addEventListener( "message", async ( { data } ) => {
     console.log( "in sandbox", data )
@@ -23,13 +23,13 @@ window.addEventListener( "message", async ( { data } ) => {
         //     const similarity = embeddings.reduce( ( acc, val, index ) => acc + val * queryEmbeddings[ index ], 0 )
         //     return { slice, similarity }
         // } ) ) )
-        // console.timeEnd( "Embedding slices" )
-        // console.time( "Sorting" )
-        // result.sort( ( a, b ) => b.similarity - a.similarity )
-        // console.timeEnd( "Sorting" )
-        const [ embeddings ] = [ await embed( data.context ) ]
-        const similarity = embeddings.reduce( ( acc, val, index ) => acc + val * queryEmbeddings[ index ], 0 )
-        parent.postMessage( { result: similarity }, "*" )
+        console.log( await embed( ...slicesWithPreviousAndNext ) )
+        const result = ( await embed( ...slicesWithPreviousAndNext ) ).map( ( embeddings, i ) => ( { slice: slicesWithPreviousAndNext[ i ], similarity: embeddings.reduce( ( acc, val, index ) => acc + val * queryEmbeddings[ index ], 0 ) } ) )
+        console.timeEnd( "Embedding slices" )
+        console.time( "Sorting" )
+        result.sort( ( a, b ) => b.similarity - a.similarity )
+        console.timeEnd( "Sorting" )
+        parent.postMessage( { result }, "*" )
     } else
         console.log( "not a question" )
 

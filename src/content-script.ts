@@ -1,7 +1,5 @@
-import { Readability } from "@mozilla/readability"
 import * as browser from "webextension-polyfill"
 const src = browser.runtime.getURL( "src/sandbox.html" )
-browser.runtime.getURL( "src/sandbox.ts" )
 
 const iframe = document.createElement( "iframe" )
 iframe.src = src
@@ -34,3 +32,18 @@ browser.runtime.onMessage.addListener( async message => {
     console.log( "message from popup", message );
     ( await sandbox )( { ...message, context: document.body.innerText } )
 } )
+
+// import init from "@geoffreylitt/wa-sqlite-async"
+
+// export const initDB = ( async () => {
+//     console.log( browser.runtime.getURL( "/wasm/wa-sqlite-async.wasm" ) )
+//     const sqlite = await init( file => browser.runtime.getURL( "/wasm/wa-sqlite-async.wasm" ) )
+//     const DB = await sqlite.open( ":memory:" )
+//     await DB.exec( "CREATE VIRTUAL TABLE posts USING FTS5(title, body);" )
+//     await DB.exec( `INSERT INTO posts(title,body)
+//     VALUES('Learn SQlite FTS5','This tutorial teaches you how to perform full-text search in SQLite using FTS5'),
+//     ('Advanced SQlite Full-text Search','Show you some advanced techniques in SQLite full-text searching'),
+//     ('SQLite Tutorial','Help you learn SQLite quickly and effectively');` )
+//     console.log( await DB.exec( "SELECT * FROM posts;" ) )
+//     return DB
+// } )()
