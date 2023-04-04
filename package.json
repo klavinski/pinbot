@@ -24,6 +24,8 @@
     "react": "^18.2.0",
     "react-calendar": "^4.1.0",
     "react-dom": "^18.2.0",
+    "sqlite-wasm-esm": "^0.0.30",
+    "sqlite-wasm-http": "^1.1.1",
     "untitled-ui-icons": "^1.0.14",
     "voy-search": "^0.1.3",
     "webextension-polyfill": "^0.10.0",
