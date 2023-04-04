@@ -7,4 +7,5 @@ const run = async () => {
         url: browser.runtime.getURL( "src/offscreen.html" ),
     } )
 }
+
 run()

@@ -1,9 +1,7 @@
 import Worker from "./worker.ts?worker"
 
-function init() {
+async function init() {
     const worker = new Worker()
-    console.log( worker )
-
 }
 
 init()

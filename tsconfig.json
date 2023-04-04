@@ -16,6 +16,6 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "public/worker.js"],
+  "include": ["src", "public/worker.js", "src/fiddle-module.js"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
