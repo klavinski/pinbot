@@ -1,3 +1,13 @@
 import browser from "webextension-polyfill"
 
-browser.runtime.sendMessage( { body: document.body.innerText } )
+let lastSentBody = ""
+
+const sendBody = () => {
+    const body = document.body.innerHTML
+    if ( body !== lastSentBody ) {
+        lastSentBody = body
+        browser.runtime.sendMessage( { body: document.body.innerText } )
+    }
+}
+
+browser.runtime.onMessage.addListener( sendBody )

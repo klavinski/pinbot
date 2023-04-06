@@ -5,7 +5,7 @@ import { Input } from "./Input.tsx"
 import { Focus } from "./Focus.tsx"
 import "./index.css"
 import styles from "./Popup.module.css"
-import { usePopup } from "../api.ts"
+import { usePopup } from "./api.ts"
 
 export const Popup = () => {
     const [ input, setInput ] = useState( "" )

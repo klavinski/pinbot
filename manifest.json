@@ -34,7 +34,7 @@
         "value": "same-origin"
     },
     "host_permissions": ["<all_urls>"],
-    "permissions": ["offscreen"],
+    "permissions": ["offscreen", "tabs"],
     "web_accessible_resources": [
         {
             "resources": ["src/sandbox.html", "*"],
