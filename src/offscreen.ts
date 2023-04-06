@@ -1,6 +1,5 @@
 import { z } from "zod"
 import Worker from "./worker.ts?worker"
-import { onBrowserMessageTo } from "./api.ts"
 // import { createSQLiteThread } from "sqlite-wasm-http"
 
 async function init() {
@@ -26,30 +25,28 @@ const sandbox = new Promise<Window>( ( resolve, reject ) => {
 } )
 iframe.src = browser.runtime.getURL( "src/sandbox.html" )
 
-const sendMessage = ( message: unknown, to: string ) => new Promise( async resolve => {
-    const uuid = crypto.randomUUID()
+const embed = ( text: string ) => new Promise<Float32Array>( async resolve => {
     const controller = new AbortController()
-    window.addEventListener( "message", event => {
-        const parseResult = z.object( { data: z.any(), to: z.literal( "offscreen" ), uuid: z.literal( uuid ) } )
-            .safeParse( event.data )
-        if ( "data" in parseResult ) {
+    window.addEventListener( "message", ( { data } ) => {
+        try {
+            const { embeddings } = z.object( { text: z.literal( text ), embeddings: z.instanceof( Float32Array ) } ).parse( data )
             controller.abort()
-            resolve( parseResult.data )
+            resolve( embeddings )
         }
-        else
-            console.log( event.data, "parsing in offscreen" )
+        catch ( e ) {}
     }, { signal: controller.signal } );
-    ( await sandbox ).postMessage( { message, from: "offscreen", to, uuid }, "*" )
+    ( await sandbox ).postMessage( text, "*" )
 } )
 
-const onMessage = onBrowserMessageTo( "offscreen" )
-onMessage( async message => {
-    console.log( message, "in offscreen" )
-    if ( typeof message === "object" && message !== null && "query" in message ) {
-        const { embeddings } = await sendMessage( message, "sandbox" )
-        return embeddings
+chrome.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {
+    if ( typeof message === "object" && message !== null && "query" in message )
+        embed( message.query ).then( sendResponse )
+    else {
+        const contentScriptParsed = z.object( { body: z.string() } ).safeParse( message )
+        if ( "data" in contentScriptParsed )
+            console.log( "storing", { body: contentScriptParsed.data.body, title: sender.tab?.title, embeddings: "TODO", url: sender.tab?.url } )
+        else
+            console.log( message, "misunderstood in offscreen" )
     }
-    else
-        console.log( message, "in offscreen" )
-    return "handled message"
+    return true
 } )

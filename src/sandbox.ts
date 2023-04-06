@@ -5,15 +5,13 @@ const embeddingsPipe = pipeline( "embeddings", "sentence-transformers/all-MiniLM
 const embed = async ( text: string ) => ( await ( await embeddingsPipe )( text ) ).data
 
 window.addEventListener( "message", async ( { data } ) => {
-    console.log( data, "in sandbox" )
-    try {
-        const { message: { query }, } = z.object( { message: z.object( { query: z.string() } ) } ).parse( data )
+    if ( typeof data === "string" ) {
         parent.postMessage( {
-            ...data,
-            embeddings: await embed( query )
+            text: data,
+            embeddings: await embed( data )
         }, "*" )
-    } catch ( e ) {
-        console.error( e, "in sandbox" )
+    } else {
+        console.error( data, "in sandbox" )
     }
 } )
 

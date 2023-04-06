@@ -29,11 +29,11 @@ export const Popup = () => {
                 onChange={ e => setInput( e.target.value ) }
                 onKeyUp={ e => {
                     if ( e.key === "Enter" && input !== "" ) {
-                        embed( input )
+                        embed( input ).then( embeddings => setOutput( JSON.stringify( embeddings ) ) )
                     }
                 } }
             />
-            <SearchButton onClick={ () => embed( input ).then( embeddings => console.log( "embeddings", embeddings ) ) }/>
+            <SearchButton onClick={ () => embed( input ).then( embeddings => setOutput( JSON.stringify( embeddings ) ) ) }/>
         </Focus>
         { isFiltered && <>
             <Focus style={ { gridTemplateColumns: "auto 1fr" } }>
