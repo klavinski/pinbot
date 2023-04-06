@@ -33,6 +33,7 @@
     "cross_origin_opener_policy": {
         "value": "same-origin"
     },
+    "host_permissions": ["<all_urls>"],
     "permissions": ["offscreen"],
     "web_accessible_resources": [
         {
