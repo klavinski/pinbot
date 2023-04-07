@@ -1,5 +1,4 @@
 import { pipeline } from "@xenova/transformers"
-import { z } from "zod"
 
 const embeddingsPipe = pipeline( "embeddings", "sentence-transformers/all-MiniLM-L6-v2" )
 const embed = async ( text: string ) => ( await ( await embeddingsPipe )( text ) ).data

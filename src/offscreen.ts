@@ -4,10 +4,9 @@ import Worker from "./worker.ts?worker"
 
 async function init() {
     // const db = await createSQLiteThread()
-    const worker = new Worker()
 }
 
-init()
+const worker = new Worker()
 
 import winkNLP from "wink-nlp"
 import model from "wink-eng-lite-web-model"
@@ -38,15 +37,27 @@ const embed = ( text: string ) => new Promise<Float32Array>( async resolve => {
     ( await sandbox ).postMessage( text, "*" )
 } )
 
+const query = ( query: Float32Array ) => new Promise( async resolve => {
+    const controller = new AbortController()
+    worker.addEventListener( "message", ( { data } ) => {
+        const parsing = z.object( { query: z.instanceof( Float32Array ).refine( array => array.length === query.length && query.every( ( value, i ) => array[ i ] === value ) ), results: z.array( z.unknown() ) } ).safeParse( data )
+        if ( parsing.success ) {
+            controller.abort()
+            resolve( parsing.data.results )
+        }
+    }, { signal: controller.signal } )
+    worker.postMessage( { query } )
+} )
+
 chrome.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {
-    if ( typeof message === "object" && message !== null && "query" in message )
-        embed( message.query ).then( sendResponse )
-    else {
-        const contentScriptParsed = z.object( { body: z.string() } ).safeParse( message )
-        if ( "data" in contentScriptParsed )
-            console.log( "storing", { body: contentScriptParsed.data.body, title: sender.tab?.title, embeddings: "TODO", url: sender.tab?.url } )
-        else
-            console.log( message, "misunderstood in offscreen" )
+    const queryParsing = z.object( { query: z.string() } ).safeParse( message )
+    if ( queryParsing.success ) {
+        embed( queryParsing.data.query ).then( query ).then( sendResponse )
+        return true
     }
-    return true
+    const storeParsing = z.object( { body: z.string() } ).safeParse( message )
+    if ( storeParsing.success )
+        embed( storeParsing.data.body ).then( embeddings =>
+            worker.postMessage( { store: { body: storeParsing.data.body, title: sender.tab?.title ?? null, embeddings, url: sender.tab?.url ?? null } } )
+        )
 } )

@@ -7,3 +7,33 @@
     display: grid;
     grid-template-columns: auto auto 1fr auto auto;
 }
+
+.result {
+}
+
+.body, .info {
+    color: #777;
+}
+
+.info {
+    display: flex;
+    gap: 0.5em;
+}
+
+.info > * {
+    display: flex;
+}
+
+.title {
+    font-weight: bold;
+}
+
+.url {
+    text-decoration: underline;
+    text-decoration-color: #777;
+    color: var( --focus );
+}
+
+.url:hover {
+    text-decoration-color: var( --focus );
+}
