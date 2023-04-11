@@ -1,8 +1,9 @@
 .container {
     border: calc( 2em / 18 ) solid #7774;
-    border-radius: calc( 4em / 18 );
+    border-radius: calc( 8em / 18 );
     display: grid;
     background-color: #fff;
+    padding: calc( 2em / 18 ) calc( 3em / 18 );
 }
 
 .container:focus-within {

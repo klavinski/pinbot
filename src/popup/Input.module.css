@@ -1,7 +1,8 @@
 .container {
-    all: inherit;
+    font-size: inherit;
     outline: none;
     border: none;
     border-radius: 0;
     width: 100%;
+    resize: none;
 }

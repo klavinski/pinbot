@@ -8,5 +8,5 @@ chrome.offscreen.createDocument( {
 
 browser.tabs.onUpdated.addListener( ( tabId, { status } ) => {
     if ( status === "complete" )
-        browser.tabs.sendMessage( tabId, "please send the page body to offscreen" )
+        setTimeout( () => browser.tabs.sendMessage( tabId, "please send the page body to offscreen" ), 1000 )
 } )

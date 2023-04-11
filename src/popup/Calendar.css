@@ -1,0 +1,24 @@
+.react-calendar {
+    border: none;
+}
+
+.react-calendar__tile {
+    border-radius: calc( 16em / 18 );
+}
+
+.react-calendar__month-view__days__day--weekend {
+    color: var( --red );
+}
+
+
+.react-calendar__tile--now,
+.react-calendar__tile--now:enabled:hover,
+.react-calendar__tile--now:enabled:focus {
+    background-color: var( --yellow );
+}
+
+.react-calendar__tile--active,
+.react-calendar__tile--active:enabled:hover,
+.react-calendar__tile--active:enabled:focus {
+    background-color: var( --focus );
+}

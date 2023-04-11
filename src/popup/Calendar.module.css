@@ -1,0 +1,17 @@
+.background {
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    backdrop-filter: brightness( 0.9 ) blur( 0.5em );
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    border: calc( 2em / 18 ) solid #7774;
+    box-shadow: 0 0 1em #7774;
+    border-radius: calc( 16em / 18 );
+    overflow: hidden;
+}

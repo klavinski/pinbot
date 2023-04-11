@@ -56,8 +56,10 @@ chrome.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {
         return true
     }
     const storeParsing = z.object( { body: z.string() } ).safeParse( message )
-    if ( storeParsing.success )
-        embed( storeParsing.data.body ).then( embeddings =>
-            worker.postMessage( { store: { body: storeParsing.data.body, title: sender.tab?.title ?? null, embeddings, url: sender.tab?.url ?? null } } )
+    if ( storeParsing.success ) {
+        const sentences = readDoc( storeParsing.data.body ).sentences().out()
+        Promise.all( sentences.map( async sentence => ( { embeddings: await embed( sentence ), sentence } ) ) ).then( content =>
+            worker.postMessage( { store: { content, title: sender.tab?.title ?? null, url: sender.tab?.url ?? null } } )
         )
+    }
 } )

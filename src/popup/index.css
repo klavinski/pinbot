@@ -1,13 +1,22 @@
 @import "pretendard/dist/web/static/pretendard-dynamic-subset.css";
 
+@font-face {
+    font-family: "Julia Mono";
+    src: url( "./JuliaMono-Regular.woff2" );
+}
+
 :root {
     --focus: #4af;
+    --red: #c40233;
+    --yellow: #ffd300;
 }
 
 * {
     box-sizing: border-box;
     transition: all 0.2s ease-in-out;
     font-feature-settings: "cv05", "kern", "calt", "ccmp", "frac";
+    font-family: "Pretendard";
+    text-underline-offset: calc( 2em / 18 );
 }
 
 a {
@@ -16,9 +25,24 @@ a {
 }
 
 body {
-    font-family: "Pretendard";
     font-size: 18px;
     line-height: calc( 24em / 18 );
     margin: 0;
     width: 600px;
+}
+
+code {
+    font-family: "Julia Mono";
+}
+
+svg {
+    flex-shrink: 0;
+}
+
+.react-calendar {
+    border: 2px solid #7774;
+}
+
+abbr[title] {
+    text-decoration: none;
 }

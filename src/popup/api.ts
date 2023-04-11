@@ -3,7 +3,11 @@ import browser from "webextension-polyfill"
 import { z } from "zod"
 
 const parser = z.array( z.object( {
-    body: z.string(),
+    sentences: z.array( z.object( {
+        sentence: z.string(),
+        score: z.number(),
+        part: z.number(),
+    } ) ),
     date: z.number(),
     score: z.number(),
     title: z.string().nullable(),
