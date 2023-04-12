@@ -1,14 +1,10 @@
 @import "pretendard/dist/web/static/pretendard-dynamic-subset.css";
 
-@font-face {
-    font-family: "Julia Mono";
-    src: url( "./JuliaMono-Regular.woff2" );
-}
-
 :root {
     --focus: #4af;
     --red: #c40233;
     --yellow: #ffd300;
+    --gold: #b39c7f;
 }
 
 * {
@@ -31,8 +27,8 @@ body {
     width: 600px;
 }
 
-code {
-    font-family: "Julia Mono";
+input {
+    background-color: transparent;
 }
 
 svg {

@@ -1,6 +1,6 @@
 import { ChangeEvent, useState } from "react"
 import { IconArrowRight, IconCalendar, IconCircleMinus, IconCirclePlus, IconClockHour4, IconMoodAnnoyed, IconMoodCry, IconMoodEmpty, IconMoodSad, IconMoodSmile, IconQuote, IconQuoteOff, IconSearch, IconWorldOff, IconWorldWww, IconX } from "@tabler/icons-react"
-import icon from "../../icons/black-icon.svg"
+import { ReactComponent as Icon } from "../../icons/black-icon.svg"
 import { Input } from "./Input.tsx"
 import { Focus } from "./Focus.tsx"
 import "./index.css"
@@ -8,6 +8,7 @@ import styles from "./Popup.module.css"
 import { usePopup } from "./api.ts"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { Calendar } from "./Calendar.tsx"
+import { IconSliders04 } from "untitled-ui-icons"
 
 const Confidence = ( { score }: { score: number } ) => <div>
     { score >= 0.8 ? <IconMoodSmile/> :
@@ -40,11 +41,19 @@ export const Popup = () => {
     const ExactInfoButton = shown.exactInfo ? IconQuoteOff : IconQuote
     const UrlInfoButton = shown.urlInfo ? IconWorldOff : IconWorldWww
     const [ parent ] = useAutoAnimate()
-    return <div className={ styles.container } ref={ parent }>
+    return <div className={ styles.container } ref={ parent } onKeyUp={ e => {
+        if ( e.key === "Enter" && fields.query !== "" ) {
+            query( fields.query ).then( setOutput )
+        }
+    } }>
         <div className={ styles.header }>
-            <img src={ icon }/><div>Valet</div>
             <div/>
-            <IconMoodSmile/><div>My account</div>
+            <div className={ styles.title }>
+                <Icon/><div>VALET</div>
+            </div>
+            <div className={ styles.myAccount }>
+                <IconSliders04/><div>My account</div>
+            </div>
         </div>
         <Focus style={ { gridTemplateColumns: "auto 1fr auto" } }>
             <FieldsButton onClick={ () => setShown( { ...shown, fields: ! shown.fields } ) }/>
@@ -54,11 +63,6 @@ export const Popup = () => {
                 placeholder="Natural language search"
                 value={ fields.query }
                 onChange={ e => setFields( { ...fields, query: e.target.value } ) }
-                onKeyUp={ e => {
-                    if ( e.key === "Enter" && fields.query !== "" ) {
-                        query( fields.query ).then( setOutput )
-                    }
-                } }
             />
             { fields.query.length === 0 ? <div/> : output.length === 0 ? <SearchButton onClick={ () => query( fields.query ).then( setOutput ) }/> :
                 <IconX onClick={ () => setOutput( [] ) }/> }
@@ -68,7 +72,7 @@ export const Popup = () => {
                 <ExactInfoButton onClick={ () => setShown( { ...shown, exactInfo: ! shown.exactInfo } ) }/>
                 <Input placeholder="Exact search"/>
             </Focus>
-            { shown.exactInfo && <div>Example: <code>"exact query" -"query to exclude" "prefix*"</code></div> }
+            { shown.exactInfo && <div>Example: <div className={ styles.quote }>"exact query" -"query to exclude" "prefix*"</div></div> }
             <Focus style={ { gridTemplateColumns: "auto 1fr" } }>
                 <UrlInfoButton onClick={ () => setShown( { ...shown, urlInfo: ! shown.urlInfo } ) }/>
                 <Input
@@ -78,7 +82,7 @@ export const Popup = () => {
                     value={ fields.urls }
                 />
             </Focus>
-            { shown.urlInfo && <div>Example: <code>https://wikipedia.org<br/>app.slack.com/client/team-id/channel-id</code></div> }
+            { shown.urlInfo && <div>Example: <div className={ styles.quote }>https://wikipedia.org<br/>app.slack.com/client/team-id/channel-id</div></div> }
             <Focus style={ { gridTemplateColumns: "auto 1fr auto 1fr" } }>
                 <IconCalendar/>
                 <Input
