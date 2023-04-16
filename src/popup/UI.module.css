@@ -1,0 +1,29 @@
+.container {
+    display: inline-grid;
+    grid-template-columns: auto 1fr auto;
+}
+
+.children {
+    display: grid;
+}
+
+.childrenUrl {
+    color: var( --focus );
+}
+
+.containerUrl {
+    box-shadow: 0 calc( 2em / 18 ) var( --shadow );
+}
+
+.containerUrl:hover {
+    box-shadow: 0 calc( 2em / 18 ) var( --focus );
+}
+
+.containerUrl:active {
+    box-shadow: 0 0 var( --focus );
+    transform: translateY( calc( 2em / 18 ) );
+}
+
+.flex {
+    display: flex;
+}

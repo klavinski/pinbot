@@ -13,7 +13,7 @@ module.exports = {
         "@typescript-eslint/object-curly-spacing": [ "warn", "always" ],
         "@typescript-eslint/space-before-blocks": [ "warn", "always" ],
         "@typescript-eslint/type-annotation-spacing": "warn",
-        "array-bracket-spacing": [ "error", "always" ],
+        "array-bracket-spacing": [ "warn", "always" ],
         "arrow-spacing": [ "warn", { before: true, after: true } ],
         "block-spacing": [ "warn", "always" ],
         "comma-spacing": [ "warn", { before: false, after: true } ],

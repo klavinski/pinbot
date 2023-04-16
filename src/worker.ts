@@ -8,6 +8,7 @@ const init = async () => {
         sqlite.oo1.DB
         // const db = new ( sqlite.oo1.OpfsDb as new ( filename: string, mode: string ) => DB )( "db", "c" )
         const db = new sqlite.oo1.DB() as DB
+        db.exec( "PRAGMA journal_mode = WAL; PRAGMA synchronous = normal; PRAGMA temp_store = memory; PRAGMA mmap_size = 30000000000;" )
         db.exec( "CREATE TABLE IF NOT EXISTS pages (date INTEGER, embeddings BLOB, part INTEGER, sentence TEXT, title TEXT, url TEXT);" )
         // db.exec( "CREATE VIRTUAL TABLE IF NOT EXISTS pages USING FTS5 ( body, date, embeddings, title, url );" )
         return db

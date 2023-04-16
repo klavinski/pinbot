@@ -10,8 +10,8 @@
 }
 
 .container {
-    border: calc( 2em / 18 ) solid #7774;
-    box-shadow: 0 0 1em #7774;
+    border: calc( 2em / 18 ) solid var( --shadow );
+    box-shadow: 0 0 1em var( --shadow );
     border-radius: calc( 16em / 18 );
     overflow: hidden;
 }

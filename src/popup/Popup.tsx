@@ -1,33 +1,47 @@
-import { ChangeEvent, useState } from "react"
-import { IconArrowRight, IconCalendar, IconCircleMinus, IconCirclePlus, IconClockHour4, IconMoodAnnoyed, IconMoodCry, IconMoodEmpty, IconMoodSad, IconMoodSmile, IconQuote, IconQuoteOff, IconSearch, IconWorldOff, IconWorldWww, IconX } from "@tabler/icons-react"
+import { useState } from "react"
+import { IconArrowRight, IconCalendar, IconCircleMinus, IconCirclePlus, IconClockHour4, IconMessageDots, IconMessages, IconMoodAnnoyed, IconMoodCry, IconMoodEmpty, IconMoodSad, IconMoodSmile, IconQuote, IconQuoteOff, IconSearch, IconWorld, IconWorldOff, IconX } from "@tabler/icons-react"
 import { ReactComponent as Icon } from "../../icons/black-icon.svg"
 import { Input } from "./Input.tsx"
 import { Focus } from "./Focus.tsx"
 import "./index.css"
 import styles from "./Popup.module.css"
-import { usePopup } from "./api.ts"
+import { usePopup } from "./oldApi.ts"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { Calendar } from "./Calendar.tsx"
 import { IconSliders04 } from "untitled-ui-icons"
+import { Query } from "./types.ts"
 
-const Confidence = ( { score }: { score: number } ) => <div>
-    { score >= 0.8 ? <IconMoodSmile/> :
+import browser from "webextension-polyfill"
+import { apiAs } from "../../api.ts"
+import { UI } from "./UI.tsx"
+const api = apiAs( "popup", {
+    offscreen: {
+        addListener: browser.runtime.onMessage.addListener,
+        send: browser.runtime.sendMessage
+    }
+} )
+setTimeout( async () => console.log( await api.hello( "from popup" ) ), 2000 )
+
+const initialFields = {
+    query: "",
+    exact: "",
+    from: null,
+    to: null,
+    urls: ""
+} as Query
+
+const Confidence = ( { score }: { score: number } ) => <UI prefix={
+    score >= 0.8 ? <IconMoodSmile/> :
         score >= 0.6 ? <IconMoodEmpty/> :
             score >= 0.4 ? <IconMoodAnnoyed/> :
                 score >= 0.2 ? <IconMoodSad/> :
-                    <IconMoodCry/> }
+                    <IconMoodCry/> }>
     { Math.round( score * 100 ) }% confidence
-</div>
+</UI>
 
 export const Popup = () => {
     const { query, isLoading } = usePopup()
-    const [ fields, setFields ] = useState( {
-        query: "",
-        exact: "",
-        from: null as Date | null,
-        to: null as Date | null,
-        urls: ""
-    } )
+    const [ fields, setFields ] = useState( initialFields )
     const [ output, setOutput ] = useState( [] as Awaited<ReturnType<typeof query>> )
     const [ shown, setShown ] = useState( {
         exactInfo: false,
@@ -39,64 +53,69 @@ export const Popup = () => {
     const FieldsButton = shown.fields ? IconCircleMinus : IconCirclePlus
     const SearchButton = isLoading ? IconClockHour4 : IconSearch
     const ExactInfoButton = shown.exactInfo ? IconQuoteOff : IconQuote
-    const UrlInfoButton = shown.urlInfo ? IconWorldOff : IconWorldWww
+    const UrlInfoButton = shown.urlInfo ? IconWorldOff : IconWorld
     const [ parent ] = useAutoAnimate()
     return <div className={ styles.container } ref={ parent } onKeyUp={ e => {
-        if ( e.key === "Enter" && fields.query !== "" ) {
-            query( fields.query ).then( setOutput )
-        }
+        if ( e.key === "Enter" )
+            query( fields ).then( setOutput )
     } }>
         <div className={ styles.header }>
             <div/>
             <div className={ styles.title }>
-                <Icon/><div>VALET</div>
+                Pin<Icon/>bot
             </div>
-            <div className={ styles.myAccount }>
-                <IconSliders04/><div>My account</div>
-            </div>
+            <UI prefix={ <IconSliders04/> }>My account</UI>
         </div>
-        <Focus style={ { gridTemplateColumns: "auto 1fr auto" } }>
+        <Focus><UI prefix={
             <FieldsButton onClick={ () => setShown( { ...shown, fields: ! shown.fields } ) }/>
+        } suffix={
+            fields.query.length === 0 ? <div/> : output.length === 0 ? <SearchButton onClick={ () => query( fields.query ).then( setOutput ) }/> :
+                <IconX onClick={ () => setOutput( [] ) }/>
+        }>
             <Input
                 autoFocus
                 disabled={ isLoading }
                 placeholder="Natural language search"
                 value={ fields.query }
-                onChange={ e => setFields( { ...fields, query: e.target.value } ) }
+                onChange={ query => setFields( { ...fields, query } ) }
             />
-            { fields.query.length === 0 ? <div/> : output.length === 0 ? <SearchButton onClick={ () => query( fields.query ).then( setOutput ) }/> :
-                <IconX onClick={ () => setOutput( [] ) }/> }
+        </UI>
         </Focus>
         { shown.fields && <>
-            <Focus style={ { gridTemplateColumns: "auto 1fr" } }>
+            <Focus><UI prefix={
                 <ExactInfoButton onClick={ () => setShown( { ...shown, exactInfo: ! shown.exactInfo } ) }/>
-                <Input placeholder="Exact search"/>
+            }>
+                <Input placeholder="Exact search" onChange={ exact => setFields( { ...fields, exact } ) }/>
+            </UI>
             </Focus>
             { shown.exactInfo && <div>Example: <div className={ styles.quote }>"exact query" -"query to exclude" "prefix*"</div></div> }
-            <Focus style={ { gridTemplateColumns: "auto 1fr" } }>
+            <Focus><UI prefix={
                 <UrlInfoButton onClick={ () => setShown( { ...shown, urlInfo: ! shown.urlInfo } ) }/>
+            }>
                 <Input
-                    onChange={ ( e: ChangeEvent<HTMLTextAreaElement> ) => setFields( { ...fields, urls: e.target.value } ) }
+                    onChange={ urls => setFields( { ...fields, urls } ) }
                     placeholder="Newline-separated URL prefixes"
                     rows={ fields.urls.split( "\n" ).length }
                     value={ fields.urls }
                 />
-            </Focus>
+            </UI></Focus>
             { shown.urlInfo && <div>Example: <div className={ styles.quote }>https://wikipedia.org<br/>app.slack.com/client/team-id/channel-id</div></div> }
-            <Focus style={ { gridTemplateColumns: "auto 1fr auto 1fr" } }>
+            <Focus><UI prefix={
                 <IconCalendar/>
+            }>
                 <Input
                     onFocus={ () => setShown( { ...shown, fromCalendar: true } ) }
                     placeholder="From"
                     value={ fields.from ? new Date( fields.from ).toLocaleDateString() : "" }
-                />
+                /></UI><UI prefix={
                 <IconArrowRight/>
+            }>
                 <Input
                     onFocus={ () => setShown( { ...shown, toCalendar: true } ) }
                     placeholder="To"
                     value={ fields.to ? new Date( fields.to ).toLocaleDateString() : "" }
                 />
-            </Focus>
+            </UI></Focus>
             { ( [ "from", "to" ] as const ).map( _ => <Calendar
                 date={ fields[ _ ] }
                 setDate={ newDate => setFields( { ...fields, [ _ ]: newDate } ) }
@@ -106,9 +125,9 @@ export const Popup = () => {
         </> }
         { output.map( page => <div>
             <div className={ styles.info }>
-                <div><IconWorldWww/><a className={ styles.url }>{ page.url }</a></div>
+                <UI prefix={ <IconWorld/> } href={ page.url }>{ page.url }</UI>
                 ⦁
-                <div><IconCalendar/>{ new Date( page.date ).toLocaleDateString() }</div>
+                <UI prefix={ <IconCalendar/> }>{ new Date( page.date ).toLocaleDateString() }</UI>
                 ⦁
                 <Confidence score={ Math.max( ...page.sentences.map( _ => _.score ) ) }/>
             </div>
@@ -116,7 +135,10 @@ export const Popup = () => {
             <div className={ styles.body }>{ page.sentences.map( _ => _.sentence ).join( "... " ) }</div>
         </div> ) }
         <div className={ styles.footer }>
-            Made by Kamil Szczerba — <a className={ styles.url }>Leave feedback</a>
+            Made by Kamil Szczerba —&nbsp;
+            <UI href="https://tally.so/create" prefix={ <IconMessageDots/> }>Leave feedback</UI>
+            &nbsp;—&nbsp;
+            <UI href="https://discord.com/create" prefix={ <IconMessages/> }>Meet the community</UI>
         </div>
     </div>
 }

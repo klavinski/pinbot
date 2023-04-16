@@ -4,7 +4,7 @@
 }
 
 .container {
-    background-color: #eee;
+    background-color: #77777718;
     padding: calc( 24em / 18 );
     display: flex;
     flex-direction: column;
@@ -18,7 +18,9 @@
 }
 
 .footer {
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .body, .info {
@@ -35,13 +37,9 @@
     white-space: nowrap;
 }
 
-.myAccount {
-    display: flex;
-}
-
 .quote {
     border-radius: calc( 8em / 18 );
-    border: calc( 2em / 18 ) solid #7774;
+    border: calc( 2em / 18 ) solid var( --shadow );
     padding: calc( 2em / 18 );
     display: inline-block;
 }
@@ -54,7 +52,7 @@
     color: var( --gold );
 }
 
-.title div {
+.title {
     font-family: "Linotte";
 }
 
@@ -67,14 +65,4 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-
-.url {
-    text-decoration: underline;
-    text-decoration-color: #7774;
-    color: var( --focus );
-}
-
-.url:hover {
-    text-decoration-color: var( --focus );
 }

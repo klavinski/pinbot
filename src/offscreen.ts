@@ -15,6 +15,7 @@ const { readDoc } = winkNLP( model )
 console.log( readDoc( "Hello world! How is it going?" ).sentences().out() )
 
 import * as browser from "webextension-polyfill"
+import { queryParser, storeParser } from "./popup/types.ts"
 
 const iframe = document.querySelector( "iframe" )!
 const sandbox = new Promise<Window>( ( resolve, reject ) => {
@@ -50,16 +51,25 @@ const query = ( query: Float32Array ) => new Promise( async resolve => {
 } )
 
 chrome.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {
-    const queryParsing = z.object( { query: z.string() } ).safeParse( message )
+    const queryParsing = queryParser.safeParse( message )
     if ( queryParsing.success ) {
         embed( queryParsing.data.query ).then( query ).then( sendResponse )
         return true
     }
-    const storeParsing = z.object( { body: z.string() } ).safeParse( message )
+    const storeParsing = storeParser.safeParse( message )
     if ( storeParsing.success ) {
         const sentences = readDoc( storeParsing.data.body ).sentences().out()
         Promise.all( sentences.map( async sentence => ( { embeddings: await embed( sentence ), sentence } ) ) ).then( content =>
             worker.postMessage( { store: { content, title: sender.tab?.title ?? null, url: sender.tab?.url ?? null } } )
         )
+    }
+    console.log( "received in offscreen", message )
+} )
+
+import { apiAs } from "../api.ts"
+const api = apiAs( "offscreen", {
+    "popup": {
+        addListener: browser.runtime.onMessage.addListener,
+        send: browser.runtime.sendMessage
     }
 } )

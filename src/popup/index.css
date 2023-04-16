@@ -1,10 +1,13 @@
 @import "pretendard/dist/web/static/pretendard-dynamic-subset.css";
 
 :root {
-    --focus: #4af;
+    --focus: #5e8cc5;
     --red: #c40233;
     --yellow: #ffd300;
-    --gold: #b39c7f;
+    --gold: #9d938f;
+    --shadow: #77777740;
+    --text: #000;
+    --background: #fff;
 }
 
 * {
@@ -12,7 +15,6 @@
     transition: all 0.2s ease-in-out;
     font-feature-settings: "cv05", "kern", "calt", "ccmp", "frac";
     font-family: "Pretendard";
-    text-underline-offset: calc( 2em / 18 );
 }
 
 a {
@@ -24,10 +26,11 @@ body {
     font-size: 18px;
     line-height: calc( 24em / 18 );
     margin: 0;
-    width: 600px;
+    width: 650px;
+    background-color: var( --background );
 }
 
-input {
+input, textarea {
     background-color: transparent;
 }
 
@@ -36,7 +39,7 @@ svg {
 }
 
 .react-calendar {
-    border: 2px solid #7774;
+    border: calc( 2em / 18 ) solid var( --shadow );
 }
 
 abbr[title] {
