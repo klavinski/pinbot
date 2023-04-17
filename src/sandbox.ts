@@ -1,9 +1,10 @@
 import { pipeline } from "@xenova/transformers"
 
-const embeddingsPipe = pipeline( "embeddings", "sentence-transformers/all-MiniLM-L6-v2" )
-const embed = async ( text: string ) => ( await ( await embeddingsPipe )( text ) ).data
+const pipe = pipeline( "embeddings", "sentence-transformers/all-MiniLM-L6-v2" )
+const embed = async ( text: string ) => ( await ( await pipe )( text ) ).data
 
 window.addEventListener( "message", async ( { data } ) => {
+    console.log( data, "in sandbox" )
     if ( typeof data === "string" ) {
         parent.postMessage( {
             text: data,
@@ -15,3 +16,9 @@ window.addEventListener( "message", async ( { data } ) => {
 } )
 
 parent.postMessage( "sandbox ready", "*" )
+
+import { apiAs } from "./apiAs.ts"
+apiAs( "sandbox", { offscreen: {
+    addListener: listener => window.addEventListener( "message", message => listener( message.data ) ),
+    send: message => window.postMessage( message, "*" )
+} } )

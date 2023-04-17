@@ -6,15 +6,32 @@
     --yellow: #ffd300;
     --gold: #9d938f;
     --shadow: #77777740;
+}
+
+@media( prefers-color-scheme: dark ) {
+    :root {
+        --text: #000;
+        --background: #fff;
+    }
+}
+
+:root[data-isDark="true"] {
+    --text: #fff;
+    --background: #000;
+}
+
+:root[data-isDark="false"] {
     --text: #000;
     --background: #fff;
 }
 
+
+
 * {
     box-sizing: border-box;
-    transition: all 0.2s ease-in-out;
     font-feature-settings: "cv05", "kern", "calt", "ccmp", "frac";
     font-family: "Pretendard";
+    transition: all 0.2s ease-in-out;
 }
 
 a {
@@ -28,9 +45,11 @@ body {
     margin: 0;
     width: 650px;
     background-color: var( --background );
+    color: var( --text );
 }
 
-input, textarea {
+button, input, textarea {
+    color: inherit;
     background-color: transparent;
 }
 

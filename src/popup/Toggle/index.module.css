@@ -1,0 +1,32 @@
+.container {
+    width: calc( 32em / 18 );
+    height: calc( 32em / 18 );
+    padding: calc( 4em / 18 );
+    border-radius: 1000em;
+    display: flex;
+    color: var( --yellow );
+    background: #a3d8f3;
+    overflow: hidden;
+    position: relative;
+}
+
+.dark {
+    background: #2c315d;
+}
+
+.moon {
+    color: #fff;
+    position: absolute;
+}
+
+.moon:not( .dark .moon ) {
+    transform: translateY( calc( -32em / 18 ) );
+}
+
+.sun {
+    color: var( --yellow );
+}
+
+.dark .sun {
+    transform: translateY( calc( 32em / 18 ) );
+}

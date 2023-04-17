@@ -5,22 +5,14 @@ import { Input } from "./Input.tsx"
 import { Focus } from "./Focus.tsx"
 import "./index.css"
 import styles from "./Popup.module.css"
-import { usePopup } from "./oldApi.ts"
+import { usePopup } from "./api.ts"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { Calendar } from "./Calendar.tsx"
 import { IconSliders04 } from "untitled-ui-icons"
 import { Query } from "./types.ts"
 
-import browser from "webextension-polyfill"
-import { apiAs } from "../../api.ts"
 import { UI } from "./UI.tsx"
-const api = apiAs( "popup", {
-    offscreen: {
-        addListener: browser.runtime.onMessage.addListener,
-        send: browser.runtime.sendMessage
-    }
-} )
-setTimeout( async () => console.log( await api.hello( "from popup" ) ), 2000 )
+import { Toggle } from "./Toggle/index.tsx"
 
 const initialFields = {
     query: "",
@@ -64,7 +56,8 @@ export const Popup = () => {
             <div className={ styles.title }>
                 Pin<Icon/>bot
             </div>
-            <UI prefix={ <IconSliders04/> }>My account</UI>
+            <Toggle/>
+            { /* <UI prefix={ <IconSliders04/> }>My account</UI> */ }
         </div>
         <Focus><UI prefix={
             <FieldsButton onClick={ () => setShown( { ...shown, fields: ! shown.fields } ) }/>

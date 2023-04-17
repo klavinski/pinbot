@@ -18,6 +18,6 @@
     "jsx": "react-jsx",
     "plugins": [ { "name": "typescript-plugin-css-modules" } ]
   },
-  "include": ["src", "public/worker.js", "vite.config.ts", "api.ts"],
+  "include": ["src", "public/worker.js", "vite.config.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

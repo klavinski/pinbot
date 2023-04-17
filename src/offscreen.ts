@@ -66,10 +66,22 @@ chrome.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {
     console.log( "received in offscreen", message )
 } )
 
-import { apiAs } from "../api.ts"
+import { apiAs } from "./apiAs.ts"
 const api = apiAs( "offscreen", {
-    "popup": {
-        addListener: browser.runtime.onMessage.addListener,
-        send: browser.runtime.sendMessage
-    }
+    sandbox: {
+        addListener: listener => window.addEventListener( "message", ( { data } ) => listener( data ) ),
+        send: message => {
+            if ( iframe.contentWindow )
+                return iframe.contentWindow.postMessage( message, "*" )
+            else throw new Error( "No content window" )
+        }
+    },
+    // "popup": {
+    //     addListener: browser.runtime.onMessage.addListener,
+    //     send: browser.runtime.sendMessage
+    // }
 } )
+
+setTimeout( async () => {
+    console.log( await api.embed( "hello" ) )
+}, 1000 )

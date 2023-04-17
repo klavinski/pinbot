@@ -22,12 +22,12 @@ type Action<ZT extends ZodType, F extends string, T extends string, R, S extends
 type Spec = { [ action: string ]: Action<ZodType, string, string, unknown, Spec> }
 
 type MakeApi<S extends Spec, F extends S[keyof S]["from"]> = {
-    [action in keyof S]: F extends S[action]["from"] ? ( message: z.infer<S[action]["check"]> ) => Promise<ReturnType<S[action]["handler"]>> : never
+    [action in keyof S]: F extends S[action]["from"] ? ( message: z.infer<S[action]["check"]> ) => Promise<Awaited<ReturnType<S[action]["handler"]>>> : never
 }
 
 const add = <S extends Spec, const N extends string, ZT extends ZodType, const F extends string, const T extends string, R, S2 extends S>( spec: S, name: N, action: Action<ZT, F, T, R, S2> ) => ( { ...spec, [ name ]: action } )
 
-const build = <const S extends Spec>( spec: S ) => <const C extends S[keyof S][ "from" | "to" ], Source extends S[keyof S][ "from" | "to" ]>( source: Source, channels: Record<C, {
+const build = <const S extends Spec>( spec: S ) => <const C extends S[keyof S][ "from" | "to" ], const Source extends S[keyof S][ "from" | "to" ]>( source: Source, channels: Record<C, {
         addListener: ( listener: ( message: unknown ) => void ) => void,
         send: ( message: unknown ) => void
 }> ) => {
@@ -57,18 +57,13 @@ const build = <const S extends Spec>( spec: S ) => <const C extends S[keyof S][ 
     return api
 }
 
-const makeApi = <S extends Spec>( spec: S ) => {
+export const makeApi = <S extends Spec>( spec: S ) => {
     return {
         ...spec,
-        add: <N extends string, ZT extends ZodType, F extends string, T extends string, R, S2 extends S>( name: N, action: Action<ZT, F, T, R, S2> ) => makeApi( add( spec, name, action ) ),
-        build: <const C extends S[keyof S][ "from" | "to" ], Source extends S[keyof S][ "from" | "to" ]>( source: Source, channels: Record<C, {
+        add: <const N extends string, const ZT extends ZodType, const F extends string, const T extends string, const R, const S2 extends S>( name: N, action: Action<ZT, F, T, R, S2> ) => makeApi( add( spec, name, action ) ),
+        build: <const C extends S[keyof S][ "from" | "to" ], const Source extends S[keyof S][ "from" | "to" ]>( source: Source, channels: Record<C, {
             addListener: ( listener: ( message: unknown ) => void ) => void,
             send: ( message: unknown ) => void
     }> ) => build( spec )( source, channels )
     }
 }
-
-export const apiAs = makeApi( {} )
-    .add( "hello", { check: z.string(), from: "popup", handler: x => { const random = Math.ceil( Math.random() * 10 ); console.log( `received ${ x } from popup. sending back ${ random }` ); return random }, to: "offscreen" } ).build
-
-// export const apiAs = build( add( {}, "hello", { check: z.string(), from: "popup", handler: x => { const random = Math.ceil( Math.random() * 10 ); console.log( `received ${ x } from popup. sending back ${ random }` ); return random }, to: "offscreen" } ) )
