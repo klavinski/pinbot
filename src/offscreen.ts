@@ -10,12 +10,10 @@ const worker = new Worker()
 
 import winkNLP from "wink-nlp"
 import model from "wink-eng-lite-web-model"
-const { readDoc } = winkNLP( model )
-
-console.log( readDoc( "Hello world! How is it going?" ).sentences().out() )
+const sentences = ( text: string ) => winkNLP( model ).readDoc( text ).sentences().out()
 
 import * as browser from "webextension-polyfill"
-import { queryParser, storeParser } from "./popup/types.ts"
+import { Query, queryParser, storeParser } from "./popup/types.ts"
 
 const iframe = document.querySelector( "iframe" )!
 const sandbox = new Promise<Window>( ( resolve, reject ) => {
@@ -38,50 +36,31 @@ const embed = ( text: string ) => new Promise<Float32Array>( async resolve => {
     ( await sandbox ).postMessage( text, "*" )
 } )
 
-const query = ( query: Float32Array ) => new Promise( async resolve => {
+const search = ( query: Query & { embeddings: Float32Array } ) => new Promise( async resolve => {
     const controller = new AbortController()
     worker.addEventListener( "message", ( { data } ) => {
-        const parsing = z.object( { query: z.instanceof( Float32Array ).refine( array => array.length === query.length && query.every( ( value, i ) => array[ i ] === value ) ), results: z.array( z.unknown() ) } ).safeParse( data )
+        const parsing = z.object( { results: z.array( z.unknown() ) } ).safeParse( data )
         if ( parsing.success ) {
             controller.abort()
             resolve( parsing.data.results )
         }
     }, { signal: controller.signal } )
-    worker.postMessage( { query } )
+    worker.postMessage( query )
 } )
 
 chrome.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {
     const queryParsing = queryParser.safeParse( message )
     if ( queryParsing.success ) {
-        embed( queryParsing.data.query ).then( query ).then( sendResponse )
+        embed( queryParsing.data.query ).then( embeddings => search( { ...queryParsing.data, embeddings } ) ).then( sendResponse )
         return true
     }
     const storeParsing = storeParser.safeParse( message )
-    if ( storeParsing.success ) {
-        const sentences = readDoc( storeParsing.data.body ).sentences().out()
-        Promise.all( sentences.map( async sentence => ( { embeddings: await embed( sentence ), sentence } ) ) ).then( content =>
-            worker.postMessage( { store: { content, title: sender.tab?.title ?? null, url: sender.tab?.url ?? null } } )
+    const title = sender.tab?.title
+    const url = sender.tab?.url
+    if ( storeParsing.success && title && url ) {
+        Promise.all( sentences( storeParsing.data.body ).map( async sentence => ( { embeddings: await embed( sentence ), sentence } ) ) ).then( content =>
+            worker.postMessage( { store: { content, title, url } } )
         )
     }
     console.log( "received in offscreen", message )
 } )
-
-import { apiAs } from "./apiAs.ts"
-const api = apiAs( "offscreen", {
-    sandbox: {
-        addListener: listener => window.addEventListener( "message", ( { data } ) => listener( data ) ),
-        send: message => {
-            if ( iframe.contentWindow )
-                return iframe.contentWindow.postMessage( message, "*" )
-            else throw new Error( "No content window" )
-        }
-    },
-    // "popup": {
-    //     addListener: browser.runtime.onMessage.addListener,
-    //     send: browser.runtime.sendMessage
-    // }
-} )
-
-setTimeout( async () => {
-    console.log( await api.embed( "hello" ) )
-}, 1000 )

@@ -18,8 +18,8 @@ export const responseParser = z.array( z.object( {
     } ) ),
     date: z.number(),
     score: z.number(),
-    title: z.string().nullable(),
-    url: z.string().nullable(),
+    title: z.string(),
+    url: z.string(),
 } ) )
 
 export const storeParser = z.object( { body: z.string() } )

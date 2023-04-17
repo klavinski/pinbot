@@ -4,7 +4,7 @@ import { Query, responseParser } from "./types.ts"
 
 export const usePopup = () => {
     const [ isLoading, setIsLoading ] = useState( false )
-    const query = async ( query: Query ) => {
+    const search = async ( query: Query ) => {
         setIsLoading( true )
         try {
             const response = responseParser.parse( await browser.runtime.sendMessage( query ) )
@@ -13,5 +13,5 @@ export const usePopup = () => {
         }
         catch ( e ) { throw e }
     }
-    return { query, isLoading }
+    return { search, isLoading }
 }

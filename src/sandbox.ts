@@ -16,9 +16,3 @@ window.addEventListener( "message", async ( { data } ) => {
 } )
 
 parent.postMessage( "sandbox ready", "*" )
-
-import { apiAs } from "./apiAs.ts"
-apiAs( "sandbox", { offscreen: {
-    addListener: listener => window.addEventListener( "message", message => listener( message.data ) ),
-    send: message => window.postMessage( message, "*" )
-} } )

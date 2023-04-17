@@ -1,6 +1,7 @@
 import initSyncSQLite, { DB } from "sqlite-wasm-http/sqlite3.js"
 import { z } from "zod"
 import initSQLite from "./sqlite3-bundler-friendly.mjs"
+import { queryParser } from "./popup/types.ts"
 
 const init = async () => {
     const sqlite = await initSQLite()
@@ -8,7 +9,7 @@ const init = async () => {
         sqlite.oo1.DB
         // const db = new ( sqlite.oo1.OpfsDb as new ( filename: string, mode: string ) => DB )( "db", "c" )
         const db = new sqlite.oo1.DB() as DB
-        db.exec( "PRAGMA journal_mode = WAL; PRAGMA synchronous = normal; PRAGMA temp_store = memory; PRAGMA mmap_size = 30000000000;" )
+        // db.exec( "PRAGMA journal_mode = WAL; PRAGMA synchronous = normal; PRAGMA temp_store = memory; PRAGMA mmap_size = 30000000000;" )
         db.exec( "CREATE TABLE IF NOT EXISTS pages (date INTEGER, embeddings BLOB, part INTEGER, sentence TEXT, title TEXT, url TEXT);" )
         // db.exec( "CREATE VIRTUAL TABLE IF NOT EXISTS pages USING FTS5 ( body, date, embeddings, title, url );" )
         return db
@@ -18,8 +19,9 @@ const init = async () => {
 const db = init()
 
 self.addEventListener( "message", async ( message ) => {
-    const queryParsing = z.object( { query: z.instanceof( Float32Array ) } ).safeParse( message.data )
+    const queryParsing = queryParser.and( z.object( { embeddings: z.instanceof( Float32Array ) } ) ).safeParse( message.data )
     if ( queryParsing.success ) {
+        console.log( "querying" )
         const documents = ( await db ).exec( `
         SELECT date, title, url,
         1 - EXP( SUM( LOG( 1 - vector_cosim( embeddings, vector( '[${ queryParsing.data.query }]' ) ) ) ) / COUNT( * ) ) as score
@@ -39,7 +41,7 @@ self.addEventListener( "message", async ( message ) => {
         } ) ) )
         self.postMessage( { query: queryParsing.data.query, results: documentsWithRelevantSentences } )
     }
-    const storeParsing = z.object( { store: z.object( { content: z.array( z.object( { embeddings: z.instanceof( Float32Array ), sentence: z.string() } ) ), title: z.string().nullable(), url: z.string().nullable() } ) } ).safeParse( message.data )
+    const storeParsing = z.object( { store: z.object( { content: z.array( z.object( { embeddings: z.instanceof( Float32Array ), sentence: z.string() } ) ), title: z.string(), url: z.string() } ) } ).safeParse( message.data )
     if ( storeParsing.success ) {
         const date = Date.now()
         const { content, title, url } = storeParsing.data.store

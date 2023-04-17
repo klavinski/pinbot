@@ -32,9 +32,9 @@ const Confidence = ( { score }: { score: number } ) => <UI prefix={
 </UI>
 
 export const Popup = () => {
-    const { query, isLoading } = usePopup()
+    const { isLoading, search } = usePopup()
     const [ fields, setFields ] = useState( initialFields )
-    const [ output, setOutput ] = useState( [] as Awaited<ReturnType<typeof query>> )
+    const [ output, setOutput ] = useState( [] as Awaited<ReturnType<typeof search>> )
     const [ shown, setShown ] = useState( {
         exactInfo: false,
         fields: false,
@@ -49,11 +49,11 @@ export const Popup = () => {
     const [ parent ] = useAutoAnimate()
     return <div className={ styles.container } ref={ parent } onKeyUp={ e => {
         if ( e.key === "Enter" )
-            query( fields ).then( setOutput )
+            search( fields ).then( setOutput )
     } }>
         <div className={ styles.header }>
             <div/>
-            <div className={ styles.title }>
+            <div className={ styles.wordmark }>
                 Pin<Icon/>bot
             </div>
             <Toggle/>
@@ -62,7 +62,7 @@ export const Popup = () => {
         <Focus><UI prefix={
             <FieldsButton onClick={ () => setShown( { ...shown, fields: ! shown.fields } ) }/>
         } suffix={
-            fields.query.length === 0 ? <div/> : output.length === 0 ? <SearchButton onClick={ () => query( fields.query ).then( setOutput ) }/> :
+            fields.query.length === 0 ? <div/> : output.length === 0 ? <SearchButton onClick={ () => search( fields ).then( setOutput ) }/> :
                 <IconX onClick={ () => setOutput( [] ) }/>
         }>
             <Input
@@ -118,7 +118,9 @@ export const Popup = () => {
         </> }
         { output.map( page => <div>
             <div className={ styles.info }>
-                <UI prefix={ <IconWorld/> } href={ page.url }>{ page.url }</UI>
+                <UI prefix={ <IconWorld/> } href={ page.url }>
+                    <div className={ styles.shrinkable }>{ page.url }</div>
+                </UI>
                 ⦁
                 <UI prefix={ <IconCalendar/> }>{ new Date( page.date ).toLocaleDateString() }</UI>
                 ⦁

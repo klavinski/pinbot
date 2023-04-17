@@ -13,6 +13,7 @@
 
 .containerUrl {
     box-shadow: 0 calc( 2em / 18 ) var( --shadow );
+    cursor: pointer;
 }
 
 .containerUrl:hover {
