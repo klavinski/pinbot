@@ -9,45 +9,49 @@ const init = async () => {
         sqlite.oo1.DB
         // const db = new ( sqlite.oo1.OpfsDb as new ( filename: string, mode: string ) => DB )( "db", "c" )
         const db = new sqlite.oo1.DB() as DB
-        // db.exec( "PRAGMA journal_mode = WAL; PRAGMA synchronous = normal; PRAGMA temp_store = memory; PRAGMA mmap_size = 30000000000;" )
-        db.exec( "CREATE TABLE IF NOT EXISTS pages (date INTEGER, embeddings BLOB, part INTEGER, sentence TEXT, title TEXT, url TEXT);" )
-        // db.exec( "CREATE VIRTUAL TABLE IF NOT EXISTS pages USING FTS5 ( body, date, embeddings, title, url );" )
+        db.exec( "PRAGMA journal_mode = WAL; PRAGMA synchronous = normal; PRAGMA temp_store = memory; PRAGMA mmap_size = 30000000000;" )
+        db.exec( "CREATE TABLE IF NOT EXISTS sentences ( embeddings BLOB, sentence TEXT, uuid TEXT );" )
+        db.exec( "CREATE TABLE IF NOT EXISTS pages ( date INTEGER, title TEXT, uuid TEXT, url TEXT);" )
+        db.exec( "CREATE VIRTUAL TABLE IF NOT EXISTS fts USING FTS5 ( text, uuid UNINDEXED, tokenize=\"trigram\" );" )
         return db
     } else
         throw new Error( "No OPFS." )
 }
 const db = init()
-
-self.addEventListener( "message", async ( message ) => {
-    const queryParsing = queryParser.and( z.object( { embeddings: z.instanceof( Float32Array ) } ) ).safeParse( message.data )
+self.addEventListener( "message", async ( { data } ) => {
+    const queryParsing = queryParser.and( z.object( { embeddings: z.instanceof( Float32Array ) } ) ).safeParse( data )
     if ( queryParsing.success ) {
-        console.log( "querying" )
-        const documents = ( await db ).exec( `
-        SELECT date, title, url,
-        1 - EXP( SUM( LOG( 1 - vector_cosim( embeddings, vector( '[${ queryParsing.data.query }]' ) ) ) ) / COUNT( * ) ) as score
-        FROM pages
-        GROUP BY date, title, url
-        ORDER BY score DESC;`, { returnValue: "resultRows", rowMode: "object" } )
-        const documentsWithRelevantSentences = await Promise.all( documents.map( async document => ( {
-            ...document,
-            sentences: ( await db ).exec( `WITH matches AS (
-                    SELECT sentence, part,
-                    vector_cosim( embeddings, vector( '[${ queryParsing.data.query }]' ) ) as score
-                    FROM pages
-                    WHERE date = $1 AND title = $2 AND url = $3
-                    ORDER BY score DESC
-                    LIMIT 3
-                ) SELECT * FROM matches ORDER BY part;`, { bind: [ document.date, document.title, document.url ], returnValue: "resultRows", rowMode: "object" } )
-        } ) ) )
-        self.postMessage( { query: queryParsing.data.query, results: documentsWithRelevantSentences } )
+        const { embeddings, exact, from, query, to } = queryParsing.data
+        const pages = ( await db ).exec( `
+        SELECT date, title, text, p.uuid, url,
+        1 - EXP( SUM( LOG( 1 - vector_cosim( embeddings, vector( $1 ) ) ) ) / COUNT( sentence ) ) AS score
+        FROM pages p, sentences s, fts f
+        WHERE p.uuid = f.uuid AND p.uuid = s.uuid
+        AND (
+            $2 OR
+            LENGTH( $3 ) < 3 AND f.text LIKE '%' || $3 || '%' OR
+            LENGTH( $3 ) >= 3 AND f.text MATCH $3
+        )
+        AND ( $4 OR date >= DATE( $5 ) )
+        AND ( $6 OR date < DATE( $7, '+1 day' ) )
+        GROUP BY p.uuid
+        ORDER BY score DESC;`, { bind: [ `[ ${ embeddings }`, exact === "", exact, from === null, from ?? 0, to === null, to ?? 0 ], returnValue: "resultRows", rowMode: "object" } )
+        const pagesWithSentences = await Promise.all( pages.map( async page => ( {
+            ...page,
+            sentences: ( await db ).exec( "SELECT sentence, 1 - vector_cosim( embeddings, vector( $1 ) ) AS score FROM sentences WHERE uuid = $2;", { bind: [ `[ ${ queryParsing.data.embeddings } ]`, page.uuid ], returnValue: "resultRows", rowMode: "object" } ) } ) ) )
+        self.postMessage( { query, results: pagesWithSentences } )
     }
-    const storeParsing = z.object( { store: z.object( { content: z.array( z.object( { embeddings: z.instanceof( Float32Array ), sentence: z.string() } ) ), title: z.string(), url: z.string() } ) } ).safeParse( message.data )
+    const storeParsing = z.object( { store: z.object( { sentences: z.array( z.object( { embeddings: z.instanceof( Float32Array ), sentence: z.string() } ) ), text: z.string(), title: z.string(), url: z.string() } ) } ).safeParse( data )
+
     if ( storeParsing.success ) {
         const date = Date.now()
-        const { content, title, url } = storeParsing.data.store
-        content.forEach( async ( { embeddings, sentence }, part ) => {
-            ( await db ).exec( "INSERT INTO pages ( date, embeddings, part, sentence, title, url ) VALUES ( $1, vector($2), $3, $4, $5, $6 );", { bind: [ date, `[${ embeddings }]`, part, sentence, title, url ] } )
-        } )
+        const { sentences, text, title, url } = storeParsing.data.store
+        const pageVisitUuid = crypto.randomUUID()
+        sentences.forEach( async ( { embeddings, sentence } ) => {
+            ( await db ).exec( "INSERT INTO sentences ( embeddings, sentence, uuid ) VALUES ( vector( $1 ), $2, $3 );", { bind: [ `[ ${ embeddings } ]`, sentence, pageVisitUuid ] } )
+        } );
+        ( await db ).exec( "INSERT INTO pages ( date, title, uuid, url ) VALUES ( $1, $2, $3, $4 );", { bind: [ date, title, pageVisitUuid, url ] } );
+        ( await db ).exec( "INSERT INTO fts ( text, uuid ) VALUES ( $1, $2 );", { bind: [ text, pageVisitUuid ] } )
         console.log( "current pages", ( await db ).exec( "SELECT * FROM pages;", { returnValue: "resultRows", rowMode: "object" } ) )
     }
 } )

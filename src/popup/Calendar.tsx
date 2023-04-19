@@ -5,7 +5,7 @@ import "./Calendar.css"
 import styles from "./Calendar.module.css"
 import { IconChevronLeft, IconChevronRight, IconChevronsLeft, IconChevronsRight } from "@tabler/icons-react"
 
-export const Calendar = ( { date, setDate, setShown, shown }: { date: Date | null, setDate: ( newDate: Date | null ) => void, setShown: ( newShown: boolean ) => void, shown: boolean } ) => {
+export const Calendar = ( { date, setDate, setShown, shown }: { date: number | null, setDate: ( newDate: number | null ) => void, setShown: ( newShown: boolean ) => void, shown: boolean } ) => {
     return createPortal( <div
         className={ styles.background }
         onClick={ () => { setDate( null ); setShown( false ) } }
@@ -13,12 +13,13 @@ export const Calendar = ( { date, setDate, setShown, shown }: { date: Date | nul
     >
         <span onClick={ e => e.stopPropagation() } className={ styles.container }>
             <ReactCalendar
+                maxDate={ new Date() }
                 prevLabel={ <IconChevronLeft/> }
                 prev2Label={ <IconChevronsLeft/> }
                 nextLabel={ <IconChevronRight/> }
                 next2Label={ <IconChevronsRight/> }
-                value={ date }
-                onChange={ newDate => { if ( ! ( newDate instanceof Date ) ) throw new TypeError( `Not a date: ${ newDate }` ); setDate( newDate ); setShown( false ) } }
+                value={ date ? new Date( date ) : undefined }
+                onChange={ newDate => { if ( ! ( newDate instanceof Date ) ) throw new TypeError( `Not a date: ${ newDate }` ); setDate( newDate.getTime() ); setShown( false ) } }
             />
         </span>
     </div>, document.body )

@@ -35,10 +35,10 @@
         "value": "same-origin"
     },
     "host_permissions": ["<all_urls>"],
-    "permissions": ["offscreen", "storage", "tabs"],
+    "permissions": ["favicon", "offscreen", "storage", "tabs"],
     "web_accessible_resources": [
         {
-            "resources": ["src/sandbox.html", "*"],
+            "resources": ["_favicon/*", "src/sandbox.html", "*"],
             "matches": ["<all_urls>"]
         }
     ],

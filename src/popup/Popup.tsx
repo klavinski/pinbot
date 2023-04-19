@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { IconArrowRight, IconCalendar, IconCircleMinus, IconCirclePlus, IconClockHour4, IconMessageDots, IconMessages, IconMoodAnnoyed, IconMoodCry, IconMoodEmpty, IconMoodSad, IconMoodSmile, IconQuote, IconQuoteOff, IconSearch, IconWorld, IconWorldOff, IconX } from "@tabler/icons-react"
+import { IconArrowRight, IconBackspace, IconCalendar, IconCircleMinus, IconCirclePlus, IconMessageDots, IconMessages, IconMoodAnnoyed, IconMoodCry, IconMoodEmpty, IconMoodSad, IconMoodSmile, IconQuote, IconQuoteOff, IconSearch, IconWorld, IconWorldOff } from "@tabler/icons-react"
 import { ReactComponent as Icon } from "../../icons/black-icon.svg"
 import { Input } from "./Input.tsx"
 import { Focus } from "./Focus.tsx"
@@ -13,6 +13,7 @@ import { Query } from "./types.ts"
 
 import { UI } from "./UI.tsx"
 import { Toggle } from "./Toggle/index.tsx"
+import { Clock } from "./Clock.tsx"
 
 const initialFields = {
     query: "",
@@ -34,6 +35,7 @@ const Confidence = ( { score }: { score: number } ) => <UI prefix={
 export const Popup = () => {
     const { isLoading, search } = usePopup()
     const [ fields, setFields ] = useState( initialFields )
+    const [ lastQuery, setLastQuery ] = useState( fields )
     const [ output, setOutput ] = useState( [] as Awaited<ReturnType<typeof search>> )
     const [ shown, setShown ] = useState( {
         exactInfo: false,
@@ -43,31 +45,32 @@ export const Popup = () => {
         urlInfo: false
     } )
     const FieldsButton = shown.fields ? IconCircleMinus : IconCirclePlus
-    const SearchButton = isLoading ? IconClockHour4 : IconSearch
+    const SearchButton = isLoading ? Clock : IconSearch
     const ExactInfoButton = shown.exactInfo ? IconQuoteOff : IconQuote
     const UrlInfoButton = shown.urlInfo ? IconWorldOff : IconWorld
     const [ parent ] = useAutoAnimate()
     return <div className={ styles.container } ref={ parent } onKeyUp={ e => {
-        if ( e.key === "Enter" )
+        if ( e.key === "Enter" ) {
+            setLastQuery( fields )
             search( fields ).then( setOutput )
+        }
     } }>
         <div className={ styles.header }>
             <div/>
             <div className={ styles.wordmark }>
-                Pin<Icon/>bot
+                Pin<Icon className={ styles.logo }/>bot
             </div>
             <Toggle/>
             { /* <UI prefix={ <IconSliders04/> }>My account</UI> */ }
         </div>
-        <Focus><UI prefix={
-            <FieldsButton onClick={ () => setShown( { ...shown, fields: ! shown.fields } ) }/>
+        <Focus disabled={ isLoading }><UI prefix={
+            <FieldsButton className={ "clickableIcon" } onClick={ () => setShown( { ...shown, fields: ! shown.fields } ) }/>
         } suffix={
-            fields.query.length === 0 ? <div/> : output.length === 0 ? <SearchButton onClick={ () => search( fields ).then( setOutput ) }/> :
-                <IconX onClick={ () => setOutput( [] ) }/>
+            Object.values( fields ).every( field => ! field ) ? <div/> : output.length === 0 ? <SearchButton className={ "clickableIcon" } onClick={ () => { setLastQuery( fields ); search( fields ).then( setOutput ) } }/> :
+                <IconBackspace className={ "clickableIcon" } onClick={ () => { setFields( initialFields ); setOutput( [] ) } }/>
         }>
             <Input
                 autoFocus
-                disabled={ isLoading }
                 placeholder="Natural language search"
                 value={ fields.query }
                 onChange={ query => setFields( { ...fields, query } ) }
@@ -75,15 +78,15 @@ export const Popup = () => {
         </UI>
         </Focus>
         { shown.fields && <>
-            <Focus><UI prefix={
-                <ExactInfoButton onClick={ () => setShown( { ...shown, exactInfo: ! shown.exactInfo } ) }/>
+            <Focus disabled={ isLoading }><UI prefix={
+                <ExactInfoButton className={ "clickableIcon" } onClick={ () => setShown( { ...shown, exactInfo: ! shown.exactInfo } ) }/>
             }>
                 <Input placeholder="Exact search" onChange={ exact => setFields( { ...fields, exact } ) }/>
             </UI>
             </Focus>
-            { shown.exactInfo && <div>Example: <div className={ styles.quote }>"exact query" -"query to exclude" "prefix*"</div></div> }
-            <Focus><UI prefix={
-                <UrlInfoButton onClick={ () => setShown( { ...shown, urlInfo: ! shown.urlInfo } ) }/>
+            { shown.exactInfo && <div>Example: <div className={ styles.quote }>query "exact query" NOT this NOT "exact query"</div></div> }
+            <Focus disabled={ isLoading }><UI prefix={
+                <UrlInfoButton className={ "clickableIcon" } onClick={ () => setShown( { ...shown, urlInfo: ! shown.urlInfo } ) }/>
             }>
                 <Input
                     onChange={ urls => setFields( { ...fields, urls } ) }
@@ -93,15 +96,15 @@ export const Popup = () => {
                 />
             </UI></Focus>
             { shown.urlInfo && <div>Example: <div className={ styles.quote }>https://wikipedia.org<br/>app.slack.com/client/team-id/channel-id</div></div> }
-            <Focus><UI prefix={
-                <IconCalendar/>
+            <Focus disabled={ isLoading }><UI prefix={
+                <IconCalendar className={ "clickableIcon" }/>
             }>
                 <Input
                     onFocus={ () => setShown( { ...shown, fromCalendar: true } ) }
                     placeholder="From"
                     value={ fields.from ? new Date( fields.from ).toLocaleDateString() : "" }
                 /></UI><UI prefix={
-                <IconArrowRight/>
+                <IconArrowRight className={ "clickableIcon" }/>
             }>
                 <Input
                     onFocus={ () => setShown( { ...shown, toCalendar: true } ) }
@@ -111,24 +114,31 @@ export const Popup = () => {
             </UI></Focus>
             { ( [ "from", "to" ] as const ).map( _ => <Calendar
                 date={ fields[ _ ] }
-                setDate={ newDate => setFields( { ...fields, [ _ ]: newDate } ) }
+                setDate={ newDate => setFields( { ...fields, [ _ ]: newDate, ...( {
+                    from: { to: newDate && fields.to && newDate > fields.to ? null : fields.to },
+                    to: { from: newDate && fields.from && newDate < fields.from ? null : fields.from }
+                }[ _ ] ) } ) }
                 setShown={ newShown => setShown( { ...shown, [ `${ _ }Calendar` ]: newShown } ) }
                 shown={ shown[ `${ _ }Calendar` ] }
             /> ) }
         </> }
-        { output.map( page => <div>
-            <div className={ styles.info }>
-                <UI prefix={ <IconWorld/> } href={ page.url }>
-                    <div className={ styles.shrinkable }>{ page.url }</div>
-                </UI>
+        { output.map( page => {
+            const url = new URL( chrome.runtime.getURL( "/_favicon/" ) )
+            url.searchParams.set( "pageUrl", page.url )
+            url.searchParams.set( "size", "32" )
+            return <div>
+                <div className={ styles.info }>
+                    <UI prefix={ <img className={ styles.favicon } src={ url.toString() }/> } href={ page.url }>
+                        <div className={ styles.shrinkable }>{ page.url }</div>
+                    </UI>
                 ⦁
-                <UI prefix={ <IconCalendar/> }>{ new Date( page.date ).toLocaleDateString() }</UI>
+                    <UI prefix={ <IconCalendar/> }>{ new Date( page.date ).toLocaleDateString() }</UI>
                 ⦁
-                <Confidence score={ Math.max( ...page.sentences.map( _ => _.score ) ) }/>
-            </div>
-            <div className={ styles.title }>{ page.title }</div>
-            <div className={ styles.body }>{ page.sentences.map( _ => _.sentence ).join( "... " ) }</div>
-        </div> ) }
+                    <Confidence score={ Math.max( ...page.sentences.map( _ => _.score ) ) }/>
+                </div>
+                <div className={ styles.title }>{ page.title }</div>
+                <div className={ styles.body }>{ page.sentences.map( _ => _.sentence ).join( "... " ) }</div>
+            </div> } ) }
         <div className={ styles.footer }>
             Made by Kamil Szczerba —&nbsp;
             <UI href="https://tally.so/create" prefix={ <IconMessageDots/> }>Leave feedback</UI>

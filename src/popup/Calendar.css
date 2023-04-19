@@ -28,3 +28,9 @@
 .react-calendar__tile:enabled:hover, .react-calendar__tile:enabled:focus, .react-calendar__navigation button:enabled:hover, .react-calendar__navigation button:enabled:focus {
     background-color: var( --shadow );
 }
+
+.react-calendar__tile:disabled, .react-calendar__navigation button:disabled {
+    background-color: transparent;
+    opacity: 0.25;
+    cursor: not-allowed;
+}

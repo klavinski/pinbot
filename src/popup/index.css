@@ -57,10 +57,14 @@ svg {
     flex-shrink: 0;
 }
 
-.react-calendar {
-    border: calc( 2em / 18 ) solid var( --shadow );
-}
-
 abbr[title] {
     text-decoration: none;
+}
+
+.clickableIcon {
+    cursor: pointer;
+}
+
+.clickableIcon:active {
+    transform: scale( 0.9 );
 }

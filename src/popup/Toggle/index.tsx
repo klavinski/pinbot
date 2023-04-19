@@ -24,7 +24,7 @@ export const Toggle = () => {
             chrome.storage.sync.set( { isDark: ! isDark } )
             updateStyle( ! isDark )
         } }>
-        <IconSunFilled className={ styles.sun }/>
-        <IconMoon className={ styles.moon }/>
+        <IconSunFilled className={ [ styles.sun, "clickableIcon" ].join( " " ) }/>
+        <IconMoon className={ [ styles.moon, "clickableIcon" ].join( " " ) }/>
     </div>
 }

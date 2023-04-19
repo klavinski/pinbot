@@ -1,12 +1,19 @@
+.active {
+    background-color: var( --background );
+}
+
 .container {
     border: calc( 2em / 18 ) solid var( --shadow );
     border-radius: calc( 8em / 18 );
     display: grid;
-    background-color: var( --background );
     padding: calc( 2em / 18 ) calc( 3em / 18 );
     grid-template-columns: repeat( auto-fit, minmax( 0, 1fr ) );
 }
 
 .container:focus-within {
     border-color: var( --focus );
+}
+
+.disabled, .disabled * {
+    cursor: inherit !important;
 }

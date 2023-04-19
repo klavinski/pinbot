@@ -1,4 +1,4 @@
-import { ComponentPropsWithoutRef, ReactNode, useRef } from "react"
+import { ComponentPropsWithoutRef, ReactNode, useEffect, useRef } from "react"
 import styles from "./Focus.module.css"
 
 const minBy = <T, >( map: ( x: T ) => number, xs: T[] ) => xs.reduce( ( a, b ) => map( a ) < map( b ) ? a : b )
@@ -16,10 +16,15 @@ const distance = ( { clientX, clientY }: { clientX: number, clientY: number } ) 
                                     0
 }
 
-export const Focus = ( { className, ...props }: ComponentPropsWithoutRef<"div"> ) => {
+export const Focus = ( { className, disabled, ...props }: ComponentPropsWithoutRef<"div"> & { disabled?: boolean } ) => {
     const ref = useRef( null as null | HTMLDivElement )
+    useEffect( () => {
+        if ( typeof disabled === "boolean" && ref.current ) {
+            [ ...ref.current.querySelectorAll( "input" ), ...ref.current.querySelectorAll( "textarea" ) ].forEach( input => input.disabled = disabled )
+        }
+    }, [ disabled ] )
     return <div
-        className={ [ styles.container, className ].filter( _ => _ ).join( " " ) }
+        className={ [ styles.container, disabled ? styles.disabled : styles.active, className ].filter( _ => _ ).join( " " ) }
         onClick={ click => ref.current && minBy( distance( click ), [ ...ref.current.querySelectorAll( "input" ) ] ).focus() }
         ref={ ref }
         { ...props }
