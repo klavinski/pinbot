@@ -23,7 +23,7 @@ const sandbox = new Promise<Window>( ( resolve, reject ) => {
 } )
 iframe.src = browser.runtime.getURL( "src/sandbox.html" )
 
-const embed = ( text: string ) => new Promise<Float32Array>( async resolve => {
+const embed = ( text: string ) => text === "" ? Promise.resolve( null ) : new Promise<Float32Array | null>( async resolve => {
     const controller = new AbortController()
     window.addEventListener( "message", ( { data } ) => {
         try {
@@ -36,7 +36,7 @@ const embed = ( text: string ) => new Promise<Float32Array>( async resolve => {
     ( await sandbox ).postMessage( text, "*" )
 } )
 
-const search = ( query: Query & { embeddings: Float32Array } ) => new Promise( async resolve => {
+const search = ( query: Query & { embeddings: Float32Array | null } ) => new Promise( async resolve => {
     const controller = new AbortController()
     worker.addEventListener( "message", ( { data } ) => {
         const parsing = z.object( { results: z.array( z.unknown() ) } ).safeParse( data )
@@ -59,7 +59,7 @@ chrome.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {
     const url = sender.tab?.url
     if ( storeParsing.success && title && url ) {
         const text = [ title, url, storeParsing.data.body ].join( "\n" )
-        Promise.all( sentences( text ).map( async sentence => ( { embeddings: await embed( sentence ), sentence } ) ) ).then( sentences =>
+        Promise.all( sentences( text ).flatMap( _ => _.split( "\n" ) ).map( async sentence => ( { embeddings: await embed( sentence ), sentence } ) ) ).then( sentences =>
             worker.postMessage( { store: { sentences, text, title, url } } )
         )
     }

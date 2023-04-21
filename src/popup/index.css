@@ -4,19 +4,19 @@
     --focus: #5e8cc5;
     --red: #c40233;
     --yellow: #ffd300;
-    --gold: #9d938f;
+    --gold: #968b80;
     --shadow: #77777740;
 }
 
 @media( prefers-color-scheme: dark ) {
     :root {
-        --text: #fff;
+        --text: #ddd;
         --background: #000;
     }
 }
 
 :root[data-isDark="true"] {
-    --text: #fff;
+    --text: #ddd;
     --background: #000;
 }
 
@@ -25,13 +25,12 @@
     --background: #fff;
 }
 
-
-
 * {
     box-sizing: border-box;
     font-feature-settings: "cv05", "kern", "calt", "ccmp", "frac";
     font-family: "Pretendard";
-    transition: all 0.2s ease-in-out;
+    transition: transform .2s ease-in-out, border .2s ease-in-out, box-shadow .2s ease-in-out, opacity .2s ease-in-out;
+    font-feature-settings: "cv05", "kern", "calt", "ccmp", "frac";
 }
 
 a {

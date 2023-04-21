@@ -5,7 +5,7 @@ import "./Calendar.css"
 import styles from "./Calendar.module.css"
 import { IconChevronLeft, IconChevronRight, IconChevronsLeft, IconChevronsRight } from "@tabler/icons-react"
 
-export const Calendar = ( { date, setDate, setShown, shown }: { date: number | null, setDate: ( newDate: number | null ) => void, setShown: ( newShown: boolean ) => void, shown: boolean } ) => {
+export const Calendar = ( { date, setDate, setShown, shown }: { date: string | null, setDate: ( newDate: string | null ) => void, setShown: ( newShown: boolean ) => void, shown: boolean } ) => {
     return createPortal( <div
         className={ styles.background }
         onClick={ () => { setDate( null ); setShown( false ) } }
@@ -19,7 +19,7 @@ export const Calendar = ( { date, setDate, setShown, shown }: { date: number | n
                 nextLabel={ <IconChevronRight/> }
                 next2Label={ <IconChevronsRight/> }
                 value={ date ? new Date( date ) : undefined }
-                onChange={ newDate => { if ( ! ( newDate instanceof Date ) ) throw new TypeError( `Not a date: ${ newDate }` ); setDate( newDate.getTime() ); setShown( false ) } }
+                onChange={ newDate => { if ( ! ( newDate instanceof Date ) ) throw new TypeError( `Not a date: ${ newDate }` ); setDate( newDate.toISOString() ); setShown( false ) } }
             />
         </span>
     </div>, document.body )

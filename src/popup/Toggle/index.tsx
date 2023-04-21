@@ -19,12 +19,12 @@ export const Toggle = () => {
         updateFromOSPreference()
         return abortController.abort
     }, [] )
-    return <div className={ [ styles.container, isDark ? styles.dark : "" ].join( " " ) }
+    return <div className={ [ styles.container, isDark ? styles.dark : "", "clickableIcon" ].join( " " ) }
         onClick={ () => {
             chrome.storage.sync.set( { isDark: ! isDark } )
             updateStyle( ! isDark )
         } }>
-        <IconSunFilled className={ [ styles.sun, "clickableIcon" ].join( " " ) }/>
-        <IconMoon className={ [ styles.moon, "clickableIcon" ].join( " " ) }/>
+        <IconSunFilled className={ styles.sun }/>
+        <IconMoon className={ styles.moon }/>
     </div>
 }

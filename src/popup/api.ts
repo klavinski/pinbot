@@ -2,12 +2,14 @@ import { useState } from "react"
 import browser from "webextension-polyfill"
 import { Query, responseParser } from "./types.ts"
 
+const logAndReturn = <T>( x: T ) => { console.log( x ); return x }
+
 export const usePopup = () => {
     const [ isLoading, setIsLoading ] = useState( false )
     const search = async ( query: Query ) => {
         setIsLoading( true )
         try {
-            const response = responseParser.parse( await browser.runtime.sendMessage( query ) ).results
+            const response = responseParser.parse( logAndReturn( await browser.runtime.sendMessage( query ) ) ).results
             setIsLoading( false )
             return response
         }

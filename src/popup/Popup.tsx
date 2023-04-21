@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { IconArrowRight, IconBackspace, IconCalendar, IconCircleMinus, IconCirclePlus, IconMessageDots, IconMessages, IconMoodAnnoyed, IconMoodCry, IconMoodEmpty, IconMoodSad, IconMoodSmile, IconQuote, IconQuoteOff, IconSearch, IconWorld, IconWorldOff } from "@tabler/icons-react"
+import { useEffect, useState } from "react"
+import { IconArrowRight, IconCalendar, IconCircleMinus, IconCirclePlus, IconMessageDots, IconMessages, IconMoodAnnoyed, IconMoodCry, IconMoodEmpty, IconMoodSad, IconMoodSmile, IconPointFilled, IconQuote, IconQuoteOff, IconSearch, IconWorld, IconWorldOff } from "@tabler/icons-react"
 import { ReactComponent as Icon } from "../../icons/black-icon.svg"
 import { Input } from "./Input.tsx"
 import { Focus } from "./Focus.tsx"
@@ -14,14 +14,23 @@ import { Query } from "./types.ts"
 import { UI } from "./UI.tsx"
 import { Toggle } from "./Toggle/index.tsx"
 import { Clock } from "./Clock.tsx"
+import { AccountButton } from "./Account.tsx"
+import { Tooltip } from "./Tooltip.tsx"
 
 const initialFields = {
     query: "",
     exact: "",
     from: null,
     to: null,
-    urls: ""
+    url: ""
 } as Query
+
+const useSessionState = <T, >( key: string, initialState: T | ( () => T ) ) => {
+    const [ state, setState ] = useState( initialState )
+    useEffect( () => { chrome.storage.session.get().then( _ => key in _ && setState( _[ key ] ) ) }, [] )
+    useEffect( () => { chrome.storage.session.set( { [ key ]: state } ) }, [ state ] )
+    return [ state, setState ] as const
+}
 
 const Confidence = ( { score }: { score: number } ) => <UI prefix={
     score >= 0.8 ? <IconMoodSmile/> :
@@ -34,10 +43,9 @@ const Confidence = ( { score }: { score: number } ) => <UI prefix={
 
 export const Popup = () => {
     const { isLoading, search } = usePopup()
-    const [ fields, setFields ] = useState( initialFields )
-    const [ lastQuery, setLastQuery ] = useState( fields )
-    const [ output, setOutput ] = useState( [] as Awaited<ReturnType<typeof search>> )
-    const [ shown, setShown ] = useState( {
+    const [ fields, setFields ] = useSessionState( "fields", initialFields )
+    const [ output, setOutput ] = useSessionState( "output", [] as Awaited<ReturnType<typeof search>> )
+    const [ shown, setShown ] = useSessionState( "shown", {
         exactInfo: false,
         fields: false,
         fromCalendar: false,
@@ -45,29 +53,24 @@ export const Popup = () => {
         urlInfo: false
     } )
     const FieldsButton = shown.fields ? IconCircleMinus : IconCirclePlus
-    const SearchButton = isLoading ? Clock : IconSearch
     const ExactInfoButton = shown.exactInfo ? IconQuoteOff : IconQuote
     const UrlInfoButton = shown.urlInfo ? IconWorldOff : IconWorld
     const [ parent ] = useAutoAnimate()
     return <div className={ styles.container } ref={ parent } onKeyUp={ e => {
-        if ( e.key === "Enter" ) {
-            setLastQuery( fields )
+        if ( e.key === "Enter" && Object.values( fields ).some( _ => _ ) )
             search( fields ).then( setOutput )
-        }
     } }>
         <div className={ styles.header }>
-            <div/>
-            <div className={ styles.wordmark }>
+            <Tooltip content="Light/dark mode"><Toggle/></Tooltip>
+            <Tooltip content="Account settings"><AccountButton/></Tooltip>
+        </div>
+        <div className={ styles.wordmark }>
                 Pin<Icon className={ styles.logo }/>bot
-            </div>
-            <Toggle/>
-            { /* <UI prefix={ <IconSliders04/> }>My account</UI> */ }
         </div>
         <Focus disabled={ isLoading }><UI prefix={
             <FieldsButton className={ "clickableIcon" } onClick={ () => setShown( { ...shown, fields: ! shown.fields } ) }/>
         } suffix={
-            Object.values( fields ).every( field => ! field ) ? <div/> : output.length === 0 ? <SearchButton className={ "clickableIcon" } onClick={ () => { setLastQuery( fields ); search( fields ).then( setOutput ) } }/> :
-                <IconBackspace className={ "clickableIcon" } onClick={ () => { setFields( initialFields ); setOutput( [] ) } }/>
+            isLoading ? <Clock/> : Object.values( fields ).every( field => ! field ) ? <div/> : <IconSearch className={ "clickableIcon" } onClick={ () => search( fields ).then( setOutput ) }/>
         }>
             <Input
                 autoFocus
@@ -81,7 +84,7 @@ export const Popup = () => {
             <Focus disabled={ isLoading }><UI prefix={
                 <ExactInfoButton className={ "clickableIcon" } onClick={ () => setShown( { ...shown, exactInfo: ! shown.exactInfo } ) }/>
             }>
-                <Input placeholder="Exact search" onChange={ exact => setFields( { ...fields, exact } ) }/>
+                <Input placeholder="Exact search" value={ fields.exact } onChange={ exact => setFields( { ...fields, exact } ) }/>
             </UI>
             </Focus>
             { shown.exactInfo && <div>Example: <div className={ styles.quote }>query "exact query" NOT this NOT "exact query"</div></div> }
@@ -89,22 +92,29 @@ export const Popup = () => {
                 <UrlInfoButton className={ "clickableIcon" } onClick={ () => setShown( { ...shown, urlInfo: ! shown.urlInfo } ) }/>
             }>
                 <Input
-                    onChange={ urls => setFields( { ...fields, urls } ) }
-                    placeholder="Newline-separated URL prefixes"
-                    rows={ fields.urls.split( "\n" ).length }
-                    value={ fields.urls }
+                    onChange={ url => setFields( { ...fields, url } ) }
+                    placeholder="URL"
+                    value={ fields.url }
                 />
             </UI></Focus>
-            { shown.urlInfo && <div>Example: <div className={ styles.quote }>https://wikipedia.org<br/>app.slack.com/client/team-id/channel-id</div></div> }
+            { shown.urlInfo && <div>
+                Use <div className={ styles.quote }>*</div> as a wildcard. Examples:
+                <UI prefix={ <IconPointFilled/> }><div>
+                    Videos from any YouTube channel: <div className={ styles.quote }>youtube.com/@*/videos</div>
+                </div></UI>
+                <UI prefix={ <IconPointFilled/> }><div>
+                    A slack channel: <div className={ styles.quote }>app.slack.com/client/team-id/channel-id</div>
+                </div></UI>
+            </div> }
             <Focus disabled={ isLoading }><UI prefix={
-                <IconCalendar className={ "clickableIcon" }/>
+                <IconCalendar className={ "clickableIcon" } onClick={ e => { e.stopPropagation(); setShown( { ...shown, fromCalendar: true } ) } }/>
             }>
                 <Input
                     onFocus={ () => setShown( { ...shown, fromCalendar: true } ) }
                     placeholder="From"
                     value={ fields.from ? new Date( fields.from ).toLocaleDateString() : "" }
                 /></UI><UI prefix={
-                <IconArrowRight className={ "clickableIcon" }/>
+                <IconArrowRight className={ "clickableIcon" } onClick={ e => { e.stopPropagation(); setShown( { ...shown, toCalendar: true } ) } }/>
             }>
                 <Input
                     onFocus={ () => setShown( { ...shown, toCalendar: true } ) }
@@ -128,13 +138,15 @@ export const Popup = () => {
             url.searchParams.set( "size", "32" )
             return <div>
                 <div className={ styles.info }>
-                    <UI prefix={ <img className={ styles.favicon } src={ url.toString() }/> } href={ page.url }>
-                        <div className={ styles.shrinkable }>{ page.url }</div>
-                    </UI>
+                    <Tooltip content={ page.url }>
+                        <UI prefix={ <img className={ styles.favicon } src={ url.toString() }/> } href={ page.url }>
+                            <div className={ styles.shrinkable }>{ page.url }</div>
+                        </UI>
+                    </Tooltip>
                 ⦁
                     <UI prefix={ <IconCalendar/> }>{ new Date( page.date ).toLocaleDateString() }</UI>
                 ⦁
-                    <Confidence score={ Math.max( ...page.sentences.map( _ => _.score ) ) }/>
+                    <Confidence score={ page.score }/>
                 </div>
                 <div className={ styles.title }>{ page.title }</div>
                 <div className={ styles.body }>{ page.sentences.map( _ => _.sentence ).join( "... " ) }</div>
