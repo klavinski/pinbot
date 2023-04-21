@@ -58,9 +58,8 @@ chrome.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {
     const title = sender.tab?.title
     const url = sender.tab?.url
     if ( storeParsing.success && title && url ) {
-        const text = [ title, url, storeParsing.data.body ].join( "\n" )
-        Promise.all( sentences( text ).flatMap( _ => _.split( "\n" ) ).map( async sentence => ( { embeddings: await embed( sentence ), sentence } ) ) ).then( sentences =>
-            worker.postMessage( { store: { sentences, text, title, url } } )
+        Promise.all( [ title, ...sentences( storeParsing.data.body ) ].flatMap( _ => _.split( "\n" ) ).map( async sentence => ( { embeddings: await embed( sentence ), sentence } ) ) ).then( sentences =>
+            worker.postMessage( { store: { sentences, body: storeParsing.data.body, title, url } } )
         )
     }
     console.log( "received in offscreen", message )
