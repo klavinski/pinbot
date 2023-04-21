@@ -23,16 +23,15 @@ self.addEventListener( "message", async ( { data } ) => {
     if ( queryParsing.success ) {
         const { embeddings, exact, from, query, to, url } = queryParsing.data
         const pages = ( await db ).exec( `
-        SELECT date, title, text, p.uuid, url,
+        SELECT p.date, p.title, f.text, p.uuid, p.url,
         1 - EXP( SUM( LOG( 1 - MAX( MIN( vector_cosim( embeddings, vector( $1 ) ), 1 ), 0 ) ) ) / COUNT( sentence ) ) AS score
-        FROM pages p, sentences s, fts f
-        WHERE p.uuid = f.uuid AND p.uuid = s.uuid
-        AND ( LENGTH( $2 ) = 0 OR url GLOB '*' || $2 || '*' )
-        AND (
+        FROM pages p, sentences s JOIN ( SELECT * FROM fts WHERE
             LENGTH( $3 ) = 0 OR
             LENGTH( $3 ) < 3 AND f.text LIKE '%' || $3 || '%' OR
             LENGTH( $3 ) >= 3 AND f.text MATCH $3
-        )
+        ) AS f ON p.uuid = f.uuid
+        WHERE p.uuid = s.uuid
+        AND ( LENGTH( $2 ) = 0 OR url GLOB '*' || $2 || '*' )
         AND ( $4 OR date >= DATE( $5 ) )
         AND ( $6 OR date <= DATE( $7, '+1 day' ) )
         GROUP BY p.uuid
