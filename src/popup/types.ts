@@ -14,11 +14,11 @@ export const responseParser = z.object( {
     results: z.array( z.object( {
         body: z.string(),
         sentences: z.array( z.object( {
-            sentence: z.string(),
+            text: z.string(),
             score: z.number()
         } ) ),
-        date: z.string(),
         score: z.number(),
+        date: z.string(),
         title: z.string(),
         url: z.string(),
     } ) )

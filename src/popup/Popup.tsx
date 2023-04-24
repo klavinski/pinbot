@@ -16,6 +16,8 @@ import { Toggle } from "./Toggle/index.tsx"
 import { Clock } from "./Clock.tsx"
 import { AccountButton } from "./Account.tsx"
 import { Tooltip } from "./Tooltip.tsx"
+import { maximumIndex } from "../utils.ts"
+import { AlertsButton } from "./Alerts.tsx"
 
 const initialFields = {
     query: "",
@@ -32,14 +34,17 @@ const useSessionState = <T, >( key: string, initialState: T | ( () => T ) ) => {
     return [ state, setState ] as const
 }
 
-const Confidence = ( { score }: { score: number } ) => <UI prefix={
-    score >= 0.8 ? <IconMoodSmile/> :
-        score >= 0.6 ? <IconMoodEmpty/> :
-            score >= 0.4 ? <IconMoodAnnoyed/> :
-                score >= 0.2 ? <IconMoodSad/> :
-                    <IconMoodCry/> }>
-    { Math.round( score * 100 ) }% confidence
-</UI>
+const Confidence = ( { pageScore, maxSentenceScore }: { pageScore: number, maxSentenceScore: number } ) => {
+    const score = Math.max( pageScore, maxSentenceScore )
+    return <UI prefix={
+        score >= 0.8 ? <IconMoodSmile/> :
+            score >= 0.6 ? <IconMoodEmpty/> :
+                score >= 0.4 ? <IconMoodAnnoyed/> :
+                    score >= 0.2 ? <IconMoodSad/> :
+                        <IconMoodCry/> }>
+        { Math.round( Math.min( pageScore, maxSentenceScore ) * 100 ) } — { Math.round( Math.max( pageScore, maxSentenceScore ) * 100 ) } % confidence
+    </UI>
+}
 
 export const Popup = () => {
     const { isLoading, search } = usePopup()
@@ -57,11 +62,12 @@ export const Popup = () => {
     const UrlInfoButton = shown.urlInfo ? IconWorldOff : IconWorld
     const [ parent ] = useAutoAnimate()
     return <div className={ styles.container } ref={ parent } onKeyUp={ e => {
-        if ( e.key === "Enter" && Object.values( fields ).some( _ => _ ) )
+        if ( e.key === "Enter" && fields.query && ! isLoading )
             search( fields ).then( setOutput )
     } }>
         <div className={ styles.header }>
             <Tooltip content="Light/dark mode"><Toggle/></Tooltip>
+            <Tooltip content="Alerts"><AlertsButton/></Tooltip>
             <Tooltip content="Account settings"><AccountButton/></Tooltip>
         </div>
         <div className={ styles.wordmark }>
@@ -70,7 +76,7 @@ export const Popup = () => {
         <Focus disabled={ isLoading }><UI prefix={
             <FieldsButton className={ "clickableIcon" } onClick={ () => setShown( { ...shown, fields: ! shown.fields } ) }/>
         } suffix={
-            isLoading ? <Clock/> : Object.values( fields ).every( field => ! field ) ? <div/> : <IconSearch className={ "clickableIcon" } onClick={ () => search( fields ).then( setOutput ) }/>
+            isLoading ? <Clock/> : fields.query ? <IconSearch className={ "clickableIcon" } onClick={ () => search( fields ).then( setOutput ) }/> : <div/>
         }>
             <Input
                 autoFocus
@@ -87,7 +93,14 @@ export const Popup = () => {
                 <Input placeholder="Exact search" value={ fields.exact } onChange={ exact => setFields( { ...fields, exact } ) }/>
             </UI>
             </Focus>
-            { shown.exactInfo && <div>Example: <div className={ styles.quote }>query "exact query" NOT this NOT "exact query"</div></div> }
+            { shown.exactInfo && <div>Words can appear in any order. Use <div className={ styles.quote }>NOT</div> to exclude words. Examples:
+                <UI prefix={ <IconPointFilled/> }>
+                    <div className={ styles.quote }>include these words</div>
+                </UI>
+                <UI prefix={ <IconPointFilled/> }><div>
+                    <div className={ styles.quote }>include these words NOT exclude these words</div>
+                </div></UI>
+            </div> }
             <Focus disabled={ isLoading }><UI prefix={
                 <UrlInfoButton className={ "clickableIcon" } onClick={ () => setShown( { ...shown, urlInfo: ! shown.urlInfo } ) }/>
             }>
@@ -136,6 +149,10 @@ export const Popup = () => {
             const url = new URL( chrome.runtime.getURL( "/_favicon/" ) )
             url.searchParams.set( "pageUrl", page.url )
             url.searchParams.set( "size", "32" )
+            const [ title, ...body ] = page.sentences
+            const bestIndex = maximumIndex( body, "score" )
+            const before = body[ bestIndex - 1 ]?.text
+            const after = body[ bestIndex + 1 ]?.text
             return <div>
                 <div className={ styles.info }>
                     <Tooltip content={ page.url }>
@@ -146,10 +163,14 @@ export const Popup = () => {
                 ⦁
                     <UI prefix={ <IconCalendar/> }>{ new Date( page.date ).toLocaleDateString() }</UI>
                 ⦁
-                    <Confidence score={ page.score }/>
+                    <Confidence pageScore={ page.score } maxSentenceScore={ Math.max( ...page.sentences.map( _ => _.score ) ) }/>
                 </div>
                 <div className={ styles.title }>{ page.title }</div>
-                <div className={ styles.body }>{ page.sentences.map( _ => _.sentence ).join( "... " ) }</div>
+                <div className={ styles.body }>
+                    { before && `${ before } ` }
+                    <strong>{ body[ bestIndex ].text }</strong>
+                    { after && ` ${ after }` }
+                </div>
             </div> } ) }
         <div className={ styles.footer }>
             Made by Kamil Szczerba —&nbsp;

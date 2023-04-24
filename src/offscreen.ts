@@ -1,19 +1,10 @@
 import { z } from "zod"
 import Worker from "./worker.ts?worker"
-// import { createSQLiteThread } from "sqlite-wasm-http"
-
-async function init() {
-    // const db = await createSQLiteThread()
-}
-
-import winkNLP from "wink-nlp"
-import model from "wink-eng-lite-web-model"
-const sentences = ( text: string ) => winkNLP( model ).readDoc( text ).sentences().out()
-
 const worker = new Worker()
 
 import * as browser from "webextension-polyfill"
 import { Query, queryParser, storeParser } from "./popup/types.ts"
+import { split } from "./utils.ts"
 
 const iframe = document.querySelector( "iframe" )!
 const sandbox = new Promise<Window>( ( resolve, reject ) => {
@@ -58,8 +49,8 @@ chrome.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {
     const title = sender.tab?.title
     const url = sender.tab?.url
     if ( storeParsing.success && title && url ) {
-        Promise.all( [ title, ...sentences( storeParsing.data.body ) ].flatMap( _ => _.split( "\n" ) ).map( async sentence => ( { embeddings: await embed( sentence ), sentence } ) ) ).then( sentences =>
-            worker.postMessage( { store: { sentences, body: storeParsing.data.body, title, url } } )
+        Promise.all( [ title, ...split( storeParsing.data.body ) ].map( async sentence => ( { embeddings: await embed( sentence ), text: sentence } ) ) ).then( async sentences =>
+            worker.postMessage( { store: { body: storeParsing.data.body, embeddings: await embed( storeParsing.data.body ), sentences, title, url } } )
         )
     }
     console.log( "received in offscreen", message )

@@ -4,6 +4,6 @@
     border: solid calc( 2em / 18 ) var( --shadow );
     border-radius: calc( 4em / 18 );
     padding: calc( 4em / 18 ) calc( 8em / 18 );
-    backdrop-filter: blur( 1em );
+    background-color: var( --background );
     box-shadow: 0 0 1em var( --shadow );
 }

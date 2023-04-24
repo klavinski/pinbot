@@ -1,0 +1,7 @@
+.button {
+    padding: calc( 4em / 18 );
+    background-color: var( --shadow );
+    display: flex;
+    border-radius: 1000em;
+    color: var( --gold );
+}
