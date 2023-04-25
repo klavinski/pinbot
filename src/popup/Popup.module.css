@@ -3,12 +3,26 @@
     src: url( "./linotte.woff2" );
 }
 
+.body {
+    text-align: justify;
+}
+
+.bold {
+    font-weight: 600;
+}
+
+.buttons {
+    display: flex;
+    gap: calc( 8em / 18 );
+    justify-self: right;
+}
+
 .container {
     background-color: #77777718;
     padding: calc( 24em / 18 );
     display: flex;
     flex-direction: column;
-    gap: calc( 12em / 18 );
+    gap: calc( 16em / 18 );
 }
 
 .favicon {
@@ -25,15 +39,13 @@
 }
 
 .header {
-    position: absolute;
-    right: calc( 24em / 18 );
-    display: flex;
-    gap: calc( 8em / 18 );
-    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: start;
 }
 
-.body, .info {
-    color: #777;
+.body, .info, .order {
+    color: #888;
 }
 
 .info {
@@ -51,6 +63,35 @@
     opacity: 0.8;
 }
 
+.order {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.orderLabel {
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var( --text );
+    border-radius: calc( 8em / 18 );
+    padding: calc( 2em / 18 ) calc( 4em / 18 );
+    border: calc( 2em / 18 ) solid var( --shadow );
+}
+
+.orderLabel > * {
+    backface-visibility: hidden;
+}
+
+.orderLabel > *:nth-child( 2 ) {
+    margin-top: calc( -24em / 18 );
+}
+
+.rotated {
+    transform: rotateX( 180deg );
+}
+
 .quote {
     border-radius: calc( 8em / 18 );
     border: calc( 2em / 18 ) solid var( --shadow );
@@ -62,10 +103,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-
-.title {
-    font-weight: bold;
 }
 
 .wordmark {

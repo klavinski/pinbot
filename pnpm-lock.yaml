@@ -37,6 +37,9 @@ dependencies:
   sqlite-wasm-http:
     specifier: ^1.1.1
     version: 1.1.1
+  twemoji-colr-font:
+    specifier: ^14.0.2
+    version: 14.0.2
   typescript-plugin-css-modules:
     specifier: ^5.0.1
     version: 5.0.1(typescript@5.0.3)
@@ -3844,6 +3847,10 @@ packages:
       tslib: 1.14.1
       typescript: 5.0.3
     dev: true
+
+  /twemoji-colr-font@14.0.2:
+    resolution: {integrity: sha512-AVuNSlRkqBLaRJb/n0w1Ubw3IXQlikxSmeBo0uY1tuAIF1UpdBX70pvDoqVS2KVoYNfOMHcGaMokjjuOhlygGg==}
+    dev: false
 
   /type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}

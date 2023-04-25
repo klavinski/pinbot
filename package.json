@@ -1,7 +1,7 @@
 {
-  "name": "valet",
+  "name": "pinbot",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite build --watch",
@@ -23,6 +23,7 @@
     "react-calendar": "^4.2.1",
     "react-dom": "^18.2.0",
     "sqlite-wasm-http": "^1.1.1",
+    "twemoji-colr-font": "^14.0.2",
     "typescript-plugin-css-modules": "^5.0.1",
     "untitled-ui-icons": "^1.0.14",
     "vite-plugin-svgr": "^2.4.0",

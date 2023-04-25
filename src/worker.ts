@@ -38,6 +38,7 @@ self.addEventListener( "message", async ( { data } ) => {
         WHERE url GLOB '*' || $2 || '*'
         ${ from ? `AND date >= DATE( '${ from }' )` : "" }
         ${ to ? `AND date <= DATE( '${ to }', '+1 day' )` : "" }
+        AND date >= DATE( 'now', '-1 month' )
         AND text = body
         AND ( TRUE OR $1 = $1 )`, // otherwise, "SQLite3Error: Bind index is out of range." when not using $1
         { bind: [ exact, url ], returnValue: "resultRows", rowMode: "object" } )
@@ -47,7 +48,6 @@ self.addEventListener( "message", async ( { data } ) => {
             const score = cosineSimilarity( embeddings, new Float32Array( page.embeddings.buffer ) )
             return { ...page, score }
         } ) )
-        pagesWithScore.sort( ( a, b ) => b.score - a.score )
         const pagesWithSentences = await Promise.all( pagesWithScore.map( async page => {
             const sentences = await Promise.all( [ page.title, ...split( page.body ) ].map( async sentence => ( { text: sentence, score: cosineSimilarity( embeddings, new Float32Array( ( await db ).exec( "SELECT embeddings FROM pairs WHERE text = $1;", { bind: [ sentence ], returnValue: "resultRows", rowMode: "object" } )[ 0 ].embeddings.buffer ) ) } ) ) )
             return { ...page, sentences }

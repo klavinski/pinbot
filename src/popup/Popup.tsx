@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { IconArrowRight, IconCalendar, IconCircleMinus, IconCirclePlus, IconMessageDots, IconMessages, IconMoodAnnoyed, IconMoodCry, IconMoodEmpty, IconMoodSad, IconMoodSmile, IconPointFilled, IconQuote, IconQuoteOff, IconSearch, IconWorld, IconWorldOff } from "@tabler/icons-react"
+import { IconArrowRight, IconCalendar, IconCircle, IconCircleMinus, IconCirclePlus, IconMessageDots, IconMessages, IconMoodAnnoyed, IconMoodCry, IconMoodEmpty, IconMoodSad, IconMoodSmile, IconPointFilled, IconQuote, IconQuoteOff, IconSearch, IconSwitchHorizontal, IconWorld, IconWorldOff } from "@tabler/icons-react"
 import { ReactComponent as Icon } from "../../icons/black-icon.svg"
 import { Input } from "./Input.tsx"
 import { Focus } from "./Focus.tsx"
@@ -8,7 +8,6 @@ import styles from "./Popup.module.css"
 import { usePopup } from "./api.ts"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { Calendar } from "./Calendar.tsx"
-import { IconSliders04 } from "untitled-ui-icons"
 import { Query } from "./types.ts"
 
 import { UI } from "./UI.tsx"
@@ -18,6 +17,9 @@ import { AccountButton } from "./Account.tsx"
 import { Tooltip } from "./Tooltip.tsx"
 import { maximumIndex } from "../utils.ts"
 import { AlertsButton } from "./Alerts.tsx"
+
+import manifest from "../../manifest.json"
+import { IconCheckCircle } from "untitled-ui-icons"
 
 const initialFields = {
     query: "",
@@ -34,15 +36,14 @@ const useSessionState = <T, >( key: string, initialState: T | ( () => T ) ) => {
     return [ state, setState ] as const
 }
 
-const Confidence = ( { pageScore, maxSentenceScore }: { pageScore: number, maxSentenceScore: number } ) => {
-    const score = Math.max( pageScore, maxSentenceScore )
+const Confidence = ( { score }: { score: number } ) => {
     return <UI prefix={
         score >= 0.8 ? <IconMoodSmile/> :
             score >= 0.6 ? <IconMoodEmpty/> :
                 score >= 0.4 ? <IconMoodAnnoyed/> :
                     score >= 0.2 ? <IconMoodSad/> :
                         <IconMoodCry/> }>
-        { Math.round( Math.min( pageScore, maxSentenceScore ) * 100 ) } — { Math.round( Math.max( pageScore, maxSentenceScore ) * 100 ) } % confidence
+        { score > 1 ? 100 : score < 0 ? 0 : Math.round( score * 100 ) } % confidence
     </UI>
 }
 
@@ -57,6 +58,7 @@ export const Popup = () => {
         toCalendar: false,
         urlInfo: false
     } )
+    const [ order, setOrder ] = useSessionState( "order", "sentence" as "page" | "sentence" )
     const FieldsButton = shown.fields ? IconCircleMinus : IconCirclePlus
     const ExactInfoButton = shown.exactInfo ? IconQuoteOff : IconQuote
     const UrlInfoButton = shown.urlInfo ? IconWorldOff : IconWorld
@@ -66,12 +68,15 @@ export const Popup = () => {
             search( fields ).then( setOutput )
     } }>
         <div className={ styles.header }>
-            <Tooltip content="Light/dark mode"><Toggle/></Tooltip>
-            <Tooltip content="Alerts"><AlertsButton/></Tooltip>
-            <Tooltip content="Account settings"><AccountButton/></Tooltip>
-        </div>
-        <div className={ styles.wordmark }>
+            <div/>
+            <div className={ styles.wordmark }>
                 Pin<Icon className={ styles.logo }/>bot
+            </div>
+            <div className={ styles.buttons }>
+                <Tooltip content="Light/dark mode"><Toggle/></Tooltip>
+                <Tooltip content="Alerts"><AlertsButton/></Tooltip>
+                <Tooltip content="Account settings"><AccountButton/></Tooltip>
+            </div>
         </div>
         <Focus disabled={ isLoading }><UI prefix={
             <FieldsButton className={ "clickableIcon" } onClick={ () => setShown( { ...shown, fields: ! shown.fields } ) }/>
@@ -93,7 +98,7 @@ export const Popup = () => {
                 <Input placeholder="Exact search" value={ fields.exact } onChange={ exact => setFields( { ...fields, exact } ) }/>
             </UI>
             </Focus>
-            { shown.exactInfo && <div>Words can appear in any order. Use <div className={ styles.quote }>NOT</div> to exclude words. Examples:
+            { shown.exactInfo && <div>Words can appear in any order. Use <div className={ styles.quote }>NOT</div> to exclude words. Examples:<br/>
                 <UI prefix={ <IconPointFilled/> }>
                     <div className={ styles.quote }>include these words</div>
                 </UI>
@@ -144,8 +149,19 @@ export const Popup = () => {
                 setShown={ newShown => setShown( { ...shown, [ `${ _ }Calendar` ]: newShown } ) }
                 shown={ shown[ `${ _ }Calendar` ] }
             /> ) }
+            <div className={ styles.order }>
+                Order by&nbsp;
+                <div className={ [ styles.orderLabel, "clickableIcon" ].join( " " ) } onClick={ () => setOrder( ( { sentence: "page", page: "sentence" } as const )[ order ] ) }>
+                    <div className={ order !== "page" ? styles.rotated : undefined }>page</div>
+                    <div className={ order !== "sentence" ? styles.rotated : undefined }>sentence</div>
+                </div>
+                &nbsp;score
+            </div>
         </> }
-        { output.map( page => {
+        { output.sort( ( a, b ) => ( {
+            page: b.score - a.score,
+            sentence: ( Math.max( ...b.sentences.map( _ => _.score ) ) - Math.max( ...a.sentences.map( _ => _.score ) ) )
+        }[ order ] ) ).map( page => {
             const url = new URL( chrome.runtime.getURL( "/_favicon/" ) )
             url.searchParams.set( "pageUrl", page.url )
             url.searchParams.set( "size", "32" )
@@ -163,20 +179,20 @@ export const Popup = () => {
                 ⦁
                     <UI prefix={ <IconCalendar/> }>{ new Date( page.date ).toLocaleDateString() }</UI>
                 ⦁
-                    <Confidence pageScore={ page.score } maxSentenceScore={ Math.max( ...page.sentences.map( _ => _.score ) ) }/>
+                    <Confidence score={ { page: page.score, sentence: Math.max( ...page.sentences.map( _ => _.score ) ) }[ order ] }/>
                 </div>
-                <div className={ styles.title }>{ page.title }</div>
+                <div className={ styles.bold }>{ page.title }</div>
                 <div className={ styles.body }>
                     { before && `${ before } ` }
-                    <strong>{ body[ bestIndex ].text }</strong>
+                    <span className={ styles.bold }>{ body[ bestIndex ].text }</span>
                     { after && ` ${ after }` }
                 </div>
             </div> } ) }
         <div className={ styles.footer }>
-            Made by Kamil Szczerba —&nbsp;
+            v{ manifest.version } —&nbsp;
             <UI href="https://tally.so/create" prefix={ <IconMessageDots/> }>Leave feedback</UI>
             &nbsp;—&nbsp;
-            <UI href="https://discord.com/create" prefix={ <IconMessages/> }>Meet the community</UI>
+            <UI href="https://discord.gg/NetMteXfjf" prefix={ <IconMessages/> }>Meet the community</UI>
         </div>
     </div>
 }
