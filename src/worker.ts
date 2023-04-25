@@ -38,7 +38,7 @@ self.addEventListener( "message", async ( { data } ) => {
         WHERE url GLOB '*' || $2 || '*'
         ${ from ? `AND date >= DATE( '${ from }' )` : "" }
         ${ to ? `AND date <= DATE( '${ to }', '+1 day' )` : "" }
-        AND date >= DATE( 'now', '-1 month' )
+        AND date >= DATE( 'now', '-14 days' )
         AND text = body
         AND ( TRUE OR $1 = $1 )`, // otherwise, "SQLite3Error: Bind index is out of range." when not using $1
         { bind: [ exact, url ], returnValue: "resultRows", rowMode: "object" } )

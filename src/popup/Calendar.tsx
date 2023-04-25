@@ -4,7 +4,7 @@ import "react-calendar/dist/Calendar.css"
 import "./Calendar.css"
 import { IconChevronLeft, IconChevronRight, IconChevronsLeft, IconChevronsRight } from "@tabler/icons-react"
 
-new Date().setMonth( new Date().getMonth() - 1 )
+new Date().setDate( new Date().getDate() - 14 )
 
 export const Calendar = ( { date, setDate, setShown, shown }: { date: string | null, setDate: ( newDate: string | null ) => void, setShown: ( newShown: boolean ) => void, shown: boolean } ) => {
     return createPortal( <div
@@ -14,7 +14,7 @@ export const Calendar = ( { date, setDate, setShown, shown }: { date: string | n
     >
         <span onClick={ e => e.stopPropagation() }>
             <ReactCalendar
-                minDate={ new Date( new Date().setMonth( new Date().getMonth() - 1 ) ) }
+                minDate={ new Date( new Date().setDate( new Date().getDate() - 14 ) ) }
                 maxDate={ new Date() }
                 prevLabel={ <IconChevronLeft/> }
                 prev2Label={ <IconChevronsLeft/> }
