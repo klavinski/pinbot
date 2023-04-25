@@ -43,16 +43,17 @@ self.addEventListener( "message", async ( { data } ) => {
         AND ( TRUE OR $1 = $1 )`, // otherwise, "SQLite3Error: Bind index is out of range." when not using $1
         { bind: [ exact, url ], returnValue: "resultRows", rowMode: "object" } )
         console.log( { pages, from, to } )
-        const pagesWithScore = await Promise.all ( pages.map( async page => {
-            // ( await db ).exec( "SELECT embeddings FROM pairs WHERE text = $1;", { bind: [ page.body ], returnValue: "resultRows", rowMode: "object" } )[ 0 ].score as number
-            const score = cosineSimilarity( embeddings, new Float32Array( page.embeddings.buffer ) )
-            return { ...page, score }
+        const pagesWithSentences = await Promise.all( pages.map( async page => {
+            const sentences = await Promise.all( [ page.title, ...split( page.body ) ].map( async sentence => ( {
+                text: sentence, score: cosineSimilarity( embeddings, new Float32Array( ( await db ).exec( "SELECT embeddings FROM pairs WHERE text = $1;", { bind: [ sentence ], returnValue: "resultRows", rowMode: "object" } )[ 0 ].embeddings.buffer ) )
+            } ) ) )
+            return {
+                ...page,
+                score: cosineSimilarity( embeddings, new Float32Array( page.embeddings.buffer ) ),
+                sentences
+            }
         } ) )
-        const pagesWithSentences = await Promise.all( pagesWithScore.map( async page => {
-            const sentences = await Promise.all( [ page.title, ...split( page.body ) ].map( async sentence => ( { text: sentence, score: cosineSimilarity( embeddings, new Float32Array( ( await db ).exec( "SELECT embeddings FROM pairs WHERE text = $1;", { bind: [ sentence ], returnValue: "resultRows", rowMode: "object" } )[ 0 ].embeddings.buffer ) ) } ) ) )
-            return { ...page, sentences }
-        } ) )
-        self.postMessage( { query, results: pagesWithSentences } )
+        self.postMessage( { query: queryParsing.data, results: pagesWithSentences } )
     }
     const storeParsing = z.object( { store: z.object( { sentences: z.array( z.object( { embeddings: z.instanceof( Float32Array ), text: z.string() } ) ), body: z.string(), embeddings: z.instanceof( Float32Array ), title: z.string(), url: z.string() } ) } ).safeParse( data )
 

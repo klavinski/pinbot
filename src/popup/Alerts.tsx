@@ -21,5 +21,5 @@ export const Alerts = () => <div onClick={ e => e.stopPropagation() }>
     Alerts watch pages and notify you when a change<br/>
     matches one of your natural language queries.<br/>
     <br/>
-    Upcoming in the next version!
+    Upcoming in a future version!
 </div>

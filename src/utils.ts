@@ -1,8 +1,9 @@
 import winkNLP from "wink-nlp"
 import model from "wink-eng-lite-web-model"
+const { readDoc } = winkNLP( model )
 
 export const split = ( text: string ) =>
-    winkNLP( model ).readDoc( text ).sentences().out()
+    readDoc( text ).sentences().out()
         .flatMap( _ => _.split( "\n" ) )
         .filter( _ => _ !== "" )
 

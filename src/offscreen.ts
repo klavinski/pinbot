@@ -30,10 +30,11 @@ const embed = ( text: string ) => text === "" ? Promise.resolve( null ) : new Pr
 const search = ( query: Query & { embeddings: Float32Array | null } ) => new Promise( async resolve => {
     const controller = new AbortController()
     worker.addEventListener( "message", ( { data } ) => {
-        const parsing = z.object( { results: z.array( z.unknown() ) } ).safeParse( data )
+        console.log( "received in offscreen", data, "matching with", query )
+        const parsing = z.object( { query: z.object( Object.fromEntries( Object.entries( query ).map( ( [ k, v ] ) => [ k, v instanceof Float32Array ? z.instanceof( Float32Array ) : z.literal( v ) ] ) ) ), results: z.array( z.unknown() ) } ).safeParse( data )
         if ( parsing.success ) {
             controller.abort()
-            resolve( parsing.data )
+            resolve( parsing.data.results )
         }
     }, { signal: controller.signal } )
     worker.postMessage( query )

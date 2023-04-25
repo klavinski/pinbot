@@ -10,18 +10,16 @@ export const queryParser = z.object( {
 
 export type Query = z.infer<typeof queryParser>
 
-export const responseParser = z.object( {
-    results: z.array( z.object( {
-        body: z.string(),
-        sentences: z.array( z.object( {
-            text: z.string(),
-            score: z.number()
-        } ) ),
-        score: z.number(),
-        date: z.string(),
-        title: z.string(),
-        url: z.string(),
-    } ) )
-} )
+export const responseParser = z.array( z.object( {
+    body: z.string(),
+    sentences: z.array( z.object( {
+        text: z.string(),
+        score: z.number()
+    } ) ),
+    score: z.number(),
+    date: z.string(),
+    title: z.string(),
+    url: z.string(),
+} ) )
 
 export const storeParser = z.object( { body: z.string() } )

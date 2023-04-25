@@ -190,7 +190,7 @@ export const Popup = () => {
             </div> } ) }
         <div className={ styles.footer }>
             v{ manifest.version } —&nbsp;
-            <UI href="https://tally.so/create" prefix={ <IconMessageDots/> }>Leave feedback</UI>
+            <UI href="https://tally.so/r/3NravQ" prefix={ <IconMessageDots/> }>Leave feedback</UI>
             &nbsp;—&nbsp;
             <UI href="https://discord.gg/NetMteXfjf" prefix={ <IconMessages/> }>Meet the community</UI>
         </div>

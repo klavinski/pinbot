@@ -9,7 +9,7 @@ export const usePopup = () => {
     const search = async ( query: Query ) => {
         setIsLoading( true )
         try {
-            const response = responseParser.parse( logAndReturn( await browser.runtime.sendMessage( query ) ) ).results
+            const response = responseParser.parse( logAndReturn( await browser.runtime.sendMessage( query ) ) )
             setIsLoading( false )
             return response
         }

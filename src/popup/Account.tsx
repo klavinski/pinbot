@@ -22,5 +22,5 @@ export const Account = () => <div onClick={ e => e.stopPropagation() }>
     Accounts keep all your history and synchronize it across your<br/>
     devices, while maintaining your privacy.<br/>
     <br/>
-    Upcoming in the next version!
+    Upcoming in a future version!
 </div>
