@@ -1,6 +1,6 @@
 import { useState } from "react"
 import browser from "webextension-polyfill"
-import { Query, responseParser } from "./types.ts"
+import { Query, responseParser } from "../types.ts"
 
 const logAndReturn = <T>( x: T ) => { console.log( x ); return x }
 

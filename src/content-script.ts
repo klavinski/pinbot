@@ -1,13 +1,10 @@
 import browser from "webextension-polyfill"
 
-let lastSentBody = ""
+const delay = 1000
+const frequency = 60 * 1000
+const sendBody = () => browser.runtime.sendMessage( { body: document.body.innerText } )
 
-const sendBody = () => {
-    const body = document.body.innerHTML
-    if ( body !== lastSentBody ) {
-        lastSentBody = body
-        browser.runtime.sendMessage( { body: document.body.innerText } )
-    }
-}
-
-browser.runtime.onMessage.addListener( sendBody )
+setTimeout( () => {
+    sendBody()
+    setInterval( sendBody, frequency )
+}, delay )

@@ -23,3 +23,6 @@ export const responseParser = z.array( z.object( {
 } ) )
 
 export const storeParser = z.object( { body: z.string() } )
+
+export const zSqlValue = z.union( [ z.null(), z.number(), z.boolean(), z.bigint(), z.string(), z.instanceof( Uint8Array ), z.undefined(), z.instanceof( Int8Array ), z.instanceof( ArrayBuffer ) ] )
+export const zBind = z.union( [ z.array( zSqlValue ), z.record( zSqlValue ) ] )

@@ -8,7 +8,7 @@ import styles from "./Popup.module.css"
 import { usePopup } from "./api.ts"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { Calendar } from "./Calendar.tsx"
-import { Query } from "./types.ts"
+import { Query } from "../types.ts"
 
 import { UI } from "./UI.tsx"
 import { Toggle } from "./Toggle/index.tsx"

@@ -1,58 +1,68 @@
-import { z } from "zod"
-import Worker from "./worker.ts?worker"
-const worker = new Worker()
-
-import * as browser from "webextension-polyfill"
-import { Query, queryParser, storeParser } from "./popup/types.ts"
+import { init } from "./sql.ts"
+import { embed } from "./embed.ts"
+import { Query, queryParser, storeParser } from "./types.ts"
 import { split } from "./utils.ts"
 
-const iframe = document.querySelector( "iframe" )!
-const sandbox = new Promise<Window>( ( resolve, reject ) => {
-    window.addEventListener( "message", () => {
-        iframe.contentWindow ? resolve( iframe.contentWindow ) : reject( "No contentWindow" )
-    }, { once: true } )
-} )
-iframe.src = browser.runtime.getURL( "src/sandbox.html" )
+const sql = init( `CREATE VIRTUAL TABLE IF NOT EXISTS pages USING FTS5 ( body, date UNINDEXED, title, url, tokenize=\"porter unicode61 remove_diacritics 2\" );
+CREATE TABLE IF NOT EXISTS pairs ( embeddings BLOB, text TEXT );` )
 
-const embed = ( text: string ) => text === "" ? Promise.resolve( null ) : new Promise<Float32Array | null>( async resolve => {
-    const controller = new AbortController()
-    window.addEventListener( "message", ( { data } ) => {
-        try {
-            const { embeddings } = z.object( { text: z.literal( text ), embeddings: z.instanceof( Float32Array ) } ).parse( data )
-            controller.abort()
-            resolve( embeddings )
-        }
-        catch ( e ) {}
-    }, { signal: controller.signal } );
-    ( await sandbox ).postMessage( text, "*" )
-} )
+const cosineSimilarity = ( a: Float32Array, b: Float32Array ) => {
+    let dot = 0
+    let normA = 0
+    let normB = 0
+    for ( let i = 0; i < a.length; i ++ ) {
+        dot += a[ i ] * b[ i ]
+        normA += a[ i ] ** 2
+        normB += b[ i ] ** 2
+    }
+    return dot / ( Math.sqrt( normA * normB ) )
+}
 
-const search = ( query: Query & { embeddings: Float32Array | null } ) => new Promise( async resolve => {
-    const controller = new AbortController()
-    worker.addEventListener( "message", ( { data } ) => {
-        console.log( "received in offscreen", data, "matching with", query )
-        const parsing = z.object( { query: z.object( Object.fromEntries( Object.entries( query ).map( ( [ k, v ] ) => [ k, v instanceof Float32Array ? z.instanceof( Float32Array ) : z.literal( v ) ] ) ) ), results: z.array( z.unknown() ) } ).safeParse( data )
-        if ( parsing.success ) {
-            controller.abort()
-            resolve( parsing.data.results )
+const search = async ( { exact, from, query, to, url }: Query ) => {
+    const pages = await sql( `
+        SELECT * FROM pairs, pages${ exact ? "( $1 )" : "" }
+        WHERE url GLOB '*' || $2 || '*'
+        ${ from ? `AND date >= DATE( '${ from }' )` : "" }
+        ${ to ? `AND date <= DATE( '${ to }', '+1 day' )` : "" }
+        AND date >= DATE( 'now', '-14 days' )
+        AND text = body
+        AND ( TRUE OR $1 = $1 )`, // otherwise, "SQLite3Error: Bind index is out of range." when not using $1
+    [ exact, url ] )
+    const embeddings = await embed( query )
+    return await Promise.all( pages.map( async page => {
+        const sentences = await Promise.all( [ page.title, ...split( page.body ) ].map( async sentence => {
+            console.log( sentence, embeddings, await sql( "SELECT text, $1 FROM pairs WHERE text = $1;", [ sentence ] ) )
+            return {
+                text: sentence, score: cosineSimilarity( embeddings, new Float32Array( ( await sql( "SELECT embeddings FROM pairs WHERE text = $1;", [ sentence ] ) )[ 0 ].embeddings.buffer ) )
+            }
+        } ) )
+        return {
+            ...page,
+            score: cosineSimilarity( embeddings, new Float32Array( page.embeddings.buffer ) ),
+            sentences
         }
-    }, { signal: controller.signal } )
-    worker.postMessage( query )
-} )
+    } ) )
+}
+
+const store = async ( { body, title, url }: { body: string, title: string, url: string } ) => {
+    await Promise.all( [ body, title, ...split( body ) ].map( async sentence => {
+        await sql( "INSERT INTO pairs ( embeddings, text ) VALUES ( $1, $2 );", [ ( await embed( sentence ) ).buffer, sentence ] )
+    } ) )
+    await sql( "INSERT INTO pages ( body, date, title, url ) VALUES ( $1, date( 'now' ), $2, $3);", [ body, title, url ] )
+    console.log( "current pages", await sql( "SELECT * FROM pages;" ) )
+    console.log( "current sentences", await sql( "SELECT * FROM pairs;" ) )
+}
 
 chrome.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {
     const queryParsing = queryParser.safeParse( message )
     if ( queryParsing.success ) {
-        embed( queryParsing.data.query ).then( embeddings => search( { ...queryParsing.data, embeddings } ) ).then( sendResponse )
+        search( queryParsing.data ).then( sendResponse )
         return true
     }
     const storeParsing = storeParser.safeParse( message )
     const title = sender.tab?.title
     const url = sender.tab?.url
-    if ( storeParsing.success && title && url ) {
-        Promise.all( [ title, ...split( storeParsing.data.body ) ].map( async sentence => ( { embeddings: await embed( sentence ), text: sentence } ) ) ).then( async sentences =>
-            worker.postMessage( { store: { body: storeParsing.data.body, embeddings: await embed( storeParsing.data.body ), sentences, title, url } } )
-        )
-    }
+    if ( storeParsing.success && title && url )
+        store( { body: storeParsing.data.body, title, url } )
     console.log( "received in offscreen", message )
 } )

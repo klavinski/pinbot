@@ -21,8 +21,7 @@
             "js": ["src/content-script.ts"],
             "all_frames": true,
             "match_about_blank": true,
-            "type": "module",
-            "run_at": "document_start"
+            "type": "module"
         }
     ],
     "content_security_policy": {
