@@ -1,6 +1,6 @@
 import initSyncSQLite from "sqlite-wasm-http/sqlite3.js"
 import { z } from "zod"
-import { zBind } from "./types.ts"
+import { zSqlValue } from "./types.ts"
 
 const init = async () => {
     const sqlite = await initSyncSQLite()
@@ -15,7 +15,7 @@ const init = async () => {
 const db = init()
 
 self.addEventListener( "message", async ( { data } ) => {
-    const parsing = z.object( { query: z.string(), bind: zBind, uuid: z.string() } ).safeParse( data )
+    const parsing = z.object( { query: z.string(), bind: z.array( zSqlValue ), uuid: z.string() } ).safeParse( data )
     if ( parsing.success )
         self.postMessage( { ...parsing.data, results: ( await db ).exec( parsing.data.query, { bind: parsing.data.bind, returnValue: "resultRows", rowMode: "object" } ) } )
     else

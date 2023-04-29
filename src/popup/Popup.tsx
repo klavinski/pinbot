@@ -98,13 +98,14 @@ export const Popup = () => {
                 <Input placeholder="Exact search" value={ fields.exact } onChange={ exact => setFields( { ...fields, exact } ) }/>
             </UI>
             </Focus>
-            { shown.exactInfo && <div>Words can appear in any order. Use <div className={ styles.quote }>NOT</div> to exclude words. Examples:<br/>
-                <UI prefix={ <IconPointFilled/> }>
-                    <div className={ styles.quote }>include these words</div>
-                </UI>
+            { shown.exactInfo && <div>Words can appear in any order. Use <div className={ styles.quote }>-</div> to separate words to include from those to exclude. Examples:<br/>
                 <UI prefix={ <IconPointFilled/> }><div>
-                    <div className={ styles.quote }>include these words NOT exclude these words</div>
+                    Mentions of Captain Haddock: <div className={ styles.quote }>Captain Haddock</div>
                 </div></UI>
+                <UI prefix={ <IconPointFilled/> }><div>
+                    Mentions without the fish: <div className={ styles.quote }>Captain Haddock - fish</div>
+                </div></UI><br/>
+                Only the stem of the word is considered: <div className={ styles.quote }>fish</div> matches <div className={ styles.quote }>Fish</div>, <div className={ styles.quote }>fishes</div>, <div className={ styles.quote }>fishing</div>, etc.
             </div> }
             <Focus disabled={ isLoading }><UI prefix={
                 <UrlInfoButton className={ "clickableIcon" } onClick={ () => setShown( { ...shown, urlInfo: ! shown.urlInfo } ) }/>
@@ -158,17 +159,11 @@ export const Popup = () => {
                 &nbsp;score
             </div>
         </> }
-        { output.sort( ( a, b ) => ( {
-            page: b.score - a.score,
-            sentence: ( Math.max( ...b.sentences.map( _ => _.score ) ) - Math.max( ...a.sentences.map( _ => _.score ) ) )
-        }[ order ] ) ).map( page => {
+        { output.sort( ( a, b ) => ( b.scores[ order ] - a.scores[ order ] ) ).map( page => {
             const url = new URL( chrome.runtime.getURL( "/_favicon/" ) )
             url.searchParams.set( "pageUrl", page.url )
             url.searchParams.set( "size", "32" )
-            const [ title, ...body ] = page.sentences
-            const bestIndex = maximumIndex( body, "score" )
-            const before = body[ bestIndex - 1 ]?.text
-            const after = body[ bestIndex + 1 ]?.text
+            const [ sentence1, sentence2, sentence3 ] = page.text.split( "\n" )
             return <div>
                 <div className={ styles.info }>
                     <Tooltip content={ page.url }>
@@ -177,15 +172,15 @@ export const Popup = () => {
                         </UI>
                     </Tooltip>
                 ⦁
-                    <UI prefix={ <IconCalendar/> }>{ new Date( page.date ).toLocaleDateString() }</UI>
+                    <UI prefix={ <IconCalendar/> }>{ page.added !== page.seen && `${ new Date( page.added ).toLocaleDateString() } — ` }{ new Date( page.seen ).toLocaleDateString() }</UI>
                 ⦁
-                    <Confidence score={ { page: page.score, sentence: Math.max( ...page.sentences.map( _ => _.score ) ) }[ order ] }/>
+                    <Confidence score={ page.scores[ order ] }/>
                 </div>
                 <div className={ styles.bold }>{ page.title }</div>
                 <div className={ styles.body }>
-                    { before && `${ before } ` }
-                    <span className={ styles.bold }>{ body[ bestIndex ].text }</span>
-                    { after && ` ${ after }` }
+                    { sentence1 && `${ sentence1 } ` }
+                    <span className={ styles.bold }>{ sentence2 }</span>
+                    { sentence3 && ` ${ sentence3 }` }
                 </div>
             </div> } ) }
         <div className={ styles.footer }>
