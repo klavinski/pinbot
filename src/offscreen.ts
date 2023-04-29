@@ -1,7 +1,7 @@
 import { init } from "./sql.ts"
 import { embed } from "./embed.ts"
 import { Query, queryParser, storeParser } from "./types.ts"
-import { cosineSimilarity, split, tokenize } from "./utils.ts"
+import { cosineSimilarity, mixEmbeddings, split, tokenize } from "./utils.ts"
 
 const sql = init`CREATE TABLE IF NOT EXISTS pages ( added TEXT, embeddings BLOB, removed TEXT, seen TEXT, text TEXT, url TEXT );
 DELETE FROM pages WHERE DATETIME( seen ) <= DATETIME( 'now', '-14 days' );`
@@ -12,7 +12,6 @@ const search = async ( { exact, from, query, to, url }: Query ) => {
         AND DATE( added ) >= DATE( ${ from ?? 0 } )
         AND DATE( seen ) <= DATE( ${ to ?? "now" }, '+1 day' );`
     const embeddings = await embed( query )
-    const scores = pages.map( _ => cosineSimilarity( new Float32Array( _.embeddings.buffer ), embeddings ) )
     const words = tokenize( exact )
     const excludeIndex = words.findIndex( _ => _.startsWith( "-" ) )
     const [ include, exclude ] = excludeIndex === - 1 ? [ words, [] ] : [ words.slice( 0, excludeIndex ), words.slice( excludeIndex ).filter( _ => _ !== "-" ).map( word => word.replace( /^-/, "" ) ) ]
@@ -21,19 +20,16 @@ const search = async ( { exact, from, query, to, url }: Query ) => {
         SELECT * FROM pages
         WHERE url = ${ page.url }
         AND DATETIME( seen ) = DATETIME( ${ page.seen } );`
-        console.log( otherFragments )
+        console.log( "otherFragments", otherFragments )
         const wordsInPage = otherFragments.flatMap( _ => tokenize( _.text ) )
         if ( include.every( word => wordsInPage.some( _ => _ === word ) ) && exclude.every( word => wordsInPage.every( _ => _ !== word ) ) )
             return {
                 ...page,
-                scores: {
-                    page: scores.reduce( ( a, b ) => a + b, 0 ) / scores.length,
-                    sentence: cosineSimilarity( new Float32Array( page.embeddings.buffer ), embeddings ),
-                },
+                score: cosineSimilarity( new Float32Array( page.embeddings.buffer ), embeddings ),
                 title: otherFragments.find( _ => _.text.startsWith( "\n" ) && _.text.endsWith( "\n" ) ).text.replace( "\n", "" )
             }
         else return "exclude"
-    } ) ) ).filter( _ => _ !== "exclude" )
+    } ) ) ).filter( _ => _ !== "exclude" ).sort( ( a, b ) => ( b.score - a.score ) )
 }
 const store = async ( { body, title, url }: { body: string, title: string, url: string } ) => {
     const now = ( await sql`SELECT DATETIME( 'now' ) AS now;` )[ 0 ].now
@@ -45,8 +41,8 @@ const store = async ( { body, title, url }: { body: string, title: string, url: 
         else
             await sql`UPDATE pages SET removed = DATETIME( ${ now } ) WHERE url = ${ url } AND removed IS NULL AND text = ${ text }`
     console.log( "sentences in db", sentencesInDb, triplets )
-    for ( const text of triplets.filter( text => ! sentencesInDb.map( _ => _.text ).includes( text ) ) )
-        await sql`INSERT INTO pages ( added, embeddings, seen, text, url ) VALUES ( datetime( ${ now } ), ${ ( await embed( text ) ).buffer }, datetime( ${ now } ), ${ text }, ${ url } );`
+    for ( const triplet of triplets.filter( text => ! sentencesInDb.map( _ => _.text ).includes( text ) ).map( _ => _.split( "\n" ) ) )
+        await sql`INSERT INTO pages ( added, embeddings, seen, text, url ) VALUES ( datetime( ${ now } ), ${ mixEmbeddings( await embed( title ), await embed( triplet[ 0 ] ), await embed( triplet[ 1 ] ), await embed( triplet[ 2 ] ) ).buffer }, datetime( ${ now } ), ${ triplet.join( "\n" ) }, ${ url } );`
     console.log( "current pages", await sql`SELECT * FROM pages;` )
 }
 

@@ -63,35 +63,6 @@
     opacity: 0.8;
 }
 
-.order {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.orderLabel {
-    user-select: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: var( --text );
-    border-radius: calc( 8em / 18 );
-    padding: calc( 2em / 18 ) calc( 4em / 18 );
-    border: calc( 2em / 18 ) solid var( --shadow );
-}
-
-.orderLabel > * {
-    backface-visibility: hidden;
-}
-
-.orderLabel > *:nth-child( 2 ) {
-    margin-top: calc( -24em / 18 );
-}
-
-.rotated {
-    transform: rotateX( 180deg );
-}
-
 .quote {
     border-radius: calc( 8em / 18 );
     border: calc( 2em / 18 ) solid var( --shadow );

@@ -1,14 +1,9 @@
 import { IconClockHour12, TablerIconsProps } from "@tabler/icons-react"
-import { useEffect, useState } from "react"
+import styles from "./Clock.module.css"
 
 export const Clock = ( props: TablerIconsProps ) => {
-    const [ time, setTime ] = useState( 0 )
-    useEffect( () => {
-        const interval = setInterval( () => setTime( time => time + 1 ), 1000 )
-        return () => clearInterval( interval )
-    }, [] )
     return <>
-        <IconClockHour12 { ...props } style={ { transform: `rotate( ${ 30 * Math.floor( time / 12 ) }deg )` } }/>
-        <IconClockHour12 { ...props } style={ { transform: `rotate( ${ 30 * Math.floor( time ) }deg )`, position: "absolute" } }/>
+        <IconClockHour12 className={ styles.seconds } { ...props }/>
+        <IconClockHour12 className={ styles.minutes } { ...props }/>
     </>
 }

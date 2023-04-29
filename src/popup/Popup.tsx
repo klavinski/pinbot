@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { IconArrowRight, IconCalendar, IconCircle, IconCircleMinus, IconCirclePlus, IconMessageDots, IconMessages, IconMoodAnnoyed, IconMoodCry, IconMoodEmpty, IconMoodSad, IconMoodSmile, IconPointFilled, IconQuote, IconQuoteOff, IconSearch, IconSwitchHorizontal, IconWorld, IconWorldOff } from "@tabler/icons-react"
+import { IconArrowRight, IconCalendar, IconCircleMinus, IconCirclePlus, IconMessageDots, IconMessages, IconMoodAnnoyed, IconMoodCry, IconMoodEmpty, IconMoodSad, IconMoodSmile, IconPointFilled, IconQuote, IconQuoteOff, IconSearch, IconWorld, IconWorldOff } from "@tabler/icons-react"
 import { ReactComponent as Icon } from "../../icons/black-icon.svg"
 import { Input } from "./Input.tsx"
 import { Focus } from "./Focus.tsx"
@@ -15,11 +15,9 @@ import { Toggle } from "./Toggle/index.tsx"
 import { Clock } from "./Clock.tsx"
 import { AccountButton } from "./Account.tsx"
 import { Tooltip } from "./Tooltip.tsx"
-import { maximumIndex } from "../utils.ts"
 import { AlertsButton } from "./Alerts.tsx"
 
 import manifest from "../../manifest.json"
-import { IconCheckCircle } from "untitled-ui-icons"
 
 const initialFields = {
     query: "",
@@ -58,7 +56,6 @@ export const Popup = () => {
         toCalendar: false,
         urlInfo: false
     } )
-    const [ order, setOrder ] = useSessionState( "order", "sentence" as "page" | "sentence" )
     const FieldsButton = shown.fields ? IconCircleMinus : IconCirclePlus
     const ExactInfoButton = shown.exactInfo ? IconQuoteOff : IconQuote
     const UrlInfoButton = shown.urlInfo ? IconWorldOff : IconWorld
@@ -150,16 +147,8 @@ export const Popup = () => {
                 setShown={ newShown => setShown( { ...shown, [ `${ _ }Calendar` ]: newShown } ) }
                 shown={ shown[ `${ _ }Calendar` ] }
             /> ) }
-            <div className={ styles.order }>
-                Order by&nbsp;
-                <div className={ [ styles.orderLabel, "clickableIcon" ].join( " " ) } onClick={ () => setOrder( ( { sentence: "page", page: "sentence" } as const )[ order ] ) }>
-                    <div className={ order !== "page" ? styles.rotated : undefined }>page</div>
-                    <div className={ order !== "sentence" ? styles.rotated : undefined }>sentence</div>
-                </div>
-                &nbsp;score
-            </div>
         </> }
-        { output.sort( ( a, b ) => ( b.scores[ order ] - a.scores[ order ] ) ).map( page => {
+        { output.map( page => {
             const url = new URL( chrome.runtime.getURL( "/_favicon/" ) )
             url.searchParams.set( "pageUrl", page.url )
             url.searchParams.set( "size", "32" )
@@ -174,7 +163,7 @@ export const Popup = () => {
                 ⦁
                     <UI prefix={ <IconCalendar/> }>{ page.added !== page.seen && `${ new Date( page.added ).toLocaleDateString() } — ` }{ new Date( page.seen ).toLocaleDateString() }</UI>
                 ⦁
-                    <Confidence score={ page.scores[ order ] }/>
+                    <Confidence score={ page.score }/>
                 </div>
                 <div className={ styles.bold }>{ page.title }</div>
                 <div className={ styles.body }>

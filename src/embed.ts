@@ -9,7 +9,7 @@ const sandbox = new Promise<Window>( ( resolve, reject ) => {
 } )
 iframe.src = browser.runtime.getURL( "src/sandbox.html" )
 
-export const embed = ( text: string ) => new Promise<Float32Array>( async resolve => {
+const embedWithoutCache = ( text: string ) => new Promise<Float32Array>( async resolve => {
     const controller = new AbortController()
     window.addEventListener( "message", ( { data } ) => {
         const parsing = z.object( { text: z.literal( text ), embeddings: z.instanceof( Float32Array ) } ).safeParse( data )
@@ -20,3 +20,11 @@ export const embed = ( text: string ) => new Promise<Float32Array>( async resolv
     }, { signal: controller.signal } );
     ( await sandbox ).postMessage( text, "*" )
 } )
+
+const cache = new Map<string, Float32Array>()
+
+export const embed = async ( text: string ) => {
+    if ( ! cache.has( text ) )
+        cache.set( text, await embedWithoutCache( text ) )
+    return cache.get( text )!
+}

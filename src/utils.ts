@@ -14,6 +14,12 @@ export const cosineSimilarity = ( a: Float32Array, b: Float32Array ) => {
     return dot / ( Math.sqrt( normA * normB ) )
 }
 
+export const mixEmbeddings = ( title: Float32Array, before: Float32Array, sentence: Float32Array, after: Float32Array ) => {
+    const result = new Float32Array( title.length )
+    result.forEach( ( _, i ) => result[ i ] = 0.1 * title[ i ] + 0.1 * before[ i ] + 0.7 * sentence[ i ] + 0.1 * after[ i ] )
+    return result
+}
+
 export const tokenize = ( text: string ) => text
     .normalize( "NFD" )
     .replace( /\p{Diacritic}/gu, "" )
@@ -29,7 +35,8 @@ export const tokenize = ( text: string ) => text
 
 export const split = ( text: string ) =>
     readDoc( text ).sentences().out()
-        .flatMap( _ => _.split( "\n" ) )
+        .flatMap( _ => _.replace( /\s+/, " " ).split( "\n" ) )
+        .map( _ => _.trim() )
         .filter( _ => _ !== "" )
 
 export const maximumIndex = <T extends { [key in K]: number }, K extends keyof T>( array: T[], key: K ) =>

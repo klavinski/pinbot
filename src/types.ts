@@ -12,7 +12,7 @@ export type Query = z.infer<typeof queryParser>
 
 export const responseParser = z.array( z.object( {
     text: z.string(),
-    scores: z.object( { page: z.number(), sentence: z.number() } ),
+    score: z.number(),
     added: z.string(),
     title: z.string(),
     seen: z.string(),

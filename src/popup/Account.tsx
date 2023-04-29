@@ -18,7 +18,7 @@ export const AccountButton = () => {
 }
 
 export const Account = () => <div onClick={ e => e.stopPropagation() }>
-    The current extension only keeps your history for two weeks.<br/>
+    The current extension keeps your history for only two weeks.<br/>
     Accounts keep all your history and synchronize it across your<br/>
     devices, while maintaining your privacy.<br/>
     <br/>

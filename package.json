@@ -36,6 +36,7 @@
     "@types/chrome": "^0.0.228",
     "@types/react": "^18.0.33",
     "@types/react-dom": "^18.0.11",
+    "@types/serviceworker": "^0.0.67",
     "@types/webextension-polyfill": "^0.10.0",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
