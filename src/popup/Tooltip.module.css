@@ -1,4 +1,9 @@
 .container {
+    position: relative;
+    display: grid;
+}
+
+.tooltip {
     padding: calc( 4em / 18 );
     width: max-content;
     border: solid calc( 2em / 18 ) var( --shadow );

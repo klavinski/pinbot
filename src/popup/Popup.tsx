@@ -3,13 +3,12 @@ import { IconArrowRight, IconCalendar, IconCircleMinus, IconCirclePlus, IconMess
 import { ReactComponent as Icon } from "../../icons/black-icon.svg"
 import { Input } from "./Input.tsx"
 import { Focus } from "./Focus.tsx"
-import "./index.css"
+import "../index.css"
 import styles from "./Popup.module.css"
 import { usePopup } from "./api.ts"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { Calendar } from "./Calendar.tsx"
 import { Query } from "../types.ts"
-
 import { UI } from "./UI.tsx"
 import { Toggle } from "./Toggle/index.tsx"
 import { Clock } from "./Clock.tsx"
@@ -60,7 +59,7 @@ export const Popup = () => {
     const ExactInfoButton = shown.exactInfo ? IconQuoteOff : IconQuote
     const UrlInfoButton = shown.urlInfo ? IconWorldOff : IconWorld
     const [ parent ] = useAutoAnimate()
-    return <div className={ styles.container } ref={ parent } onKeyUp={ e => {
+    return <div className={ styles.container } onKeyUp={ e => {
         if ( e.key === "Enter" && fields.query && ! isLoading )
             search( fields ).then( setOutput )
     } }>
@@ -88,8 +87,8 @@ export const Popup = () => {
             />
         </UI>
         </Focus>
-        { shown.fields && <>
-            <Focus disabled={ isLoading }><UI prefix={
+        <div ref={ parent }>{ shown.fields && <>
+            { /* <Focus disabled={ isLoading }><UI prefix={
                 <ExactInfoButton className={ "clickableIcon" } onClick={ () => setShown( { ...shown, exactInfo: ! shown.exactInfo } ) }/>
             }>
                 <Input placeholder="Exact search" value={ fields.exact } onChange={ exact => setFields( { ...fields, exact } ) }/>
@@ -103,7 +102,7 @@ export const Popup = () => {
                     Mentions without the fish: <div className={ styles.quote }>Captain Haddock - fish</div>
                 </div></UI><br/>
                 Only the stem of the word is considered: <div className={ styles.quote }>fish</div> matches <div className={ styles.quote }>Fish</div>, <div className={ styles.quote }>fishes</div>, <div className={ styles.quote }>fishing</div>, etc.
-            </div> }
+            </div> } */ }
             <Focus disabled={ isLoading }><UI prefix={
                 <UrlInfoButton className={ "clickableIcon" } onClick={ () => setShown( { ...shown, urlInfo: ! shown.urlInfo } ) }/>
             }>
@@ -147,13 +146,13 @@ export const Popup = () => {
                 setShown={ newShown => setShown( { ...shown, [ `${ _ }Calendar` ]: newShown } ) }
                 shown={ shown[ `${ _ }Calendar` ] }
             /> ) }
-        </> }
-        { output.map( page => {
+        </> }</div>
+        <div className={ styles.results }>{ output.map( page => {
             const url = new URL( chrome.runtime.getURL( "/_favicon/" ) )
             url.searchParams.set( "pageUrl", page.url )
             url.searchParams.set( "size", "32" )
             const [ sentence1, sentence2, sentence3 ] = page.text.split( "\n" )
-            return <div>
+            return <div key={ `${ page.url } ${ page.seen } ${ page.title } ${ page.text }` }>
                 <div className={ styles.info }>
                     <Tooltip content={ page.url }>
                         <UI prefix={ <img className={ styles.favicon } src={ url.toString() }/> } href={ page.url }>
@@ -161,7 +160,7 @@ export const Popup = () => {
                         </UI>
                     </Tooltip>
                 ⦁
-                    <UI prefix={ <IconCalendar/> }>{ page.added !== page.seen && `${ new Date( page.added ).toLocaleDateString() } — ` }{ new Date( page.seen ).toLocaleDateString() }</UI>
+                    <UI prefix={ <IconCalendar/> }>{ new Date( page.added ).toLocaleDateString() !== new Date( page.seen ).toLocaleDateString() && `${ new Date( page.added ).toLocaleDateString() } — ` }{ new Date( page.seen ).toLocaleDateString() }</UI>
                 ⦁
                     <Confidence score={ page.score }/>
                 </div>
@@ -171,9 +170,11 @@ export const Popup = () => {
                     <span className={ styles.bold }>{ sentence2 }</span>
                     { sentence3 && ` ${ sentence3 }` }
                 </div>
-            </div> } ) }
+            </div> } ) }</div>
         <div className={ styles.footer }>
-            v{ manifest.version } —&nbsp;
+            <Tooltip content={ `v${ manifest.version }` }>
+                By Kamil Szczerba —&nbsp;
+            </Tooltip>
             <UI href="https://tally.so/r/3NravQ" prefix={ <IconMessageDots/> }>Leave feedback</UI>
             &nbsp;—&nbsp;
             <UI href="https://discord.gg/NetMteXfjf" prefix={ <IconMessages/> }>Meet the community</UI>
