@@ -23,6 +23,7 @@
     display: flex;
     flex-direction: column;
     gap: calc( 16em / 18 );
+    width: 650px;
 }
 
 .favicon {

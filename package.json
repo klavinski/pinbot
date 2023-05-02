@@ -4,7 +4,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite build --watch",
+    "dev:web": "vite serve src/web --mode web",
+    "build:web": "vite build --mode web",
     "build": "vite build && sed -i '' 's/document\\.baseURI/self\\.location\\.href/g' dist/assets/worker-*.js && sed -i '' 's/document\\.currentScript&&document\\.currentScript.src||//g' dist/assets/worker-*.js",
     "models": "git lfs install && cd public/models/onnx && git sparse-checkout set quantized/sentence-transformers/all-MiniLM-L6-v2",
     "preview": "vite preview",

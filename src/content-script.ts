@@ -1,6 +1,6 @@
 import browser from "webextension-polyfill"
 
-const delay = 1000
+const delay = 1 * 1000
 const frequency = 20 * 1000
 const sendBody = () => {
     const selection = document.getSelection()

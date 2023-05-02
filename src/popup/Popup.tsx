@@ -59,7 +59,7 @@ export const Popup = () => {
     const ExactInfoButton = shown.exactInfo ? IconQuoteOff : IconQuote
     const UrlInfoButton = shown.urlInfo ? IconWorldOff : IconWorld
     const [ parent ] = useAutoAnimate()
-    return <div className={ styles.container } onKeyUp={ e => {
+    return <div ref={ parent } className={ styles.container } onKeyUp={ e => {
         if ( e.key === "Enter" && fields.query && ! isLoading )
             search( fields ).then( setOutput )
     } }>
@@ -87,7 +87,7 @@ export const Popup = () => {
             />
         </UI>
         </Focus>
-        <div ref={ parent }>{ shown.fields && <>
+        { shown.fields && <>
             { /* <Focus disabled={ isLoading }><UI prefix={
                 <ExactInfoButton className={ "clickableIcon" } onClick={ () => setShown( { ...shown, exactInfo: ! shown.exactInfo } ) }/>
             }>
@@ -146,7 +146,7 @@ export const Popup = () => {
                 setShown={ newShown => setShown( { ...shown, [ `${ _ }Calendar` ]: newShown } ) }
                 shown={ shown[ `${ _ }Calendar` ] }
             /> ) }
-        </> }</div>
+        </> }
         <div className={ styles.results }>{ output.map( page => {
             const url = new URL( chrome.runtime.getURL( "/_favicon/" ) )
             url.searchParams.set( "pageUrl", page.url )
@@ -173,7 +173,7 @@ export const Popup = () => {
             </div> } ) }</div>
         <div className={ styles.footer }>
             <Tooltip content={ `v${ manifest.version }` }>
-                By Kamil Szczerba —&nbsp;
+                Made by Kamil Szczerba —&nbsp;
             </Tooltip>
             <UI href="https://tally.so/r/3NravQ" prefix={ <IconMessageDots/> }>Leave feedback</UI>
             &nbsp;—&nbsp;

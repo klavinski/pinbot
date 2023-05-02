@@ -4,7 +4,9 @@ import svgr from "vite-plugin-svgr"
 import { crx } from "@crxjs/vite-plugin"
 import manifest from "./manifest.json"
 
-export default defineConfig( {
+export default defineConfig( ( { mode } ) => mode === "web" ? {
+    plugins: [ react() ],
+} : {
     build: {
         rollupOptions: {
             input: [ "src/offscreen.html" ],
