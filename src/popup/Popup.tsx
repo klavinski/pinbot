@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import { IconArrowRight, IconCalendar, IconCircleMinus, IconCirclePlus, IconMessageDots, IconMessages, IconMoodAnnoyed, IconMoodCry, IconMoodEmpty, IconMoodSad, IconMoodSmile, IconPointFilled, IconQuote, IconQuoteOff, IconSearch, IconWorld, IconWorldOff } from "@tabler/icons-react"
-import { ReactComponent as Icon } from "../../icons/black-icon.svg"
 import { Input } from "./Input.tsx"
 import { Focus } from "./Focus.tsx"
 import "../index.css"
@@ -17,6 +16,7 @@ import { Tooltip } from "./Tooltip.tsx"
 import { AlertsButton } from "./Alerts.tsx"
 
 import manifest from "../../manifest.json"
+import { Wordmark } from "./Wordmark.tsx"
 
 const initialFields = {
     query: "",
@@ -65,9 +65,7 @@ export const Popup = () => {
     } }>
         <div className={ styles.header }>
             <div/>
-            <div className={ styles.wordmark }>
-                Pin<Icon className={ styles.logo }/>bot
-            </div>
+            <Wordmark/>
             <div className={ styles.buttons }>
                 <Tooltip content="Light/dark mode"><Toggle/></Tooltip>
                 <Tooltip content="Alerts"><AlertsButton/></Tooltip>

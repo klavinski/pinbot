@@ -16,6 +16,7 @@
 
 .moon {
     color: #fff;
+    left: calc( 4em / 18 );
     position: absolute;
 }
 

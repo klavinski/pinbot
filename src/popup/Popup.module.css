@@ -1,8 +1,3 @@
-@font-face {
-    font-family: "Linotte";
-    src: url( "./linotte.woff2" );
-}
-
 .body {
     text-align: justify;
 }
@@ -59,11 +54,6 @@
     white-space: nowrap;
 }
 
-.logo {
-    color: #4293a2;
-    opacity: 0.8;
-}
-
 .quote {
     border-radius: calc( 8em / 18 );
     border: calc( 2em / 18 ) solid var( --shadow );
@@ -80,23 +70,4 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-
-.wordmark {
-    display: flex;
-    justify-content: center;
-    font-size: 2em;
-    align-items: center;
-    color: var( --gold );
-    opacity: 0.8;
-    user-select: none;
-}
-
-.wordmark {
-    font-family: "Linotte";
-}
-
-.wordmark svg {
-    height: 1.8em;
-    padding-bottom: 0.3em;
 }

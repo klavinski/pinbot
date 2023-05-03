@@ -4,9 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev:web": "vite serve src/web --mode web",
-    "build:web": "vite build --mode web",
-    "build": "vite build && sed -i '' 's/document\\.baseURI/self\\.location\\.href/g' dist/assets/worker-*.js && sed -i '' 's/document\\.currentScript&&document\\.currentScript.src||//g' dist/assets/worker-*.js",
+    "dev:web": "vite dev src/web --mode web --host",
+    "build:web": "vite build src/web --mode web",
+    "build:extension": "vite build --mode extension && sed -i '' 's/document\\.baseURI/self\\.location\\.href/g' dist/assets/worker-*.js && sed -i '' 's/document\\.currentScript&&document\\.currentScript.src||//g' dist/assets/worker-*.js",
     "models": "git lfs install && cd public/models/onnx && git sparse-checkout set quantized/sentence-transformers/all-MiniLM-L6-v2",
     "preview": "vite preview",
     "clone": "git clone --depth 1 --filter=blob:none --sparse https://huggingface.co/Xenova/transformers.js"
@@ -51,6 +51,6 @@
     "eslint-plugin-react": "^7.32.2",
     "postcss": "^8.4.21",
     "typescript": "^5.0.3",
-    "vite": "^4.2.1"
+    "vite": "^4.3.4"
   }
 }

@@ -88,6 +88,7 @@ abbr[title] {
 
 .clickableIcon {
     cursor: pointer;
+    display: inline-block;
 }
 
 .clickableIcon:active {

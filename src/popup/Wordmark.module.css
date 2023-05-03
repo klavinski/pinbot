@@ -1,0 +1,25 @@
+@font-face {
+    font-family: "Linotte";
+    src: url( "./linotte.woff2" );
+}
+
+.container {
+    font-family: "Linotte";
+    display: flex;
+    justify-content: center;
+    font-size: 2em;
+    align-items: center;
+    color: var( --gold );
+    opacity: 0.8;
+    user-select: none;
+}
+
+.container svg {
+    height: 1.8em;
+    padding-bottom: 0.3em;
+}
+
+.logo {
+    color: #4293a2;
+    opacity: 0.8;
+}

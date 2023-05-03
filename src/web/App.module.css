@@ -1,5 +1,99 @@
+.background {
+    animation: caret linear 1s infinite;
+    background-size: contain;
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    width: 200vh;
+    height: 100vh;
+    transform-style: preserve-3d;
+    transform: translateZ( -1px );
+    position: absolute;
+    left: calc( 50% - 100vh );
+}
+
+.circle {
+    width: calc( 24em / 18 );
+    height: calc( 24em / 18 );
+    display: flex;
+    border-radius: 50%;
+    justify-content: center;
+    align-items: center;
+    background-color: var( --shadow );
+    flex-shrink: 0;;
+}
+
 .container {
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.features {
+    display: grid;
+    gap: 1em;
+    padding: 1em;
+    backdrop-filter: blur( 0.5em );
+    max-width: 1366px;
+}
+
+.feature {
+    display: grid;
+    gap: 1em;
+    justify-items: center;
+}
+
+.feature > * {
+    border-radius: calc( 8em / 18 );
+}
+
+@media ( min-width: 768px ) {
+    .feature {
+        grid-template-columns: repeat( 2, 1fr );
+    }
+
+    .feature:nth-child( 2n + 2 ) > *:nth-child( 1 ) {
+        grid-area: 1 / 2;
+    }
+
+    .feature:nth-child( 2n + 2 ) > *:nth-child( 2 ) {
+        grid-column: 1 / 1;
+    }
+}
+
+.description {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1em;
+    align-items: center;
+}
+
+.feature img {
+    width: 100%;
+}
+
+.withIcons > * {
+    vertical-align: top;
+}
+
+.header {
+    backdrop-filter: blur( 0.5em );
+    padding: 0 calc( 16em / 18 );
+    display: grid;
+    top: 0;
+    position: sticky;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    z-index: 2;
+}
+
+.header > *:nth-child( 1 ) {
+    display: flex;
+    gap: 0.5em;
+}
+
+.header > *:nth-child( 3 ) {
+    justify-self: end;
 }
 
 .headline {
@@ -8,21 +102,58 @@
     -webkit-text-fill-color: transparent;
     font-size: calc( 64em / 18 );
     font-weight: 700;
+    max-width: 768px;
+    text-align: center;
+    padding: 0rem;
+}
+
+.hero {
+    display: grid;
+    grid-template-rows: 1fr minmax( 0, 16em ) 8em;
+    height: calc( 100vh - 48px );
+    width: 100%;
+    align-items: center;
+    justify-items: center;
+    padding: calc( 16em / 18 );
+    z-index: 1;
 }
 
 .install {
-    display: flex;
-    align-items: center;
+    border-radius: calc( 8em / 18 );
+    backdrop-filter: blur( 0.5em ) brightness( 1.2 );
+    margin: auto;
+    border: calc( 2em / 18 ) solid var( --shadow );
+    padding: calc( 12em / 18 );
+    text-align: center;
 }
 
-.number {
-    width: calc( 24em / 18 );
-    height: calc( 24em / 18 );
-    display: flex;
-    border-radius: 50%;
-    justify-content: center;
-    align-items: center;
-    background-color: var( --shadow );
+.install > * {
+    vertical-align: top;
+}
+
+.scroll {
+    perspective: 6px;
+    perspective-origin: center bottom;
+    height: 100vh;
+    overflow: auto;
+    position: relative;
+}
+
+@media( prefers-color-scheme: dark ) {
+    :root:not(:root[data-isDark="false"]) .container {
+        background-color: #464646;
+    }
+    :root:not(:root[data-isDark="false"]) .container {
+        animation-name: dark-caret;
+    }
+}
+
+:root[data-isDark="true"] .scroll {
+    background-color: #464646;
+}
+
+:root[data-isDark="true"] .background {
+    animation-name: dark-caret;
 }
 
 .subtitle {
@@ -31,4 +162,22 @@
     display: flex;
     align-items: center;
     gap: 0.4em;
+}
+
+@keyframes caret {
+    0% {
+        background-image: url( "./caret.jpg" );
+    }
+    100% {
+        background-image: url( "./no caret.jpg" );
+    }
+}
+
+@keyframes dark-caret {
+    0% {
+        background-image: url( "./dark caret.jpg" );
+    }
+    100% {
+        background-image: url( "./dark no caret.jpg" );
+    }
 }
