@@ -97,7 +97,7 @@
 }
 
 .headline {
-    background-image: linear-gradient( -45deg, #645ebe, #269cd7, #8b60b1 );
+    background-image: linear-gradient( -45deg, #1d4f9d, #45bace, #1b4b97 );
     background-clip: text;
     -webkit-text-fill-color: transparent;
     font-size: calc( 64em / 18 );
@@ -109,7 +109,7 @@
 
 .hero {
     display: grid;
-    grid-template-rows: 1fr minmax( 0, 16em ) 8em;
+    grid-template-rows: 1fr minmax( 0, 24em ) 8em;
     height: calc( 100vh - 48px );
     width: 100%;
     align-items: center;
@@ -132,7 +132,7 @@
 }
 
 .scroll {
-    perspective: 6px;
+    perspective: 8px;
     perspective-origin: center bottom;
     height: 100vh;
     overflow: auto;

@@ -1,5 +1,5 @@
 import styles from "./Wordmark.module.css"
-import { ReactComponent as Icon } from "./../../icons/black-icon.svg"
+import iconSrc from "./../../icons/teal-icon.svg"
 export const Wordmark = () => <div className={ styles.container }>
-    Pin<div className={ styles.logo }/>bot
+    Pin<img className={ styles.logo } src={ iconSrc }/>bot
 </div>

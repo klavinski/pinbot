@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg fill="none" stroke="#4293a2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" version="1.1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<rect x="5" y="9" width="14" height="10" ry="3" fill="none"/>
+<line x1="9" x2="9.01" y1="13" y2="13"/>
+<line x1="15" x2="15.01" y1="13" y2="13"/>
+<path d="m9 18v3.0002c1.8729-0.9365 3.9364-1.9683 6-3.0002v3.0002c-2.4836-1.2419-4.6318-2.316-6-3.0002zm0 0c1.3682 0.68415 3.5165 1.7583 6 3.0002v-3.0002c-2.0636 1.0318-4.1271 2.0637-6 3.0002v-3.0002z" fill="none"/>
+<path transform="rotate(90.017)" d="m15.999-4.5039a1.5 1.5002 0 0 1-0.75 1.2992 1.5 1.5002 0 0 1-1.5-1e-7 1.5 1.5002 0 0 1-0.75-1.2992h1.5z" fill="none"/>
+<path transform="matrix(.0010768 -1 1 .0011049 0 0)" d="m-12.978 19.517a1.5 1.499 0 0 1-0.75 1.2982 1.5 1.499 0 0 1-1.5-1e-6 1.5 1.499 0 0 1-0.75-1.2982h1.5z" fill="none"/>
+<circle cx="12" cy="4.5" r="1.5" fill="none"/>
+<path d="m12 6v2-2z" fill="none"/>
+</svg>

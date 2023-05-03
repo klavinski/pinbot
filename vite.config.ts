@@ -1,6 +1,5 @@
 import { defineConfig } from "vite"
 import react from "@vitejs/plugin-react"
-import svgr from "vite-plugin-svgr"
 import { crx } from "@crxjs/vite-plugin"
 import manifest from "./manifest.json"
 
@@ -12,17 +11,13 @@ export default defineConfig( ( { mode } ) => {
                     input: [ "src/offscreen.html" ],
                 },
             },
-            plugins: [
-                react(),
-                svgr(),
-                crx( { manifest } ),
-            ],
+            plugins: [ react(), crx( { manifest } ) ],
             worker: {
                 format: "es"
             },
-            web: {
-                plugins: [ react(), svgr( { include: "**/*", exportAsDefault: true } ) ]
-            }
+        },
+        web: {
+            plugins: [ react() ]
         }
     }
     if ( mode in configs )

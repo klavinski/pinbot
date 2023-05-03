@@ -14,12 +14,8 @@
     user-select: none;
 }
 
-.container svg {
+.logo {
+    opacity: 0.8;
     height: 1.8em;
     padding-bottom: 0.3em;
-}
-
-.logo {
-    color: #4293a2;
-    opacity: 0.8;
 }
