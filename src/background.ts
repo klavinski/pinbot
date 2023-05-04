@@ -4,8 +4,13 @@ import browser from "webextension-polyfill"
     const url = browser.runtime.getURL( "src/offscreen.html" )
     if ( ( await clients.matchAll() ).every( _ => _.url !== url ) )
         chrome.offscreen.createDocument( {
-            justification: "SQLite worker & WASM sandbox",
-            reasons: [ chrome.offscreen.Reason.IFRAME_SCRIPTING ],
+            justification: "DB worker & WASM sandbox",
+            reasons: [ chrome.offscreen.Reason.IFRAME_SCRIPTING, "WORKERS" ],
             url: browser.runtime.getURL( "src/offscreen.html" ),
         } )
 } )()
+
+browser.tabs.onUpdated.addListener( ( tabId, { status } ) => {
+    if ( status === "complete" )
+        browser.tabs.sendMessage( tabId, "please send the page body to offscreen" )
+} )

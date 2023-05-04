@@ -11,7 +11,7 @@ export const Toggle = () => {
     useEffect( () => {
         const darkModePreference = window.matchMedia( "( prefers-color-scheme: dark )" )
         const updateFromOSPreference = async () => {
-            const storage = "chrome" in self ? await chrome.storage.sync.get() : {}
+            const storage = "chrome" in self ? await chrome?.storage?.sync.get() ?? {} : {}
             updateStyle( "isDark" in storage ? storage.isDark : darkModePreference.matches )
         }
         const abortController = new AbortController()
@@ -21,7 +21,7 @@ export const Toggle = () => {
     }, [] )
     return <div className={ [ styles.container, isDark ? styles.dark : "", "clickableIcon" ].join( " " ) }
         onClick={ () => {
-            "chrome" in self && chrome.storage.sync.set( { isDark: ! isDark } )
+            "chrome" in self && chrome?.storage?.sync.set( { isDark: ! isDark } )
             updateStyle( ! isDark )
         } }>
         <IconSunFilled className={ styles.sun }/>

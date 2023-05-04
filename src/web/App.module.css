@@ -1,3 +1,23 @@
+.about {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+    backdrop-filter: blur( 0.5em );
+    width: 100%;
+    padding: 1em;
+}
+
+.about > p {
+    max-width: 768px;
+    text-align: justify;
+    hyphens: auto;
+}
+
+.about > p > * {
+    vertical-align: top;
+}
+
 .background {
     animation: caret linear 1s infinite;
     background-size: contain;
@@ -6,7 +26,7 @@
     width: 200vh;
     height: 100vh;
     transform-style: preserve-3d;
-    transform: translateZ( -1px );
+    transform: translateZ( -3px ) scale( 6 );
     position: absolute;
     left: calc( 50% - 100vh );
 }
@@ -26,11 +46,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 4em;
 }
 
 .features {
     display: grid;
-    gap: 1em;
+    gap: 2em;
     padding: 1em;
     backdrop-filter: blur( 0.5em );
     max-width: 1366px;
@@ -38,7 +59,7 @@
 
 .feature {
     display: grid;
-    gap: 1em;
+    gap: 2em;
     justify-items: center;
 }
 
@@ -105,6 +126,7 @@
     max-width: 768px;
     text-align: center;
     padding: 0rem;
+    text-shadow: none;
 }
 
 .hero {
@@ -120,23 +142,39 @@
 
 .install {
     border-radius: calc( 8em / 18 );
-    backdrop-filter: blur( 0.5em ) brightness( 1.2 );
+    backdrop-filter: blur( 0.5em );
     margin: auto;
     border: calc( 2em / 18 ) solid var( --shadow );
     padding: calc( 12em / 18 );
     text-align: center;
+    font-size: calc( 24em / 18 );
 }
 
 .install > * {
     vertical-align: top;
 }
 
+.kamil {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    font-size: calc( 32em / 18 );
+    gap: 0.5em;
+}
+
+.kamil img {
+    border-radius: 50%;
+    max-width: 3em;
+}
+
 .scroll {
-    perspective: 8px;
+    perspective: 1px;
     perspective-origin: center bottom;
     height: 100vh;
-    overflow: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
     position: relative;
+    text-shadow: 0 0 0.5em var( --background );
 }
 
 @media( prefers-color-scheme: dark ) {
