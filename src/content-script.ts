@@ -1,6 +1,6 @@
 import browser from "webextension-polyfill"
 
-const delay = 1 * 1000
+const delay = 3 * 1000
 
 const sendBody = () => {
 
