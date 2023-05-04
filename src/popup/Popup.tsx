@@ -145,12 +145,12 @@ export const Popup = () => {
                 shown={ shown[ `${ _ }Calendar` ] }
             /> ) }
         </> }
-        <div className={ styles.results }>{ output.map( page => {
+        <div className={ styles.results }>{ output.map( ( page, i ) => {
             const url = new URL( chrome.runtime.getURL( "/_favicon/" ) )
             url.searchParams.set( "pageUrl", page.url )
             url.searchParams.set( "size", "32" )
             const [ sentence1, sentence2, sentence3 ] = page.text.split( "\n" )
-            return <div key={ `${ page.url } ${ page.seen } ${ page.title } ${ page.text }` }>
+            return <div key={ `${ i } ${ page.url } ${ page.seen } ${ page.title } ${ page.text }` }>
                 <div className={ styles.info }>
                     <Tooltip content={ page.url }>
                         <UI prefix={ <img className={ styles.favicon } src={ url.toString() }/> } href={ page.url }>

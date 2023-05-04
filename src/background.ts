@@ -5,7 +5,7 @@ import browser from "webextension-polyfill"
     if ( ( await clients.matchAll() ).every( _ => _.url !== url ) )
         chrome.offscreen.createDocument( {
             justification: "DB worker & WASM sandbox",
-            reasons: [ chrome.offscreen.Reason.IFRAME_SCRIPTING, "WORKERS" ],
+            reasons: [ chrome.offscreen.Reason.IFRAME_SCRIPTING ],
             url: browser.runtime.getURL( "src/offscreen.html" ),
         } )
 } )()
