@@ -1,4 +1,4 @@
-import { IconArrowDown, IconBrandChrome, IconMessageDots, IconMessages } from "@tabler/icons-react"
+import { IconArrowDown, IconBrandChrome, IconMessageDots, IconMessages, IconPlayerPlayFilled } from "@tabler/icons-react"
 import styles from "./App.module.css"
 import darkMode from "./dark.png"
 import bach from "./bach.png"
@@ -12,7 +12,7 @@ import { ReactNode } from "react"
 
 const Install = ( { suffix }: { suffix?: ReactNode } ) => <div className={ styles.install }>
     Install the{ " " }
-    <UI prefix={ <IconBrandChrome size={ 24 / 18 * 24 }/> } href="chrome">extension for Chrome</UI>
+    <UI prefix={ <IconBrandChrome size={ 24 / 18 * 24 }/> } href="https://chrome.google.com/webstore/detail/pinbot/jbijbbnkaeclpmednjodmbdeobebiobg">extension for Chrome</UI>
     { suffix }
 </div>
 
@@ -29,7 +29,9 @@ export const App = () => <>
         <div className={ styles.container }>
             <div className={ styles.hero }>
                 <div className={ styles.headline }>Privately search your browser history using AI.</div>
-                <div/>
+                <a href="https://www.youtube.com/watch?v=GYwJu5Kv-rA" className={ styles.play } target="_blank">
+                    <IconPlayerPlayFilled className="clickableIcon"/>
+                </a>
                 <Install suffix={ <>{ " " }or learn more<IconArrowDown size={ 24 * 24 / 18 }/></> }/>
             </div>
             <div id="features" className={ styles.features }>

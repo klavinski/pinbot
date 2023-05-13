@@ -194,6 +194,21 @@
     animation-name: dark-caret;
 }
 
+.play {
+    transform: scale(4);
+}
+
+.play > * {
+    opacity: 0.7;
+    background-color: var( --background );
+    color: var( --text );
+    border-radius: 100%;
+    width: calc( 32em / 18 );
+    height: calc( 32em / 18 );
+    padding: calc( 6em / 18 );
+    border: calc( 2em / 18 ) solid var( --text );
+}
+
 .subtitle {
     font-size: calc( 32em / 18 );
     font-weight: 600;
