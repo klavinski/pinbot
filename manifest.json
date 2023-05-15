@@ -35,7 +35,7 @@
         "value": "same-origin"
     },
     "host_permissions": ["<all_urls>"],
-    "permissions": ["favicon", "offscreen", "storage", "tabs"],
+    "permissions": ["favicon", "offscreen", "storage"],
     "web_accessible_resources": [
         {
             "resources": ["_favicon/*", "src/sandbox.html", "*"],
