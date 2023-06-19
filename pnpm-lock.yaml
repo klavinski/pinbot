@@ -23,9 +23,18 @@ dependencies:
   '@iconify-json/icon-park-outline':
     specifier: ^1.1.11
     version: 1.1.11
+  '@iconify-json/lucide':
+    specifier: ^1.1.102
+    version: 1.1.102
+  '@iconify-json/majesticons':
+    specifier: ^1.1.7
+    version: 1.1.7
   '@iconify-json/tabler':
     specifier: ^1.1.79
     version: 1.1.79
+  '@iconify-json/uil':
+    specifier: ^1.1.4
+    version: 1.1.4
   '@tiptap/core':
     specifier: ^2.0.3
     version: 2.0.3(@tiptap/pm@2.0.3)
@@ -767,8 +776,26 @@ packages:
       '@iconify/types': 2.0.0
     dev: false
 
+  /@iconify-json/lucide@1.1.102:
+    resolution: {integrity: sha512-B/elOdrHKfRPSk3nzvH6zI2JJP9OXSEhpC0CRdYOrf9/Ukk5EBrw/7z6PgYqCzavRhdB6cGCI+lXa05BAOZ9gw==}
+    dependencies:
+      '@iconify/types': 2.0.0
+    dev: false
+
+  /@iconify-json/majesticons@1.1.7:
+    resolution: {integrity: sha512-tIJktXeMjahlwV6V8fNvxYB64bUnrYpUjnb7plWXadLg656NqFBOcz7BsU0HXj6tb4u/0o3t4uKgLxTgzIbUhQ==}
+    dependencies:
+      '@iconify/types': 2.0.0
+    dev: false
+
   /@iconify-json/tabler@1.1.79:
     resolution: {integrity: sha512-O3RtNqP5ZaP8abkLR/JJuqPY2JjsuV1ttK3xttbcCE9Uz11Pu1WpmbGJ8jv75DoAGYoZ784VUgL8oiJcINLblw==}
+    dependencies:
+      '@iconify/types': 2.0.0
+    dev: false
+
+  /@iconify-json/uil@1.1.4:
+    resolution: {integrity: sha512-ucuFHlUvkfQUnyq4l2Sskrdg8r5DB8IQwMxEpPQ2JG1QTRbUmliddTT9r8/b3h69w+/IySHUy+iJcbfiHoa9zA==}
     dependencies:
       '@iconify/types': 2.0.0
     dev: false

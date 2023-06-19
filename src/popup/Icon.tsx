@@ -1,18 +1,28 @@
 import styles from "./Icon.module.css"
-import IconTag from "~icons/tabler/tag"
-import IconHash from "~icons/tabler/hash"
-import IconPencil from "~icons/tabler/pencil"
-import IconFrame from "~icons/tabler/face-id"
+import IconTablerTag from "~icons/tabler/tag"
+import IconTablerHash from "~icons/tabler/hash"
+import IconTablerPencil from "~icons/tabler/pencil"
+import IconTablerFaceId from "~icons/tabler/face-id"
+import IconUilNewspaper from "~icons/uil/newspaper"
+import IconTablerLanguage from "~icons/tabler/language"
+import IconTablerBook2 from "~icons/tabler/book-2"
+import IconUilUsersAlt from "~icons/uil/users-alt"
 
 
 import { embed } from "../transformers.ts"
 import { cosineSimilarity } from "../utils.ts"
 import { ComponentPropsWithoutRef, ReactNode, useEffect, useState } from "react"
+import { IconHeartHand } from "untitled-ui-icons"
 
 const icons = {
-    "pencil": IconPencil,
-    "tag": IconTag,
-    "frame": IconFrame
+    "book": IconTablerBook2,
+    "charity": IconHeartHand,
+    "language": IconTablerLanguage,
+    "news": IconUilNewspaper,
+    "pencil": IconTablerPencil,
+    "people": IconUilUsersAlt,
+    "tag": IconTablerTag,
+    "frame": IconTablerFaceId
 } as const
 
 const embeddings = Promise.all( Object.entries( icons ).map( async ( [ name ] ) => ( { name: name as keyof typeof icons, embedding: await embed( name ) } ) ) )
@@ -25,10 +35,10 @@ const findClosest = async ( query: string ) => {
 }
 
 export const Icon = ( { className, of, ...props }: { of: ReactNode } & ComponentPropsWithoutRef<"div"> ) => {
-    const [ element, setElement ] = useState( <IconHash/> )
+    const [ element, setElement ] = useState( <IconTablerHash/> )
     useEffect( () => {
         if ( typeof of === "string" )
-            findClosest( of ).then( _ => setElement( of === "" ? <IconHash/> : <_/> ) )
+            findClosest( of ).then( _ => setElement( of === "" ? <IconTablerHash/> : <_/> ) )
         else
             setElement( <>{ of }</> )
     }, [ of ] )

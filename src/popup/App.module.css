@@ -38,9 +38,3 @@
     justify-content: center;
     flex-direction: column;
 }
-
-.tip {
-    display: flex;
-    align-items: center;
-    opacity: 0.5;
-}

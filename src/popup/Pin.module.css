@@ -15,6 +15,10 @@
     opacity: 0;
 }
 
+.description {
+    min-width: 0;
+}
+
 .header {
     display: grid;
     grid-template-columns: 32px 1fr 32px;

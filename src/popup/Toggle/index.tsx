@@ -25,7 +25,7 @@ export const Toggle = () => {
             "chrome" in self && chrome?.storage?.sync.set( { isDark: ! isDark } )
             updateStyle( ! isDark )
         } }>
-        <IconTablerSunFilled className={ styles.sun }/>
-        <IconTablerMoon className={ styles.moon }/>
+        <IconSunFilled className={ styles.sun }/>
+        <IconMoon className={ styles.moon }/>
     </div>
 }

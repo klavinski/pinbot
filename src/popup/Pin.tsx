@@ -2,8 +2,6 @@ import { useState } from "react"
 import { Lottie } from "@crello/react-lottie"
 import remove from "react-useanimations/lib/trash"
 import hide from "./visibility-V3.json"
-import IconPin from "~icons/tabler/pin"
-import IconPinned from "~icons/tabler/pinned"
 import styles from "./Pin.module.css"
 import { Icon } from "./Icon.tsx"
 import { Editor } from "./Editor.tsx"
@@ -11,6 +9,7 @@ import { useApi } from "./context.tsx"
 import { useEffect } from "react"
 import { SetStateAction } from "react"
 import { Dispatch } from "react"
+import { UI } from "./UI.tsx"
 
 export const Pin = ( { setVisiblePictures, url, visiblePictures }: { setVisiblePictures: Dispatch<SetStateAction<boolean>>, url: string, visiblePictures: boolean } ) => {
     const api = useApi()
@@ -26,8 +25,12 @@ export const Pin = ( { setVisiblePictures, url, visiblePictures }: { setVisibleP
     return pin ? <div className={ styles.container }>
         <div className={ styles.header }>
             <Icon of={ <img src={ favicon.toString() }/> } className={ styles.favicon }/>
-            <Editor content={ pin.text }
-                onUpdate={ text => api.sql`UPDATE pins SET text = ${ text }  WHERE url = ${ url };` }/>
+            <div className={ styles.description }>
+                <UI prefix="" href={ pin.url }>{ pin.url }</UI>
+                <Editor content={ pin.text }
+                    onUpdate={ text => api.sql`UPDATE pins SET text = ${ text }  WHERE url = ${ url };` }
+                />
+            </div>
             <div className={ styles.actions }>
                 <div onMouseEnter={ () => setRemoving( false ) }
                     onMouseLeave={ () => setRemoving( true ) }>

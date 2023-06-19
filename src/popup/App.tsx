@@ -7,14 +7,11 @@ import { Wordmark } from "./Wordmark.tsx"
 import { Toggle } from "./Toggle/index.tsx"
 import { Tooltip } from "./Tooltip.tsx"
 import styles from "./App.module.css"
-import IconArrowDown from "~icons/tabler/arrow-down"
 import { useApi } from "./context.tsx"
 import { useEffect } from "react"
-import { useMemo } from "react"
 import { Icon } from "./Icon.tsx"
 import IconPin from "~icons/tabler/pin"
 import { Clock } from "./Clock.tsx"
-import { IconSlashCircle01 } from "untitled-ui-icons"
 import IconForbidden from "~icons/eva/slash-outline"
 import { Lottie } from "@crello/react-lottie"
 import check from "react-useanimations/lib/checkmark"
@@ -74,6 +71,7 @@ const getBody = () => {
 export const App = () => {
     const [ pins, setPins ] = useState( [] as { url: string }[] )
     const [ icon, setIcon ] = useState( <Icon of={ <IconPin/> }/> )
+    const [ successfulPin, setSuccessfulPin ] = useState( null as null | string )
     const [ isDisabled, setIsDisabled ] = useState( false )
     const [ visiblePictures, setVisiblePictures ] = useState( true )
     const api = useApi()
@@ -86,7 +84,7 @@ export const App = () => {
                 function: getBody,
             } ) )[ 0 ].result as ReturnType<typeof getBody>
             setPage( {
-                title: tab.title, body: result.body, url: `${ tab.url }${ result.selectedText ? `#:~:${ result.selectedText }` : "" }`,
+                title: tab.title, body: result.body, url: tab.url,
             } )
         } else {
             setIcon( <Icon of={ <IconForbidden/> }/> )
@@ -107,15 +105,14 @@ export const App = () => {
                         const summary = await api.summarize( page.body )
                         const screenshot = await chrome.tabs.captureVisibleTab( { format: "png", quality: 100 } )
                         const tags = await api.classify( summary )
-                        api.sql`INSERT OR REPLACE INTO pins ( screenshot, text, url ) VALUES ( ${ screenshot }, ${ `<p>${ page.title }</p><p>${ page.body }</p><p>${ tags.filter( _ => _.score > 0.23 ).sort( ( a, b ) => b.score - a.score ).slice( 0, 3 ).map( _ => `<tag>${ _.name }</tag>` ).join( " " ) }</p>` }, ${ page.url } );`
+                        await api.sql`INSERT OR REPLACE INTO pins ( screenshot, text, url ) VALUES ( ${ screenshot }, ${ `<p>${ page.title }</p><p>${ summary }</p><p>${ tags.filter( _ => _.score > 0.23 ).sort( ( a, b ) => b.score - a.score ).slice( 0, 3 ).map( _ => `<tag>${ _.name }</tag>` ).join( " " ) }</p>` }, ${ page.url } );`
+                        setSuccessfulPin( page.url )
                     }
                     setIcon( <Icon of={ <Lottie config={ { animationData: check.animationData } }/> }/> )
                 } }>
                 { icon }Pin the current page
             </div>
-            <div className={ styles.tip }>
-                <Icon of={ <IconPointRight/> }/>Save the scroll position by selecting text
-            </div>
+            { successfulPin ? <Pin url={ successfulPin } visiblePictures={ visiblePictures } setVisiblePictures={ setVisiblePictures }/> : null }
         </div> : pins.map( ( { url } ) =>
             <Pin key={ url } url={ url }visiblePictures={ visiblePictures } setVisiblePictures={ setVisiblePictures }/> ) }
         <Footer pins={ pins } onSubmit={ () => pins.length === 0 ? api.sql`SELECT url FROM pins;`.then( setPins ) : setPins( [] ) }/>
