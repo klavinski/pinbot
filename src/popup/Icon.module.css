@@ -1,0 +1,28 @@
+@font-face {
+    font-family: "Linotte";
+    src: url( "./linotte.woff2" );
+}
+
+.clickable {
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+
+.clickable:active {
+    transform: scale( 0.9 );
+}
+
+.container {
+    font-family: "Linotte", "Pretendard", "Twemoji";
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.frame {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-content: center;
+    margin: -4px;
+}

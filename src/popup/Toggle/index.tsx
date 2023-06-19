@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import styles from "./index.module.css"
-import { IconMoon, IconSunFilled } from "@tabler/icons-react"
+import IconMoon from "~icons/tabler/moon"
+import IconSunFilled from "~icons/tabler/sun-filled"
 
 export const Toggle = () => {
     const [ isDark, setIsDark ] = useState( () => window.matchMedia( "( prefers-color-scheme: dark )" ).matches )
@@ -24,7 +25,7 @@ export const Toggle = () => {
             "chrome" in self && chrome?.storage?.sync.set( { isDark: ! isDark } )
             updateStyle( ! isDark )
         } }>
-        <IconSunFilled className={ styles.sun }/>
-        <IconMoon className={ styles.moon }/>
+        <IconTablerSunFilled className={ styles.sun }/>
+        <IconTablerMoon className={ styles.moon }/>
     </div>
 }

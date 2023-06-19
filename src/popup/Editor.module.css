@@ -1,0 +1,52 @@
+@font-face {
+    font-family: "Linotte";
+    src: url( "./linotte.woff2" );
+}
+
+.container {
+    min-width: 0;
+}
+
+.empty:first-child::before {
+    opacity: 0.4;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+}
+
+.paragraph {
+    margin: 0;
+    line-height: 24px;
+}
+
+.paragraph:nth-child( n + 2 ) {
+    color: #777;
+}
+
+.short {
+    font-family: "Linotte", "Pretendard", "Twemoji";
+}
+
+.tag {
+    background-color: #fff;
+    color: black;
+    display: inline-flex;
+    border-radius: 4px;
+    place-items: center;
+    justify-content: center;
+    padding-right: 1px;
+    min-width: 24px;
+    box-shadow: 0 0 2px #0001, 0 0 4px #0001;
+    max-width: 100%;
+}
+
+.tagContent {
+    white-space: nowrap !important;
+    overflow: scroll;
+    height: 24px;
+}
+
+.tagWrapper {
+    max-width: 100%;
+}

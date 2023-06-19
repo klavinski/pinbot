@@ -1,0 +1,58 @@
+.border {
+    height: 32px;
+    backdrop-filter: blur( 8px ) saturate( 1.5 );
+    width: 100%;
+    mask-image: linear-gradient( to top, #0000 0px, #000f 0px, #000f 1px, #000b 2px, #0000 2px );
+    background-color: #fff4;
+}
+
+.container {
+    position: sticky;
+    z-index: 1;
+    width: 100%;
+    bottom: 0;
+    pointer-events: none;
+    line-height: 0;
+    margin-top: -34.5px;
+}
+
+.content {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    backdrop-filter: blur( 1.5px );
+    margin-top: -2px;
+    mask-image: linear-gradient( to bottom, #0000 1.5px, #000f 1.5px );
+    pointer-events: all;
+    padding: 4px;
+    padding-top: 6px;
+    gap: 4px;
+    background-color: #fff7;
+}
+
+.content > * {
+    filter: drop-shadow( 0 1px 1px #0004 );
+}
+
+.input {
+    min-width: 0;
+    background-color: transparent;
+    border: none;
+}
+
+.glow {
+    height: 4px;
+    position: absolute;
+    bottom: 32px;
+    width: 100%;
+    backdrop-filter: invert( 1 ) brightness( 0.7 ) invert( 1 ) saturate( 1.7 );
+    mask-image: linear-gradient( to bottom, #0000, #000a 30%, #000f 50%, #000a 70%, #0000 );
+}
+
+.shadow {
+    height: 8px;
+    position: absolute;
+    bottom: 30px;
+    width: 100%;
+    backdrop-filter: invert( 1 ) brightness( 1.8 ) invert( 1 ) saturate( 0.7 );
+    mask-image: linear-gradient( to bottom, #0000, #0003 30%, #0008 50%, #000f 50%, #0004 70%, #0000 );
+}

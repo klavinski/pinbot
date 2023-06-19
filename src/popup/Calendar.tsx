@@ -2,7 +2,11 @@ import { Calendar as ReactCalendar } from "react-calendar"
 import { createPortal } from "react-dom"
 import "react-calendar/dist/Calendar.css"
 import "./Calendar.css"
-import { IconChevronLeft, IconChevronRight, IconChevronsLeft, IconChevronsRight } from "@tabler/icons-react"
+
+import IconChevronLeft from "~icons/tabler/chevron-left"
+import IconChevronRight from "~icons/tabler/chevron-right"
+import IconChevronsLeft from "~icons/tabler/chevrons-left"
+import IconChevronsRight from "~icons/tabler/chevrons-right"
 
 new Date().setDate( new Date().getDate() - 14 )
 

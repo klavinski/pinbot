@@ -1,0 +1,12 @@
+.container {
+    display: flex;
+    border-radius: 16px;
+}
+
+.container {
+    background-color: #ffc3c3;
+}
+
+.container > * {
+    display: flex;
+}

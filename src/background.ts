@@ -1,16 +1,9 @@
-import browser from "webextension-polyfill"
-
 ( async () => {
-    const url = browser.runtime.getURL( "src/offscreen.html" )
+    const url = chrome.runtime.getURL( "src/offscreen.html" )
     if ( ( await clients.matchAll() ).every( _ => _.url !== url ) )
         chrome.offscreen.createDocument( {
-            justification: "DB worker & WASM sandbox",
+            justification: "DB worker & transformers.js environment",
             reasons: [ chrome.offscreen.Reason.IFRAME_SCRIPTING ],
-            url: browser.runtime.getURL( "src/offscreen.html" ),
+            url: chrome.runtime.getURL( "src/offscreen.html" ),
         } )
 } )()
-
-browser.tabs.onUpdated.addListener( ( tabId, { status } ) => {
-    if ( status === "complete" )
-        browser.tabs.sendMessage( tabId, "please send the page body to offscreen" )
-} )

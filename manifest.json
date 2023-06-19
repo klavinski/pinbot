@@ -1,30 +1,20 @@
 {
     "manifest_version": 3,
     "name": "Pinbot",
-    "version": "0.1.0",
     "description": "Privately search your browser history with AI.",
     "icons": {
       "128": "icons/128.png"
     },
     "action": {
-    "default_icon": {
-        "128": "icons/128.png"
-    },
-    "default_popup": "src/popup/index.html"
+        "default_icon": {
+            "128": "icons/128.png"
+        },
+        "default_popup": "src/popup/index.html"
     },
     "background": {
         "service_worker": "src/background.ts",
         "type": "module"
     },
-    "content_scripts": [
-        {
-            "matches": ["<all_urls>"],
-            "js": ["src/content-script.ts"],
-            "all_frames": true,
-            "match_about_blank": true,
-            "type": "module"
-        }
-    ],
     "content_security_policy": {
         "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
     },
@@ -35,14 +25,11 @@
         "value": "same-origin"
     },
     "host_permissions": ["<all_urls>"],
-    "permissions": ["favicon", "offscreen", "storage"],
+    "permissions": ["activeTab", "favicon", "offscreen", "scripting", "storage"],
     "web_accessible_resources": [
         {
-            "resources": ["_favicon/*", "src/sandbox.html", "*"],
+            "resources": ["_favicon/*", "*"],
             "matches": ["<all_urls>"]
         }
-    ],
-    "sandbox": {
-    "pages": ["src/sandbox.html"]
-    }
+    ]
 }

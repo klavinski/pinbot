@@ -40,7 +40,6 @@ module.exports = {
         "space-in-parens": [ "warn", "always" ],
         "space-infix-ops": [ "warn" ],
         "space-unary-ops": [ "warn", { words: true, nonwords: true } ],
-        "spaced-comment": [ "warn", "always" ],
         "switch-colon-spacing": [ "warn", { after: true, before: false } ],
         "template-curly-spacing": [ "warn", "always" ],
         "template-tag-spacing": [ "warn", "never" ],

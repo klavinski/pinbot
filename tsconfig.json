@@ -11,13 +11,13 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
     "plugins": [ { "name": "typescript-plugin-css-modules" } ]
   },
-  "include": ["src", "public/worker.js", "vite.config.ts"],
+  "include": ["src", "public/worker.js", "vite.config.ts", "src/web"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -1,9 +1,13 @@
 import { createRoot } from "react-dom/client"
 import { StrictMode } from "react"
-import { Popup } from "./Popup.tsx"
+import { App } from "./App.tsx"
+import { ApiProvider } from "./context.tsx"
+import "./index.css"
 
 createRoot( document.getElementById( "root" )! ).render(
     <StrictMode>
-        <Popup/>
+        <ApiProvider>
+            <App/>
+        </ApiProvider>
     </StrictMode>
 )

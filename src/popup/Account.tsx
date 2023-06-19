@@ -1,7 +1,7 @@
 import { createPortal } from "react-dom"
 import styles from "./Alerts.module.css"
 import { useState } from "react"
-import { IconMoodSmile } from "@tabler/icons-react"
+import IconMoodSmile from "~icons/tabler/mood-smile"
 
 export const AccountButton = () => {
     const [ isOpen, setIsOpen ] = useState( false )

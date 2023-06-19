@@ -1,0 +1,46 @@
+.button {
+    background-color: #7770;
+    border-radius: 10px;
+    transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+    padding: 4px 7px;
+    cursor: pointer;
+    box-shadow: 0 0 0 2px #0001;
+    display: flex;
+    align-items: center;
+}
+
+.button:active {
+    box-shadow: 0 0 0 #0001;
+    transform: scale( 0.995 );
+}
+
+.buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: right;
+    padding: 8px 8px 0 0;
+}
+
+.container {
+    position: relative;
+    width: 300px;
+    background-color: #eee;
+}
+
+.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.pin {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.tip {
+    display: flex;
+    align-items: center;
+    opacity: 0.5;
+}

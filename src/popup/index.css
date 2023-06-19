@@ -1,0 +1,51 @@
+@import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
+@import "twemoji-colr-font/twemoji.css";
+
+:root {
+    --focus: #5e8cc5;
+    --red: #c40233;
+    --yellow: #ffd300;
+    --gold: #968b80;
+    --shadow: #77777740;
+    --text: #000;
+    --background: #fff;
+}
+
+@media( prefers-color-scheme: dark ) {
+    :root {
+        --text: #ddd;
+        --background: #000;
+    }
+}
+
+:root[data-isDark="true"] {
+    --text: #ddd;
+    --background: #000;
+}
+
+:root[data-isDark="false"] {
+    --text: #000;
+    --background: #fff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Pretendard Variable", "Twemoji";
+    font-feature-settings: "cv05", "kern", "calt", "ccmp", "frac";
+    font-size: 18px;
+    font-weight: calc( 250 / 0.61 );
+}
+
+*:focus {
+    outline: none;
+}
+
+.node-tag {
+    display: inline-flex;
+    vertical-align: top;
+    max-width: 100%;
+}

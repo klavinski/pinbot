@@ -1,23 +1,39 @@
 import { defineConfig } from "vite"
 import react from "@vitejs/plugin-react"
-import { crx } from "@crxjs/vite-plugin"
+import Icons from "unplugin-icons/vite"
+import { crx, ManifestV3Export } from "@crxjs/vite-plugin"
 import manifest from "./manifest.json"
+import { version } from "./package.json"
 
 export default defineConfig( ( { mode } ) => {
     const configs = {
+        development: {
+            build: {
+                rollupOptions: {
+                    input: [ "src/popup/index.html", "src/offscreen.html" ],
+                },
+            },
+            plugins: [ react(), Icons( { compiler: "jsx" } ) ],
+            server: {
+                open: "src/popup/index.html",
+            },
+            worker: {
+                format: "es"
+            },
+        },
         extension: {
             build: {
                 rollupOptions: {
                     input: [ "src/offscreen.html" ],
                 },
             },
-            plugins: [ react(), crx( { manifest } ) ],
+            plugins: [ react(), Icons( { compiler: "jsx" } ), crx( { manifest: { ...manifest, version } as ManifestV3Export } ) ],
             worker: {
                 format: "es"
             },
         },
         web: {
-            plugins: [ react() ]
+            plugins: [ react(), Icons( { compiler: "jsx" } ) ]
         }
     }
     if ( mode in configs )
