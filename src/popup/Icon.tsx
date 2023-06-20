@@ -9,7 +9,7 @@ import IconTablerBook2 from "~icons/tabler/book-2"
 import IconUilUsersAlt from "~icons/uil/users-alt"
 
 
-import { embed } from "../transformers.ts"
+import { embed } from "../workers/transformers.ts"
 import { cosineSimilarity } from "../utils.ts"
 import { ComponentPropsWithoutRef, ReactNode, useEffect, useState } from "react"
 import { IconHeartHand } from "untitled-ui-icons"

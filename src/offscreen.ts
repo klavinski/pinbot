@@ -39,22 +39,28 @@
 //     console.log( "current pages", await sql`SELECT * FROM pages;` )
 // }
 import { offscreenApi } from "./api.ts"
-import { sql } from "./sql.ts"
-import { embed, summarize } from "./transformers.ts"
 import { tags } from "./tags.ts"
 import { cosineSimilarity } from "./utils.ts"
+
+const sqlWorker = new ComlinkWorker<typeof import( "./workers/sql.ts" )>( new URL( "./workers/sql.ts", import.meta.url ) )
+const transformersWorker = new ComlinkWorker<typeof import( "./workers/transformers.ts" )>( new URL( "./workers/transformers.ts", import.meta.url ) )
 
 const tagsMap = new Map<string, Promise<Float32Array>>()
 
 const classify = async ( text: string ) => {
-    const textEmbedding = await embed( text )
+    const textEmbedding = await transformersWorker.embed( text )
     return await Promise.all( tags.map( async tag => {
         if ( ! tagsMap.has( tag.name ) )
-            tagsMap.set( tag.name, embed( tag.name ) )
+            tagsMap.set( tag.name, transformersWorker.embed( tag.name ) )
         const tagEmbedding = await tagsMap.get( tag.name )!
         console.log( tag.name, cosineSimilarity( textEmbedding, tagEmbedding ), tagEmbedding )
         return { name: tag.name, score: cosineSimilarity( textEmbedding, tagEmbedding ) }
     } ) )
 }
 
-const api = offscreenApi( { classify, embed, sql, summarize } )
+const api = offscreenApi( { classify, embed: transformersWorker.embed, sql: async ( ...args ) => {
+    console.log( "received sql", args )
+    const result = await sqlWorker.sql( ...args )
+    console.log( "sql result", result )
+    return result
+}, summarize: transformersWorker.summarize } )

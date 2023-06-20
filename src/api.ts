@@ -32,6 +32,7 @@ export const offscreenApi = ( handlers: {
             handlers.sql( ...sqlParsing.data.sql ).then( sendResponse )
             return true
         }
+        console.log( sqlParsing )
         const summarizeParsing = z.object( { summarize: z.string() } ).safeParse( message )
         if ( summarizeParsing.success ) {
             handlers.summarize( summarizeParsing.data.summarize ).then( sendResponse )
