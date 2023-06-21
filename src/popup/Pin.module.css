@@ -19,6 +19,12 @@
     min-width: 0;
 }
 
+.favicon {
+    position: sticky;
+    top: 0;
+    transform: scale( 0.5 );
+}
+
 .header {
     display: grid;
     grid-template-columns: 32px 1fr 32px;
@@ -26,10 +32,24 @@
     align-items: start;
 }
 
-.favicon {
-    position: sticky;
-    top: 0;
-    transform: scale( 0.5 );
+.link {
+    color: var( --focus );
+    display: inline-block;
+    box-shadow: 0 calc( 2em / 18 ) var( --shadow );
+    transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.link:hover {
+    box-shadow: 0 calc( 2em / 18 ) var( --focus );
+}
+
+.link:active {
+    box-shadow: 0 0 var( --focus );
+    transform: translateY( calc( 2em / 18 ) );
 }
 
 .screenshot {

@@ -25,7 +25,7 @@ export const Pin = ( { setVisiblePictures, url, visiblePictures }: { setVisibleP
         <div className={ styles.header }>
             <Icon of={ <img src={ favicon.toString() }/> } className={ styles.favicon }/>
             <div className={ styles.description }>
-                <UI prefix="" href={ pin.url }>{ pin.url }</UI>
+                <a className={ styles.link } href={ pin.url }>{ pin.url }</a>
                 <Editor content={ pin.text }
                     onUpdate={ text => api.sql`UPDATE pins SET text = ${ text }  WHERE url = ${ url };` }
                 />
