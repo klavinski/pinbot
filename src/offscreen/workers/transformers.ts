@@ -6,7 +6,6 @@ env.backends.onnx.wasm.wasmPaths = "/wasm/"
 env.backends.onnx.wasm.numThreads = 1
 
 const pipes = {
-    classify: null,
     embed: null,
     summarize: null,
 } as Record<string, Awaited<ReturnType<typeof pipeline>> | null>

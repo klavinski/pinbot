@@ -38,29 +38,17 @@
 //         await sql`INSERT INTO pages ( added, embeddings, seen, text, title, url ) VALUES ( datetime( ${ now } ), ${ mixEmbeddings( await embed( title ), await embed( triplet[ 0 ] ), await embed( triplet[ 1 ] ), await embed( triplet[ 2 ] ) ).buffer }, datetime( ${ now } ), ${ triplet.join( "\n" ) }, ${ title }, ${ url } );`
 //     console.log( "current pages", await sql`SELECT * FROM pages;` )
 // }
-import { offscreenApi } from "./api.ts"
-import { tags } from "./tags.ts"
-import { cosineSimilarity } from "./utils.ts"
+import { z } from "zod"
+import { api } from "./api.ts"
 
-const sqlWorker = new ComlinkWorker<typeof import( "./workers/sql.ts" )>( new URL( "./workers/sql.ts", import.meta.url ) )
-const transformersWorker = new ComlinkWorker<typeof import( "./workers/transformers.ts" )>( new URL( "./workers/transformers.ts", import.meta.url ) )
+const call = async <F extends ( ...args: T ) => unknown, T extends unknown[]>( f: F, args: T ) => await f( ...args )
 
-const tagsMap = new Map<string, Promise<Float32Array>>()
-
-const classify = async ( text: string ) => {
-    const textEmbedding = await transformersWorker.embed( text )
-    return await Promise.all( tags.map( async tag => {
-        if ( ! tagsMap.has( tag.name ) )
-            tagsMap.set( tag.name, transformersWorker.embed( tag.name ) )
-        const tagEmbedding = await tagsMap.get( tag.name )!
-        console.log( tag.name, cosineSimilarity( textEmbedding, tagEmbedding ), tagEmbedding )
-        return { name: tag.name, score: cosineSimilarity( textEmbedding, tagEmbedding ) }
-    } ) )
-}
-
-const api = offscreenApi( { classify, embed: transformersWorker.embed, sql: async ( ...args ) => {
-    console.log( "received sql", args )
-    const result = await sqlWorker.sql( ...args )
-    console.log( "sql result", result )
-    return result
-}, summarize: transformersWorker.summarize } )
+chrome.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {
+    console.log( message )
+    for ( const [ key, handler ] of Object.entries( api ) ) {
+        const parsing = z.object( { [ key ]: z.any().array() } ).safeParse( message )
+        if ( parsing.success )
+            call( handler, parsing.data[ key ] ).then( sendResponse )
+    }
+    return true
+} )

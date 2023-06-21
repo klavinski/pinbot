@@ -11,7 +11,7 @@ export default defineConfig( ( { mode } ) => {
         extension: {
             build: {
                 rollupOptions: {
-                    input: [ "src/offscreen.html" ],
+                    input: [ "src/offscreen/index.html" ],
                 },
             },
             plugins: [

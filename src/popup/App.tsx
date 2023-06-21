@@ -7,7 +7,7 @@ import { Wordmark } from "./Wordmark.tsx"
 import { Toggle } from "./Toggle/index.tsx"
 import { Tooltip } from "./Tooltip.tsx"
 import styles from "./App.module.css"
-import { useApi } from "./context.tsx"
+import { useApi } from "./api.tsx"
 import { useEffect } from "react"
 import { Icon } from "./Icon.tsx"
 import IconPin from "~icons/tabler/pin"
@@ -44,7 +44,6 @@ const getBody = () => {
 
     const selection = document.getSelection()
     if ( selection ) {
-        const selectedText = selection.toString()
         const userSelects = new Map<HTMLElement, string>()
         document.querySelectorAll( "*" ).forEach( _ => {
             if ( _ instanceof HTMLElement ) {
@@ -63,7 +62,7 @@ const getBody = () => {
         selection.removeAllRanges()
         savedRange && selection.addRange( savedRange )
 
-        return { body, selectedText }
+        return { body }
     }
     throw new Error( "No selection" )
 }

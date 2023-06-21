@@ -5,7 +5,7 @@ import hide from "./visibility-V3.json"
 import styles from "./Pin.module.css"
 import { Icon } from "./Icon.tsx"
 import { Editor } from "./Editor.tsx"
-import { useApi } from "./context.tsx"
+import { useApi } from "./api.tsx"
 import { useEffect } from "react"
 import { SetStateAction } from "react"
 import { Dispatch } from "react"
@@ -14,7 +14,6 @@ import { UI } from "./UI.tsx"
 export const Pin = ( { setVisiblePictures, url, visiblePictures }: { setVisiblePictures: Dispatch<SetStateAction<boolean>>, url: string, visiblePictures: boolean } ) => {
     const api = useApi()
     const [ pin, setPin ] = useState( null as { text: string, screenshot: string, url: string } | null )
-    const [ hidden, setHidden ] = useState( false )
     useEffect( () => {
         api.sql`SELECT * FROM pins WHERE url = ${ url }`.then( ( [ pin ] ) => setPin( pin ) )
     }, [ url ] )
