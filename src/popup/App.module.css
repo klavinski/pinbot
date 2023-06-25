@@ -1,3 +1,11 @@
+.addPin {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin-bottom: 24px;
+}
+
 .button {
     background-color: #7770;
     border-radius: 10px;
@@ -30,11 +38,4 @@
 .disabled {
     opacity: 0.5;
     pointer-events: none;
-}
-
-.pin {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
 }

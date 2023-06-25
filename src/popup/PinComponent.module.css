@@ -3,6 +3,28 @@
     top: 0;
 }
 
+.actions > * {
+    cursor: pointer;
+}
+
+.actions > *:first-child {
+    margin-top: -6.5px;
+    transition: filter 0.5s ease-in-out 0.5s;
+}
+
+.action > *:nth-child( n + 2 ) {
+    transition: transform 0.2s ease-in-out;
+}
+
+.actions > *:nth-child( n + 2 ):active {
+    transform: scale( 0.95 );
+}
+
+.container {
+    box-shadow: 0 -4px 4px -4px var( --shadow ), 0 -8px 8px -8px var( --shadow );
+    padding-top: 4px;
+}
+
 .container:hover {
     overflow-anchor: auto;
 }
@@ -11,7 +33,7 @@
     overflow-anchor: none;
 }
 
-.container:not( :hover ) .actions {
+.container:not( :hover ) .actions > *:nth-child( n + 2 ) {
     opacity: 0;
 }
 

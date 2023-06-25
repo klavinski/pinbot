@@ -1,6 +1,6 @@
 import { createPortal } from "react-dom"
 import styles from "./Alerts.module.css"
-import { IconBell03 } from "untitled-ui-icons"
+import { IconBell03 } from "untitled-ui-icons/icons/IconBell03"
 import { useState } from "react"
 
 export const AlertsButton = () => {

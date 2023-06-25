@@ -2,21 +2,19 @@ import { useState } from "react"
 import { Lottie } from "@crello/react-lottie"
 import remove from "react-useanimations/lib/trash"
 import hide from "./visibility-V3.json"
-import styles from "./Pin.module.css"
+import bookmark from "./bookmark.json"
+import styles from "./PinComponent.module.css"
 import { Icon } from "./Icon.tsx"
 import { Editor } from "./Editor.tsx"
 import { useApi } from "./api.tsx"
 import { useEffect } from "react"
 import { SetStateAction } from "react"
 import { Dispatch } from "react"
-import { UI } from "./UI.tsx"
+import { Pin } from "../types.ts"
 
-export const Pin = ( { setVisiblePictures, url, visiblePictures }: { setVisiblePictures: Dispatch<SetStateAction<boolean>>, url: string, visiblePictures: boolean } ) => {
+export const PinComponent = ( { pin: init, setVisiblePictures, visiblePictures }: { pin: Pin, setVisiblePictures: Dispatch<SetStateAction<boolean>>, visiblePictures: boolean } ) => {
     const api = useApi()
-    const [ pin, setPin ] = useState( null as { text: string, screenshot: string, url: string } | null )
-    useEffect( () => {
-        api.sql`SELECT * FROM pins WHERE url = ${ url }`.then( ( [ pin ] ) => setPin( pin ) )
-    }, [ url ] )
+    const [ pin, setPin ] = useState( init as Pin | null )
     const favicon = new URL( chrome.runtime.getURL( "/_favicon/" ) )
     favicon.searchParams.set( "pageUrl", pin?.url ?? "" )
     favicon.searchParams.set( "size", "32" )
@@ -27,11 +25,19 @@ export const Pin = ( { setVisiblePictures, url, visiblePictures }: { setVisibleP
             <div className={ styles.description }>
                 <a className={ styles.link } href={ pin.url }>{ pin.url }</a>
                 <Editor content={ pin.text }
-                    onUpdate={ text => api.sql`UPDATE pins SET text = ${ text }  WHERE url = ${ url };` }
+                    onUpdate={ text => api.sql`UPDATE pins SET text = ${ text }  WHERE url = ${ pin.url };` }
                 />
             </div>
             <div className={ styles.actions }>
-                <div onMouseEnter={ () => setRemoving( false ) }
+                <div onClick={ async () => setPin( await api.togglePin( pin ) ) }
+                    style={ { filter: `brightness( ${ pin.isPinned } )` } }>
+                    { Array.from( { length: 4 } ).map( ( _, i, { length } ) => <Icon of={ <Lottie
+                        config={ { animationData: bookmark, initialSegment: [ 0, 62 ] } }
+                        direction={ pin.isPinned ? 1 : - 1 }
+                    /> } style={ { position: i === length - 1 ? undefined : "absolute", transform: `translate( ${ 0.2 * Math.cos( i / length * Math.PI * 2 ) }px, ${ 0.2 * Math.sin( i / length * Math.PI * 2 ) }px )` } }/> ) }
+                </div>
+                <div onClick={ async () => setPin( await api.removePin( pin ) ) }
+                    onMouseEnter={ () => setRemoving( false ) }
                     onMouseLeave={ () => setRemoving( true ) }>
                     <Icon of={ <Lottie
                         config={ { animationData: remove.animationData } }

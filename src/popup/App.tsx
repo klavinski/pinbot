@@ -1,7 +1,7 @@
 
 // import { loadHnswlib, syncFileSystem } from "hnswlib-wasm"
 import { useState } from "react"
-import { Pin } from "./Pin.js"
+import { PinComponent } from "./PinComponent.js"
 import { Footer } from "./Footer.tsx"
 import { Wordmark } from "./Wordmark.tsx"
 import { Toggle } from "./Toggle/index.tsx"
@@ -15,7 +15,8 @@ import { Clock } from "./Clock.tsx"
 import IconForbidden from "~icons/eva/slash-outline"
 import { Lottie } from "@crello/react-lottie"
 import check from "react-useanimations/lib/checkmark"
-import IconPointRight from "~icons/icon-park-outline/hand-right"
+import { Pin } from "../types.ts"
+
 
 // const FILENAME = "ghost.dat"
 // const NUM_DIMENSIONS = 384
@@ -68,13 +69,17 @@ const getBody = () => {
 }
 
 export const App = () => {
-    const [ pins, setPins ] = useState( [] as { url: string }[] )
+    const [ pins, setPins ] = useState( [] as Pin[] )
     const [ icon, setIcon ] = useState( <Icon of={ <IconPin/> }/> )
-    const [ successfulPin, setSuccessfulPin ] = useState( null as null | string )
     const [ isDisabled, setIsDisabled ] = useState( false )
     const [ visiblePictures, setVisiblePictures ] = useState( true )
+    const [ query, setQuery ] = useState( null as { tags: string[], text: string } | null )
+    const [ page, setPage ] = useState( null as null | { title: string, url: string, body: string } )
     const api = useApi()
-    const [ page, setPage ] = useState( null as { title: string, body: string, url: string } | null )
+    useEffect( () => {
+        api.sql`SELECT * FROM pins WHERE isPinned = ${ query ? 1 : 0 } ORDER BY timestamp DESC;`.then( setPins )
+    }, [ query ] )
+    console.log( pins )
     useEffect( () => { ( async () => {
         const [ tab ] = await chrome.tabs.query( { active: true, currentWindow: true } )
         if ( tab?.url && tab.id && tab.title !== undefined && ! tab.url.startsWith( "chrome://" ) ) {
@@ -82,9 +87,7 @@ export const App = () => {
                 target: { tabId: tab.id },
                 function: getBody,
             } ) )[ 0 ].result as ReturnType<typeof getBody>
-            setPage( {
-                title: tab.title, body: result.body, url: tab.url,
-            } )
+            setPage( { title: tab.title, url: tab.url, body: result.body } )
         } else {
             setIcon( <Icon of={ <IconForbidden/> }/> )
             setIsDisabled( true )
@@ -95,25 +98,22 @@ export const App = () => {
             <Tooltip content="Light/dark mode"><Toggle/></Tooltip>
         </div>
         <Wordmark/>
-        { pins.length === 0 ? <div className={ styles.pin }>
+        <div className={ styles.addPin }>
             <div className={ [ styles.button, isDisabled ? styles.disabled : "" ].join( " " ) }
                 onClick={ async () => {
                     setIcon( <Clock/> )
                     setIsDisabled( true )
                     if ( page ) {
-                        const summary = await api.summarize( page.body )
                         const screenshot = await chrome.tabs.captureVisibleTab( { format: "png", quality: 100 } )
-                        const tags = await api.classify( summary )
-                        await api.sql`INSERT OR REPLACE INTO pins ( screenshot, text, url ) VALUES ( ${ screenshot }, ${ `<p>${ page.title }</p><p>${ summary }</p><p>${ tags.filter( _ => _.score > 0.23 ).sort( ( a, b ) => b.score - a.score ).slice( 0, 3 ).map( _ => `<tag>${ _.name }</tag>` ).join( " " ) }</p>` }, ${ page.url } );`
-                        setSuccessfulPin( page.url )
+                        setPins( [ await api.addPin( { screenshot, title: page.title, url: page.url, body: page.body } ), ...pins ] )
                     }
                     setIcon( <Icon of={ <Lottie config={ { animationData: check.animationData } }/> }/> )
                 } }>
                 { icon }Pin the current page
             </div>
-            { successfulPin ? <Pin url={ successfulPin } visiblePictures={ visiblePictures } setVisiblePictures={ setVisiblePictures }/> : null }
-        </div> : pins.map( ( { url } ) =>
-            <Pin key={ url } url={ url }visiblePictures={ visiblePictures } setVisiblePictures={ setVisiblePictures }/> ) }
-        <Footer pins={ pins } onSubmit={ () => pins.length === 0 ? api.sql`SELECT url FROM pins;`.then( setPins ) : setPins( [] ) }/>
+        </div>
+        { pins.map( _ =>
+            <PinComponent key={ `${ _.timestamp }${ _.url }` } pin={ _ } visiblePictures={ visiblePictures } setVisiblePictures={ setVisiblePictures }/> ) }
+        <Footer query={ query } setQuery={ setQuery }/>
     </div>
 }
