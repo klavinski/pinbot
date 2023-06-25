@@ -63,7 +63,7 @@ const getBody = () => {
         selection.removeAllRanges()
         savedRange && selection.addRange( savedRange )
 
-        return { body }
+        return body
     }
     throw new Error( "No selection" )
 }
@@ -71,27 +71,33 @@ const getBody = () => {
 export const App = () => {
     const [ pins, setPins ] = useState( [] as Pin[] )
     const [ icon, setIcon ] = useState( <Icon of={ <IconPin/> }/> )
-    const [ isDisabled, setIsDisabled ] = useState( false )
+    const [ addPin, setAddPin ] = useState( undefined as ( () => () => unknown ) | undefined )
     const [ visiblePictures, setVisiblePictures ] = useState( true )
     const [ query, setQuery ] = useState( null as { tags: string[], text: string } | null )
-    const [ page, setPage ] = useState( null as null | { title: string, url: string, body: string } )
     const api = useApi()
     useEffect( () => {
         api.sql`SELECT * FROM pins WHERE isPinned = ${ query ? 1 : 0 } ORDER BY timestamp DESC;`.then( setPins )
     }, [ query ] )
-    console.log( pins )
     useEffect( () => { ( async () => {
         const [ tab ] = await chrome.tabs.query( { active: true, currentWindow: true } )
         if ( tab?.url && tab.id && tab.title !== undefined && ! tab.url.startsWith( "chrome://" ) ) {
-            const result = ( await chrome.scripting.executeScript( {
-                target: { tabId: tab.id },
-                function: getBody,
-            } ) )[ 0 ].result as ReturnType<typeof getBody>
-            setPage( { title: tab.title, url: tab.url, body: result.body } )
-        } else {
+            const args = {
+                body: ( await chrome.scripting.executeScript( {
+                    target: { tabId: tab.id },
+                    func: getBody,
+                } ) )[ 0 ].result as ReturnType<typeof getBody>,
+                screenshot: await chrome.tabs.captureVisibleTab( { format: "png", quality: 100 } ),
+                title: tab.title,
+                url: tab.url
+            }
+            setAddPin( () => async () => {
+                setIcon( <Clock/> )
+                setAddPin( undefined )
+                setPins( [ await api.addPin( args ), ...pins ] )
+                setIcon( <Icon of={ <Lottie config={ { animationData: check.animationData } }/> }/> )
+            } )
+        } else
             setIcon( <Icon of={ <IconForbidden/> }/> )
-            setIsDisabled( true )
-        }
     } )() }, [] )
     return <div className={ styles.container }>
         <div className={ styles.buttons }>
@@ -99,16 +105,8 @@ export const App = () => {
         </div>
         <Wordmark/>
         <div className={ styles.addPin }>
-            <div className={ [ styles.button, isDisabled ? styles.disabled : "" ].join( " " ) }
-                onClick={ async () => {
-                    setIcon( <Clock/> )
-                    setIsDisabled( true )
-                    if ( page ) {
-                        const screenshot = await chrome.tabs.captureVisibleTab( { format: "png", quality: 100 } )
-                        setPins( [ await api.addPin( { screenshot, title: page.title, url: page.url, body: page.body } ), ...pins ] )
-                    }
-                    setIcon( <Icon of={ <Lottie config={ { animationData: check.animationData } }/> }/> )
-                } }>
+            <div className={ [ styles.button, addPin ? styles.disabled : "" ].join( " " ) }
+                onClick={ addPin }>
                 { icon }Pin the current page
             </div>
         </div>
