@@ -44,3 +44,11 @@ export const maximumIndex = <T extends { [key in K]: number }, K extends keyof T
         const score = item[ key ]
         return score > bestScore ? { bestIndex: index, bestScore: score } : { bestIndex, bestScore }
     }, { bestIndex: - 1, bestScore: - Infinity } ).bestIndex
+
+export const parseHtml = ( html: string ) => {
+    const body = new DOMParser().parseFromString( html, "text/html" ).body
+    return {
+        text: body.textContent ?? "",
+        tags: [ ...body.querySelectorAll( "tag" ) ].map( _ => _.textContent ?? "" ).filter( _ => _ )
+    }
+}

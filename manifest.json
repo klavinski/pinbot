@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Pinbot",
-    "description": "Privately search your browser history with AI.",
+    "description": "Manage your bookmarks with AI.",
     "icons": {
       "128": "icons/128.png"
     },

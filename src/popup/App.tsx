@@ -1,5 +1,4 @@
 
-// import { loadHnswlib, syncFileSystem } from "hnswlib-wasm"
 import { useState } from "react"
 import { PinComponent } from "./PinComponent.js"
 import { Footer } from "./Footer.tsx"
@@ -16,30 +15,6 @@ import IconForbidden from "~icons/eva/slash-outline"
 import { Lottie } from "@crello/react-lottie"
 import check from "react-useanimations/lib/checkmark"
 import { Pin } from "../types.ts"
-
-
-// const FILENAME = "ghost.dat"
-// const NUM_DIMENSIONS = 384
-// const MAX_ELEMENTS = 100000
-// const lib = await loadHnswlib()
-// lib.EmscriptenFileSystemManager.setDebugLogs( true )
-// const index = new lib.HierarchicalNSW( "cosine", NUM_DIMENSIONS )
-// await syncFileSystem( "read" )
-
-// const exists = lib.EmscriptenFileSystemManager.checkFileExists( FILENAME )
-// if ( ! exists ) {
-//     index.initIndex( MAX_ELEMENTS, 48, 128, 100, true )
-//     index.setEfSearch( 32 )
-//     index.writeIndex( FILENAME )
-// } else {
-//     index.readIndex( FILENAME, MAX_ELEMENTS, true )
-//     index.setEfSearch( 32 )
-// }
-
-// const ids = index.addItems( await Promise.all( [ "ok", "test" ].map( async text => ( await pipe( text ) ).data ) ), true )
-// console.log( ids )
-// const result = index.searchKnn( ( await pipe( "test" ) ).data, 2, undefined )
-// console.log( result )
 
 const getBody = () => {
 
@@ -74,10 +49,11 @@ export const App = () => {
     const [ addPin, setAddPin ] = useState( undefined as ( () => () => unknown ) | undefined )
     const [ visiblePictures, setVisiblePictures ] = useState( true )
     const [ query, setQuery ] = useState( null as { tags: string[], text: string } | null )
+    useEffect( () => console.log( "query", query ), [ query ] )
     const api = useApi()
-    useEffect( () => {
-        api.sql`SELECT * FROM pins WHERE isPinned = ${ query ? 1 : 0 } ORDER BY timestamp DESC;`.then( setPins )
-    }, [ query ] )
+    useEffect( () => { ( async () => {
+        setPins( query ? await api.search( query ) : [] )
+    } )() }, [ query ] )
     useEffect( () => { ( async () => {
         const [ tab ] = await chrome.tabs.query( { active: true, currentWindow: true } )
         if ( tab?.url && tab.id && tab.title !== undefined && ! tab.url.startsWith( "chrome://" ) ) {
@@ -105,7 +81,7 @@ export const App = () => {
         </div>
         <Wordmark/>
         <div className={ styles.addPin }>
-            <div className={ [ styles.button, addPin ? styles.disabled : "" ].join( " " ) }
+            <div className={ [ styles.button, addPin ? "" : styles.disabled ].join( " " ) }
                 onClick={ addPin }>
                 { icon }Pin the current page
             </div>

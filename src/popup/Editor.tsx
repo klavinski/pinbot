@@ -8,6 +8,7 @@ import { PluginKey } from "@tiptap/pm/state"
 import Placeholder from "@tiptap/extension-placeholder"
 import styles from "./Editor.module.css"
 import { Icon } from "./Icon.tsx"
+import { z } from "zod"
 
 import GraphemeSplitter from "grapheme-splitter"
 const splitter = new GraphemeSplitter()
@@ -15,7 +16,7 @@ const splitter = new GraphemeSplitter()
 export const TagPluginKey = new PluginKey( "mention" )
 
 const TagComponent = ( { node }: NodeViewProps ) => {
-    const text = node.content.content[ 0 ]?.text ?? ""
+    const { text } = z.object( { content: z.object( { text: z.string() } ).array() } ).parse( node.content ).content[ 0 ]
     const length = splitter.countGraphemes( text )
     return <NodeViewWrapper className={ styles.tag }>
         { length > 1 && <Icon of={ text } contentEditable={ false }/> }
@@ -43,7 +44,7 @@ const TagExtension = Node.create( {
     addNodeView: () => ReactNodeViewRenderer( TagComponent ),
 } )
 
-export const Editor = ( { content = "", multiline, onEnter, onUpdate, placeholder = "" }: { content?: string, multiline?: boolean, onEnter?: () => void, onUpdate?: ( text: string ) => void, placeholder?: string } ) => {
+export const Editor = ( { content = "", onEnter, onUpdate, placeholder = "" }: { content?: string, onEnter?: () => void, onUpdate?: ( text: string ) => void, placeholder?: string } ) => {
     const editor = useEditor( {
         content,
         extensions: [

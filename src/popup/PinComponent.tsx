@@ -7,7 +7,6 @@ import styles from "./PinComponent.module.css"
 import { Icon } from "./Icon.tsx"
 import { Editor } from "./Editor.tsx"
 import { useApi } from "./api.tsx"
-import { useEffect } from "react"
 import { SetStateAction } from "react"
 import { Dispatch } from "react"
 import { Pin } from "../types.ts"
@@ -25,12 +24,12 @@ export const PinComponent = ( { pin: init, setVisiblePictures, visiblePictures }
             <div className={ styles.description }>
                 <a className={ styles.link } href={ pin.url }>{ pin.url }</a>
                 <Editor content={ pin.text }
-                    onUpdate={ text => api.sql`UPDATE pins SET text = ${ text }  WHERE url = ${ pin.url };` }
+                    onUpdate={ text => api.updatePin( { ...pin, text } ) }
                 />
             </div>
             <div className={ styles.actions }>
                 <div onClick={ async () => setPin( await api.togglePin( pin ) ) }
-                    style={ { filter: `brightness( ${ pin.isPinned } )` } }>
+                    style={ { filter: `brightness( ${ pin.isPinned ? 1 : 0 } )` } }>
                     { Array.from( { length: 4 } ).map( ( _, i, { length } ) => <Icon of={ <Lottie
                         config={ { animationData: bookmark, initialSegment: [ 0, 62 ] } }
                         direction={ pin.isPinned ? 1 : - 1 }
@@ -53,5 +52,5 @@ export const PinComponent = ( { pin: init, setVisiblePictures, visiblePictures }
             </div>
         </div>
         { visiblePictures && <img src={ pin?.screenshot } className={ styles.screenshot }/> }
-    </div> : <div>Loading...</div>
+    </div> : <></>
 }
