@@ -10,15 +10,22 @@ import History from "@tiptap/extension-history"
 import styles from "./Editor.module.css"
 import { Icon } from "./Icon.tsx"
 import { z } from "zod"
-
 import GraphemeSplitter from "grapheme-splitter"
+import { Fragment } from "@tiptap/pm/model"
+
 const splitter = new GraphemeSplitter()
 
 export const TagPluginKey = new PluginKey( "mention" )
 
-const TagComponent = ( { node }: NodeViewProps ) => {
-    const { text } = z.object( { content: z.object( { text: z.string() } ).array() } ).parse( node.content ).content[ 0 ]
+const analyzeContent = ( content: Fragment ) => {
+    const parsing = z.object( { content: z.object( { text: z.string() } ).array().refine( _ => _.length > 0 ) } ).safeParse( content )
+    const text = parsing.success ? parsing.data.content[ 0 ].text : ""
     const length = splitter.countGraphemes( text )
+    return { text, length }
+}
+
+const TagComponent = ( { node }: NodeViewProps ) => {
+    const { text, length } = analyzeContent( node.content )
     return <NodeViewWrapper className={ styles.tag }>
         { length > 1 && <Icon of={ text } contentEditable={ false }/> }
         <NodeViewContent className={ [ styles.tagContent, length > 1 ? "" : styles.short ].join( " " ) }/>
@@ -40,7 +47,7 @@ const TagExtension = Node.create( {
                 .setTextSelection( { from: this.editor.state.selection.from + 1, to: this.editor.state.selection.to + 2 } )
                 .run(),
             "Backspace": () => {
-                if ( this.editor.state.selection.$head.parent.content.size === 1 && this.editor.state.selection.$head.parent.type.name === "tag" ) {
+                if ( analyzeContent( this.editor.state.selection.$head.parent.content ).length === 1 && this.editor.state.selection.$head.parent.type.name === "tag" ) {
                     this.editor.commands.deleteNode( "tag" )
                     return true
                 }

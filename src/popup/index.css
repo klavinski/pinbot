@@ -43,6 +43,8 @@ body {
     font-feature-settings: "cv05", "kern", "calt", "ccmp", "frac";
     font-size: 18px;
     font-weight: calc( 250 / 0.61 );
+    background-color: var( --background );
+    color: var( --text );
 }
 
 *:focus {

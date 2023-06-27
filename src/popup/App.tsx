@@ -15,7 +15,7 @@ import IconForbidden from "~icons/eva/slash-outline"
 import { Lottie } from "@crello/react-lottie"
 import check from "react-useanimations/lib/checkmark"
 import { Pin } from "../types.ts"
-import { AnimatePresence, motion } from "framer-motion"
+import { AnimatePresence } from "framer-motion"
 import { Transition } from "./Transition.tsx"
 
 const getBody = () => {
@@ -51,7 +51,6 @@ export const App = () => {
     const [ addPin, setAddPin ] = useState( undefined as ( () => () => unknown ) | undefined )
     const [ visiblePictures, setVisiblePictures ] = useState( true )
     const [ query, setQuery ] = useState( { tags: [], text: "" } as { tags: string[], text: string } )
-    useEffect( () => console.log( "query", query ), [ query ] )
     const api = useApi()
     useEffect( () => { ( async () => {
         setPins( query.text ? await api.search( query ) : await api.getDrafts() )
