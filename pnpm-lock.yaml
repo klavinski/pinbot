@@ -44,6 +44,9 @@ dependencies:
   '@tiptap/extension-document':
     specifier: ^2.0.3
     version: 2.0.3(@tiptap/core@2.0.3)
+  '@tiptap/extension-history':
+    specifier: ^2.0.3
+    version: 2.0.3(@tiptap/core@2.0.3)(@tiptap/pm@2.0.3)
   '@tiptap/extension-paragraph':
     specifier: ^2.0.3
     version: 2.0.3(@tiptap/core@2.0.3)
@@ -1189,6 +1192,16 @@ packages:
       '@tiptap/core': 2.0.3(@tiptap/pm@2.0.3)
       '@tiptap/pm': 2.0.3(@tiptap/core@2.0.3)
       tippy.js: 6.3.7
+    dev: false
+
+  /@tiptap/extension-history@2.0.3(@tiptap/core@2.0.3)(@tiptap/pm@2.0.3):
+    resolution: {integrity: sha512-00KHIcJ8kivn2ARI6NQYphv2LfllVCXViHGm0EhzDW6NQxCrriJKE3tKDcTFCu7LlC5doMpq9Z6KXdljc4oVeQ==}
+    peerDependencies:
+      '@tiptap/core': ^2.0.0
+      '@tiptap/pm': ^2.0.0
+    dependencies:
+      '@tiptap/core': 2.0.3(@tiptap/pm@2.0.3)
+      '@tiptap/pm': 2.0.3(@tiptap/core@2.0.3)
     dev: false
 
   /@tiptap/extension-paragraph@2.0.3(@tiptap/core@2.0.3):

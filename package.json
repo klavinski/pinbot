@@ -27,6 +27,7 @@
     "@iconify-json/uil": "^1.1.4",
     "@tiptap/core": "^2.0.3",
     "@tiptap/extension-document": "^2.0.3",
+    "@tiptap/extension-history": "^2.0.3",
     "@tiptap/extension-paragraph": "^2.0.3",
     "@tiptap/extension-placeholder": "^2.0.3",
     "@tiptap/extension-text": "^2.0.3",

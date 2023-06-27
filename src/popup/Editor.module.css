@@ -44,7 +44,7 @@
 .tagContent {
     white-space: nowrap !important;
     overflow: scroll;
-    height: 24px;
+    line-height: 24px;
 }
 
 .tagWrapper {

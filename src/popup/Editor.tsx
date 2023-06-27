@@ -6,6 +6,7 @@ import Text from "@tiptap/extension-text"
 import Document from "@tiptap/extension-document"
 import { PluginKey } from "@tiptap/pm/state"
 import Placeholder from "@tiptap/extension-placeholder"
+import History from "@tiptap/extension-history"
 import styles from "./Editor.module.css"
 import { Icon } from "./Icon.tsx"
 import { z } from "zod"
@@ -20,7 +21,7 @@ const TagComponent = ( { node }: NodeViewProps ) => {
     const length = splitter.countGraphemes( text )
     return <NodeViewWrapper className={ styles.tag }>
         { length > 1 && <Icon of={ text } contentEditable={ false }/> }
-        <NodeViewContent className={ [ styles.tagContent, length > 1 ? "" : styles.short ].join( " " ) } contentEditable={ true }/>
+        <NodeViewContent className={ [ styles.tagContent, length > 1 ? "" : styles.short ].join( " " ) }/>
     </NodeViewWrapper>
 }
 
@@ -37,11 +38,18 @@ const TagExtension = Node.create( {
                 .setTextSelection( { from: this.editor.state.selection.from + 1, to: this.editor.state.selection.to + 2 } )
                 .deleteSelection()
                 .setTextSelection( { from: this.editor.state.selection.from + 1, to: this.editor.state.selection.to + 2 } )
-                .run()
+                .run(),
+            "Backspace": () => {
+                if ( this.editor.state.selection.$head.parent.content.size === 1 && this.editor.state.selection.$head.parent.type.name === "tag" ) {
+                    this.editor.commands.deleteNode( "tag" )
+                    return true
+                }
+                return false
+            }
         }
     },
     renderHTML: ( { HTMLAttributes } ) => [ "tag", mergeAttributes( HTMLAttributes ), 0 ],
-    addNodeView: () => ReactNodeViewRenderer( TagComponent ),
+    addNodeView: () => ReactNodeViewRenderer( TagComponent )
 } )
 
 export const Editor = ( { content = "", onEnter, onUpdate, placeholder = "" }: { content?: string, onEnter?: () => void, onUpdate?: ( text: string ) => void, placeholder?: string } ) => {
@@ -49,6 +57,7 @@ export const Editor = ( { content = "", onEnter, onUpdate, placeholder = "" }: {
         content,
         extensions: [
             Document,
+            History,
             Paragraph.extend( {
                 addKeyboardShortcuts: () => ( {
                     Enter: () => {
