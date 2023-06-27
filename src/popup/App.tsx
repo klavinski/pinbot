@@ -15,6 +15,8 @@ import IconForbidden from "~icons/eva/slash-outline"
 import { Lottie } from "@crello/react-lottie"
 import check from "react-useanimations/lib/checkmark"
 import { Pin } from "../types.ts"
+import { AnimatePresence, motion } from "framer-motion"
+import { Transition } from "./Transition.tsx"
 
 const getBody = () => {
 
@@ -48,11 +50,11 @@ export const App = () => {
     const [ icon, setIcon ] = useState( <Icon of={ <IconPin/> }/> )
     const [ addPin, setAddPin ] = useState( undefined as ( () => () => unknown ) | undefined )
     const [ visiblePictures, setVisiblePictures ] = useState( true )
-    const [ query, setQuery ] = useState( null as { tags: string[], text: string } | null )
+    const [ query, setQuery ] = useState( { tags: [], text: "" } as { tags: string[], text: string } )
     useEffect( () => console.log( "query", query ), [ query ] )
     const api = useApi()
     useEffect( () => { ( async () => {
-        setPins( query ? await api.search( query ) : [] )
+        setPins( query.text ? await api.search( query ) : await api.getDrafts() )
     } )() }, [ query ] )
     useEffect( () => { ( async () => {
         const [ tab ] = await chrome.tabs.query( { active: true, currentWindow: true } )
@@ -76,18 +78,28 @@ export const App = () => {
             setIcon( <Icon of={ <IconForbidden/> }/> )
     } )() }, [] )
     return <div className={ styles.container }>
-        <div className={ styles.buttons }>
-            <Tooltip content="Light/dark mode"><Toggle/></Tooltip>
-        </div>
-        <Wordmark/>
-        <div className={ styles.addPin }>
-            <div className={ [ styles.button, addPin ? "" : styles.disabled ].join( " " ) }
-                onClick={ addPin }>
-                { icon }Pin the current page
+        <AnimatePresence initial={ false }>
+            <div className={ styles.buttons }>
+                <Tooltip content="Light/dark mode"><Toggle/></Tooltip>
             </div>
-        </div>
-        { pins.map( _ =>
-            <PinComponent key={ `${ _.timestamp }${ _.url }` } pin={ _ } visiblePictures={ visiblePictures } setVisiblePictures={ setVisiblePictures }/> ) }
-        <Footer query={ query } setQuery={ setQuery }/>
+            <Wordmark/>
+            <div className={ styles.addPin }>
+                <div className={ [ styles.button, addPin ? "" : styles.disabled ].join( " " ) }
+                    onClick={ addPin }>
+                    { icon }Pin the current page
+                </div>
+            </div>
+            { pins.length > 0 ? pins.map( _ => <Transition key={ `${ _.timestamp }${ _.url }` }>
+                <PinComponent
+                    onDelete={ () => setPins( pins.filter( p => p !== _ ) ) }
+                    pin={ _ }
+                    setVisiblePictures={ setVisiblePictures }
+                    visiblePictures={ visiblePictures }
+                />
+            </Transition> ) : <Transition key={ `empty-${ query.text ? "pins" : "drafts" }` }>
+                <div className={ styles.empty }>No { query.text ? "pins" : "drafts" }</div>
+            </Transition> }
+            <Footer query={ query } setQuery={ setQuery }/>
+        </AnimatePresence>
     </div>
 }

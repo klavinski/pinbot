@@ -55,7 +55,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
-    "@crxjs/vite-plugin": "2.0.0-beta.17",
+    "@crxjs/vite-plugin": "2.0.0-beta.18",
     "@types/chrome": "^0.0.237",
     "@types/react": "^18.2.12",
     "@types/react-dom": "^18.2.5",

@@ -13,7 +13,7 @@
     bottom: 0;
     pointer-events: none;
     line-height: 0;
-    margin-top: -34.5px;
+    margin-top: -10.5px;
 }
 
 .content {
@@ -42,7 +42,7 @@
 .glow {
     height: 4px;
     position: absolute;
-    bottom: 32px;
+    bottom: 8px;
     width: 100%;
     backdrop-filter: invert( 1 ) brightness( 0.7 ) invert( 1 ) saturate( 1.7 );
     mask-image: linear-gradient( to bottom, #0000, #000a 30%, #000f 50%, #000a 70%, #0000 );
@@ -51,7 +51,7 @@
 .shadow {
     height: 8px;
     position: absolute;
-    bottom: 30px;
+    bottom: 6px;
     width: 100%;
     backdrop-filter: invert( 1 ) brightness( 1.8 ) invert( 1 ) saturate( 0.7 );
     mask-image: linear-gradient( to bottom, #0000, #0003 30%, #0008 50%, #000f 50%, #0004 70%, #0000 );

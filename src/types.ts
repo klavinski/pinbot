@@ -15,4 +15,4 @@ export const asPin = ( value: Record<string, SQLValue> ) => {
     return { ...parsedData, embedding: new Float32Array( parsedData.embedding.buffer ) }
 }
 
-export type Pin = ReturnType<typeof toPin>
+export type Pin = ReturnType<typeof asPin>

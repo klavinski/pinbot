@@ -1,0 +1,7 @@
+.container:hover {
+    overflow-anchor: auto;
+}
+
+.container:not( :hover ) {
+    overflow-anchor: none;
+}

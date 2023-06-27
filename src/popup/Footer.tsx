@@ -6,8 +6,8 @@ import { Dispatch, SetStateAction, useRef, useState } from "react"
 import { Editor } from "./Editor.tsx"
 import { parseHtml } from "../utils.ts"
 
-export const Footer = ( { query, setQuery }: { query: { text: string, tags: string[] } | null, setQuery: Dispatch<SetStateAction<{ text: string, tags: string[] } | null>> } ) => {
-    const content = useRef( { text: "", tags: [] as string[] } )
+export const Footer = ( { query, setQuery }: { query: { text: string, tags: string[] }, setQuery: Dispatch<SetStateAction<{ text: string, tags: string[] }>> } ) => {
+    const [ content, setContent ] = useState( { text: "", tags: [] as string[] } )
     return <div className={ styles.container }>
         <div className={ styles.shadow }/>
         <div className={ styles.glow }/>
@@ -15,13 +15,17 @@ export const Footer = ( { query, setQuery }: { query: { text: string, tags: stri
         <div className={ styles.content }>
             <Editor
                 placeholder="Search your pins (# for tags)"
-                onUpdate={ _ => content.current = parseHtml( _ ) }
-                onEnter={ () => setQuery( query ? null : content.current ) }
+                onUpdate={ _ => setContent( parseHtml( _ ) ) }
+                onEnter={ () => {
+                    let currentContent = null as null | typeof content
+                    setContent( _ => { currentContent = _; return _ } )
+                    setQuery( query.text ? { tags: [], text: "" } : currentContent! )
+                } }
             />
-            <div style={ { transform: `translateX( ${ query || content.current.text !== "" ? 0 : 32 }px )`, transition: "all 0.2s ease-in-out" } }>
+            <div style={ { transform: `translateX( ${ query.text === "" && content.text === "" ? 32 : 0 }px )`, transition: "all 0.2s ease-in-out" } }>
                 <Icon
-                    of={ <Lottie config={ { animationData: search.animationData } } direction={ query ? 1 : - 1 }/> }
-                    onClick={ () => setQuery( query ? null : content.current ) }
+                    of={ <Lottie config={ { animationData: search.animationData } } direction={ query.text ? 1 : - 1 }/> }
+                    onClick={ () => setQuery( query.text ? { tags: [], text: "" } : content ) }
                 />
             </div>
         </div>

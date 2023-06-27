@@ -11,9 +11,9 @@ import { SetStateAction } from "react"
 import { Dispatch } from "react"
 import { Pin } from "../types.ts"
 
-export const PinComponent = ( { pin: init, setVisiblePictures, visiblePictures }: { pin: Pin, setVisiblePictures: Dispatch<SetStateAction<boolean>>, visiblePictures: boolean } ) => {
+export const PinComponent = ( { onDelete, pin: init, setVisiblePictures, visiblePictures }: { onDelete: () => void, pin: Pin, setVisiblePictures: Dispatch<SetStateAction<boolean>>, visiblePictures: boolean } ) => {
     const api = useApi()
-    const [ pin, setPin ] = useState( init as Pin | null )
+    const [ pin, setPin ] = useState( init as Pin )
     const favicon = new URL( chrome.runtime.getURL( "/_favicon/" ) )
     favicon.searchParams.set( "pageUrl", pin?.url ?? "" )
     favicon.searchParams.set( "size", "32" )
@@ -35,7 +35,7 @@ export const PinComponent = ( { pin: init, setVisiblePictures, visiblePictures }
                         direction={ pin.isPinned ? 1 : - 1 }
                     /> } style={ { position: i === length - 1 ? undefined : "absolute", transform: `translate( ${ 0.2 * Math.cos( i / length * Math.PI * 2 ) }px, ${ 0.2 * Math.sin( i / length * Math.PI * 2 ) }px )` } }/> ) }
                 </div>
-                <div onClick={ async () => setPin( await api.removePin( pin ) ) }
+                <div onClick={ async () => { await api.removePin( pin ); onDelete() } }
                     onMouseEnter={ () => setRemoving( false ) }
                     onMouseLeave={ () => setRemoving( true ) }>
                     <Icon of={ <Lottie

@@ -3,6 +3,10 @@ import model from "wink-eng-lite-web-model"
 const { readDoc } = winkNLP( model )
 
 export const cosineSimilarity = ( a: Float32Array, b: Float32Array ) => {
+    if ( a.length !== b.length ) {
+        console.log( a, b )
+        throw new Error( "Vectors must be of same length" )
+    }
     let dot = 0
     let normA = 0
     let normB = 0

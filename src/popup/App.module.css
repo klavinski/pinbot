@@ -4,6 +4,7 @@
     justify-content: center;
     flex-direction: column;
     margin-bottom: 24px;
+    user-select: none;
 }
 
 .button {
@@ -38,4 +39,13 @@
 .disabled {
     opacity: 0.5;
     pointer-events: none;
+}
+
+.empty {
+    opacity: 0.5;
+    text-align: center;
+    user-select: none;
+    overflow: hidden;
+    min-height: 0;
+    height: 100%;
 }
