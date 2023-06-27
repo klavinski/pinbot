@@ -11,6 +11,7 @@ export const Footer = ( { query, setQuery }: { query: { text: string, tags: stri
     return <div className={ styles.container }>
         <div className={ styles.shadow }/>
         <div className={ styles.glow }/>
+        <div className={ styles.background }/>
         <div className={ styles.border }/>
         <div className={ styles.content }>
             <Editor

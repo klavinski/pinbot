@@ -21,11 +21,13 @@
 :root[data-isDark="true"] {
     --text: #ddd;
     --background: #000;
+    transition: all 0.2s ease-in-out;
 }
 
 :root[data-isDark="false"] {
     --text: #000;
     --background: #fff;
+    transition: all 0.2s ease-in-out;
 }
 
 * {

@@ -88,7 +88,7 @@ export const App = () => {
                     { icon }Pin the current page
                 </div>
             </div>
-            { pins.length > 0 ? pins.map( _ => <Transition key={ `${ _.timestamp }${ _.url }` } style={ { boxShadow: "0 -4px 4px -4px var( --shadow ), 0 -8px 8px -8px var( --shadow )", marginBottom: "-4px" } }>
+            { pins.length > 0 ? pins.map( _ => <Transition key={ `${ _.timestamp }${ _.url }` } style={ { boxShadow: "0 -4px 4px -4px #0002, 0 -8px 8px -8px #0002" } }>
                 <PinComponent
                     onDelete={ () => setPins( pins.filter( p => p !== _ ) ) }
                     pin={ _ }

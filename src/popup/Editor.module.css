@@ -29,15 +29,15 @@
 }
 
 .tag {
-    background-color: #fff;
-    color: black;
+    backdrop-filter: brightness( 1.4 );
+    color: var( --text );
     display: inline-flex;
     border-radius: 4px;
     place-items: center;
     justify-content: center;
     padding-right: 1px;
     min-width: 24px;
-    box-shadow: 0 0 2px #0001, 0 0 4px #0001;
+    box-shadow: 0 0 2px #0002, 0 0 4px #0002;
     max-width: 100%;
 }
 
