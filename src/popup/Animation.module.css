@@ -1,0 +1,16 @@
+.container {
+    transition: filter 0.2s ease-in-out;
+}
+
+:root[data-isDark="true"] .container {
+    filter: invert( 1 );
+}
+
+.bookmark {
+    transition: filter 0.5s ease-in-out 0.4s;
+    filter: brightness( 0 );
+}
+
+:root[data-isDark="true"] .bookmark {
+    filter: brightness( 7 );
+}

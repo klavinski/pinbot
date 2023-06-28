@@ -1,8 +1,4 @@
 import { useState } from "react"
-import { Lottie } from "@crello/react-lottie"
-import remove from "react-useanimations/lib/trash"
-import hide from "./visibility-V3.json"
-import bookmark from "./bookmark.json"
 import styles from "./PinComponent.module.css"
 import { Icon } from "./Icon.tsx"
 import { Editor } from "./Editor.tsx"
@@ -10,6 +6,7 @@ import { useApi } from "./api.tsx"
 import { SetStateAction } from "react"
 import { Dispatch } from "react"
 import { Pin } from "../types.ts"
+import { Animation } from "./Animation.tsx"
 
 export const PinComponent = ( { onDelete, pin: init, setVisiblePictures, visiblePictures }: { onDelete: () => void, pin: Pin, setVisiblePictures: Dispatch<SetStateAction<boolean>>, visiblePictures: boolean } ) => {
     const api = useApi()
@@ -28,26 +25,18 @@ export const PinComponent = ( { onDelete, pin: init, setVisiblePictures, visible
                 />
             </div>
             <div className={ styles.actions }>
-                <div onClick={ async () => setPin( await api.togglePin( pin ) ) }
-                    style={ { filter: `brightness( ${ pin.isPinned ? 1 : 0 } )` } }>
-                    { Array.from( { length: 4 } ).map( ( _, i, { length } ) => <Icon of={ <Lottie
-                        config={ { animationData: bookmark, initialSegment: [ 0, 62 ] } }
-                        direction={ pin.isPinned ? 1 : - 1 }
-                    /> } style={ { position: i === length - 1 ? undefined : "absolute", transform: `translate( ${ 0.2 * Math.cos( i / length * Math.PI * 2 ) }px, ${ 0.2 * Math.sin( i / length * Math.PI * 2 ) }px )` } }/> ) }
+                <div onClick={ async () => setPin( await api.togglePin( pin ) ) }>
+                    { Array.from( { length: 4 } ).map( ( _, i, { length } ) => <Icon of={
+                        <Animation of="bookmark" direction={ pin.isPinned ? 1 : - 1 }/>
+                    } style={ { position: i === length - 1 ? undefined : "absolute", transform: `translate( ${ 0.2 * Math.cos( i / length * Math.PI * 2 ) }px, ${ 0.2 * Math.sin( i / length * Math.PI * 2 ) }px )` } }/> ) }
                 </div>
                 <div onClick={ async () => { await api.removePin( pin ); onDelete() } }
                     onMouseEnter={ () => setRemoving( false ) }
                     onMouseLeave={ () => setRemoving( true ) }>
-                    <Icon of={ <Lottie
-                        config={ { animationData: remove.animationData } }
-                        direction={ removing ? - 1 : 1 }
-                    /> }/>
+                    <Icon of={ <Animation of="remove" direction={ removing ? - 1 : 1 }/> }/>
                 </div>
                 <div onClick={ () => setVisiblePictures( ! visiblePictures ) }>
-                    <Icon of={ <Lottie
-                        config={ { animationData: hide } }
-                        direction={ visiblePictures ? - 1 : 1 }
-                    /> }/>
+                    <Icon of={ <Animation of="hide" direction={ visiblePictures ? - 1 : 1 }/> }/>
                 </div>
             </div>
         </div>

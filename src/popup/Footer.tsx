@@ -1,10 +1,9 @@
-import { Lottie } from "@crello/react-lottie"
-import search from "react-useanimations/lib/searchToX"
 import { Icon } from "./Icon.tsx"
 import styles from "./Footer.module.css"
-import { Dispatch, SetStateAction, useRef, useState } from "react"
+import { Dispatch, SetStateAction, useState } from "react"
 import { Editor } from "./Editor.tsx"
 import { parseHtml } from "../utils.ts"
+import { Animation } from "./Animation.tsx"
 
 export const Footer = ( { query, setQuery }: { query: { text: string, tags: string[] }, setQuery: Dispatch<SetStateAction<{ text: string, tags: string[] }>> } ) => {
     const [ content, setContent ] = useState( { text: "", tags: [] as string[] } )
@@ -25,7 +24,7 @@ export const Footer = ( { query, setQuery }: { query: { text: string, tags: stri
             />
             <div style={ { transform: `translateX( ${ query.text === "" && content.text === "" ? 32 : 0 }px )`, transition: "all 0.2s ease-in-out" } }>
                 <Icon
-                    of={ <Lottie config={ { animationData: search.animationData } } direction={ query.text ? 1 : - 1 }/> }
+                    of={ <Animation of="search" direction={ query.text ? 1 : - 1 }/> }
                     onClick={ () => setQuery( query.text ? { tags: [], text: "" } : content ) }
                 />
             </div>

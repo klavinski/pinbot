@@ -1,3 +1,12 @@
+.clickable {
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+
+.clickable:active {
+    transform: scale( 0.9 );
+}
+
 .container {
     width: calc( 32em / 18 );
     height: calc( 32em / 18 );

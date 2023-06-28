@@ -1,4 +1,4 @@
-import { flip, offset, shift, useFloating, useHover, useInteractions } from "@floating-ui/react"
+import { autoUpdate, flip, offset, shift, useFloating, useHover, useInteractions } from "@floating-ui/react"
 import { ReactNode, useState } from "react"
 import styles from "./Tooltip.module.css"
 
@@ -8,7 +8,8 @@ export const Tooltip = ( { content, children }: { children: ReactNode, content: 
         middleware: [ shift(), flip(), offset( 8 ) ],
         open: isOpen,
         onOpenChange: setIsOpen,
-        placement: "top"
+        placement: "top",
+        whileElementsMounted: ( ...args ) => autoUpdate( ...args )
     } )
     const hover = useHover( context )
     const { getReferenceProps, getFloatingProps } = useInteractions( [ hover ] )

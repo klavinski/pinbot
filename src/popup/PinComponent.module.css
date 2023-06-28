@@ -9,7 +9,6 @@
 
 .actions > *:first-child {
     margin-top: -6.3px;
-    transition: filter 0.5s ease-in-out 0.5s;
 }
 
 .actions > *:nth-child( n + 2 ) {

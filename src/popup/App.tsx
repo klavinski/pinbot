@@ -12,11 +12,10 @@ import { Icon } from "./Icon.tsx"
 import IconPin from "~icons/tabler/pin"
 import { Clock } from "./Clock.tsx"
 import IconForbidden from "~icons/eva/slash-outline"
-import { Lottie } from "@crello/react-lottie"
-import check from "react-useanimations/lib/checkmark"
 import { Pin } from "../types.ts"
 import { AnimatePresence } from "framer-motion"
 import { Transition } from "./Transition.tsx"
+import { Animation } from "./Animation.tsx"
 
 const getBody = () => {
 
@@ -71,7 +70,7 @@ export const App = () => {
                 setIcon( <Clock/> )
                 setAddPin( undefined )
                 setPins( [ await api.addPin( args ), ...pins ] )
-                setIcon( <Icon of={ <Lottie config={ { animationData: check.animationData } }/> }/> )
+                setIcon( <Icon of={ <Animation of="check"/> }/> )
             } )
         } else
             setIcon( <Icon of={ <IconForbidden/> }/> )

@@ -20,7 +20,7 @@ export const Toggle = () => {
         updateFromOSPreference()
         return () => abortController.abort()
     }, [] )
-    return <div className={ [ styles.container, isDark ? styles.dark : "", "clickableIcon" ].join( " " ) }
+    return <div className={ [ styles.container, isDark ? styles.dark : "", styles.clickable ].join( " " ) }
         onClick={ () => {
             "chrome" in self && chrome?.storage?.sync.set( { isDark: ! isDark } )
             updateStyle( ! isDark )

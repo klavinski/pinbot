@@ -9,12 +9,12 @@ const transformersWorker = new ComlinkWorker<typeof import( "./workers/transform
 const tagsMap = new Map<string, Promise<Float32Array>>()
 
 const classify = async ( text: string ) => {
+    const allTags = [ ...new Set( [ ...( await sqlWorker.sql`SELECT * FROM pins WHERE isPinned = true;` ).map( asPin ).flatMap( _ => parseHtml( _.text ).tags ), ...tags ] ).values() ]
     const textEmbedding = await transformersWorker.embed( text )
-    return await Promise.all( tags.map( async tag => {
+    return await Promise.all( allTags.map( async tag => {
         if ( ! tagsMap.has( tag ) )
             tagsMap.set( tag, transformersWorker.embed( tag ) )
         const tagEmbedding = await tagsMap.get( tag )!
-        console.log( tag, cosineSimilarity( textEmbedding, tagEmbedding ), tagEmbedding )
         return { name: tag, score: cosineSimilarity( textEmbedding, tagEmbedding ) }
     } ) )
 }
@@ -24,12 +24,12 @@ const iconEmbeddings = Promise.all( Object.entries( icons ).map( async ( [ name 
 export const api = {
     addPin: async ( { body, screenshot, title, url }: { body: string, screenshot: string, title: string, url: string } ) => {
         const summary = await transformersWorker.summarize( body )
-        const tags = await classify( summary )
+        const tags = await classify( [ title, body ].join( "\n" ) )
         const text = `<p>${ title }</p><p>${ summary }</p><p>${ tags.filter( _ => _.score > 0.23 ).sort( ( a, b ) => b.score - a.score ).slice( 0, 3 ).map( _ => `<tag>${ _.name }</tag>` ).join( " " ) }</p>`
         const embedding = await transformersWorker.embed( parseHtml( text ).text )
         return asPin( ( await sqlWorker.sql`INSERT OR REPLACE INTO pins ( embedding, isPinned, screenshot, text, timestamp, url ) VALUES ( ${ embedding.buffer }, 1, ${ screenshot }, ${ text }, datetime( 'now' ), ${ url } ) RETURNING *;` )[ 0 ] )
     },
-    getDrafts: async () => ( await sqlWorker.sql`SELECT * FROM pins WHERE isPinned = 0 ORDER BY timestamp DESC;` ).map( asPin ),
+    getDrafts: async () => ( await sqlWorker.sql`SELECT * FROM pins WHERE isPinned = false ORDER BY timestamp DESC;` ).map( asPin ),
     getPin: async ( { timestamp, url }: { timestamp: string, url: string } ) => asPin( ( await sqlWorker.sql`SELECT * FROM pins WHERE timestamp = ${ timestamp } AND url = ${ url }` )[ 0 ] ),
     getIcon: async ( query: string ) => {
         const queryEmbedding = await transformersWorker.embed( query )
@@ -43,7 +43,7 @@ export const api = {
     },
     search: async ( { text, tags }: { text: string, tags: string[] } ) => {
         const embedding = await transformersWorker.embed( text )
-        const results = ( await sqlWorker.sql( [ `SELECT * FROM pins WHERE isPinned = 1 ${ tags.map( _ => `AND text LIKE '%<tag>${ _ }</tag>%'` ).join( " " ) };` ] ) ).map( asPin )
+        const results = ( await sqlWorker.sql( [ `SELECT * FROM pins WHERE isPinned = true ${ tags.map( _ => `AND text LIKE '%<tag>${ _ }</tag>%'` ).join( " " ) };` ] ) ).map( asPin )
         return results.map( pin => ( { ...pin, score: cosineSimilarity( embedding, pin.embedding ) } ) ).sort( ( a, b ) => b.score - a.score )
     },
     sql: sqlWorker.sql,

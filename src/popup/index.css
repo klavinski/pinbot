@@ -8,25 +8,25 @@
     --gold: #968b80;
     --shadow: #77777740;
     --text: #000;
-    --background: #fff;
+    --background: #eee;
 }
 
 @media( prefers-color-scheme: dark ) {
     :root {
         --text: #ddd;
-        --background: #000;
+        --background: #222;
     }
 }
 
 :root[data-isDark="true"] {
     --text: #ddd;
-    --background: #000;
+    --background: #222;
     transition: all 0.2s ease-in-out;
 }
 
 :root[data-isDark="false"] {
     --text: #000;
-    --background: #fff;
+    --background: #eee;
     transition: all 0.2s ease-in-out;
 }
 
