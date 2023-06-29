@@ -4,14 +4,11 @@ import { Dispatch, SetStateAction, useState } from "react"
 import { Editor } from "./Editor.tsx"
 import { parseHtml } from "../utils.ts"
 import { Animation } from "./Animation.tsx"
+import { Glass } from "./Glass.tsx"
 
 export const Footer = ( { query, setQuery }: { query: { text: string, tags: string[] }, setQuery: Dispatch<SetStateAction<{ text: string, tags: string[] }>> } ) => {
     const [ content, setContent ] = useState( { text: "", tags: [] as string[] } )
-    return <div className={ styles.container }>
-        <div className={ styles.shadow }/>
-        <div className={ styles.glow }/>
-        <div className={ styles.background }/>
-        <div className={ styles.border }/>
+    return <Glass className={ styles.container }>
         <div className={ styles.content }>
             <Editor
                 placeholder="Search your pins (# for tags)"
@@ -29,5 +26,5 @@ export const Footer = ( { query, setQuery }: { query: { text: string, tags: stri
                 />
             </div>
         </div>
-    </div>
+    </Glass>
 }
