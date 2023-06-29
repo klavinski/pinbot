@@ -4,7 +4,7 @@ import { PinComponent } from "./PinComponent.js"
 import { Footer } from "./Footer.tsx"
 import { Wordmark } from "./Wordmark.tsx"
 import { Toggle } from "./Toggle/index.tsx"
-import { Tooltip } from "./Tooltip.tsx"
+import { useTooltip } from "./useTooltip.tsx"
 import styles from "./App.module.css"
 import { useApi } from "./api.tsx"
 import { useEffect } from "react"
@@ -75,10 +75,11 @@ export const App = () => {
         } else
             setIcon( <Icon of={ <IconForbidden/> }/> )
     } )() }, [] )
+    const { referenceProps: darkModeRef, tooltip: darkModeTooltip } = useTooltip( "Light/dark mode" )
     return <div className={ styles.container }>
         <AnimatePresence initial={ false }>
             <div className={ styles.buttons }>
-                <Tooltip content="Light/dark mode"><Toggle/></Tooltip>
+                <div { ...darkModeRef }><Toggle/>{ darkModeTooltip }</div>
             </div>
             <Wordmark/>
             <div className={ styles.addPin }>
@@ -87,7 +88,7 @@ export const App = () => {
                     { icon }Pin the current page
                 </div>
             </div>
-            { pins.length > 0 ? pins.map( _ => <Transition key={ `${ _.timestamp }${ _.url }` } style={ { boxShadow: "0 -4px 4px -4px #0002, 0 -8px 8px -8px #0002" } }>
+            { pins.length > 0 ? pins.map( _ => <Transition key={ `${ _.timestamp }${ _.url }` } style={ { boxShadow: "0 -4px 4px -4px #0001, 0 -8px 8px -8px #0001" } }>
                 <PinComponent
                     onDelete={ () => setPins( pins.filter( p => p !== _ ) ) }
                     pin={ _ }

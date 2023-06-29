@@ -1,0 +1,72 @@
+.background {
+    background-color: var( --background );
+    opacity: 0.5;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    border-radius: calc( var( --radius ) + 2px );
+}
+
+.container {
+    border-radius: calc( var( --radius ) + 2px );
+    display: grid;
+    place-items: center;
+    box-shadow: 0 0 2px #0001, 0 0 4px #0001, 0 0 2px #0001 inset, 0 0 4px #0001 inset;
+}
+
+.content {
+    border-radius: var( --radius );
+    filter: drop-shadow( 0 1px 1px #0004 );
+    margin: 2px;
+}
+
+.blur {
+    backdrop-filter: blur( 1.5px );
+    width: calc( 100% - 1px );
+    height: calc( 100% - 1px );
+    position: absolute;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: auto, auto, auto, auto, calc( 100% - 3px ) calc( 100% - 3px - var( --radius ) * 2 ), calc( 100% - 3px - var( --radius ) * 2 ) calc( 100% - 3px );
+    mask-image: radial-gradient( circle at calc( 1.5px + var( --radius ) ) calc( 1.5px + var( --radius ) ), #000f var( --radius ), #0000 var( --radius ) ),
+    radial-gradient( circle at calc( 100% - 1.5px - var( --radius ) ) calc( 1.5px + var( --radius ) ), #000f var( --radius ), #0000 var( --radius ) ),
+    radial-gradient( circle at calc( 1.5px + var( --radius ) ) calc( 100% - 1.5px - var( --radius ) ), #000f var( --radius ), #0000 var( --radius ) ),
+    radial-gradient( circle at calc( 100% - 1.5px - var( --radius ) ) calc( 100% - 1.5px - var( --radius ) ), #000f var( --radius ), #0000 var( --radius ) ),
+    linear-gradient( to top, #000f, #000f ),
+    linear-gradient( to top, #000f, #000f );
+}
+
+.border {
+    backdrop-filter: blur( 8px ) saturate( 4 );
+    position: absolute;
+}
+
+.bottom, .top {
+    width: calc( 100% - 2 * var( --radius ) );
+    height: 10px;
+}
+
+.bottom {
+    top: calc( 100% - 2px );
+    mask-image: linear-gradient( to bottom, #000f 0px, #000d 2px, #000f 2px, #0000 4px );
+}
+
+.top {
+    bottom: calc( 100% - 2px );
+    mask-image: linear-gradient( to top, #000f 0px, #000d 2px, #000f 2px, #0000 4px );
+}
+
+.left, .right {
+    height: calc( 100% - 2 * var( --radius ) );
+    width: 10px;
+}
+
+.left {
+    right: calc( 100% - 2px );
+    mask-image: linear-gradient( to left, #000f 0px, #000a 2px, #0000 2px );
+}
+
+.right {
+    left: calc( 100% - 2px );
+    mask-image: linear-gradient( to right, #000f 0px, #000a 2px, #0000 2px );
+}

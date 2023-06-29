@@ -12,7 +12,7 @@ import { UI } from "./UI.tsx"
 import { Toggle } from "./Toggle/index.tsx"
 import { Clock } from "./Clock.tsx"
 import { AccountButton } from "./Account.tsx"
-import { Tooltip } from "./Tooltip.tsx"
+import { Tooltip } from "./useTooltip.tsx"
 import { AlertsButton } from "./Alerts.tsx"
 
 import manifest from "../../manifest.json"

@@ -18,8 +18,8 @@
 }
 
 .button:active {
-    box-shadow: 0 0 0 var( --shadow );
-    transform: scale( 0.995 );
+    box-shadow: 0 0 0 #7770;
+    transform: translateY( 1px );
 }
 
 .buttons {
