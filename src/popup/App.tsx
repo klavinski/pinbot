@@ -16,6 +16,7 @@ import { Pin } from "../types.ts"
 import { AnimatePresence } from "framer-motion"
 import { Transition } from "./Transition.tsx"
 import { Animation } from "./Animation.tsx"
+import { Info } from "./Info.tsx"
 
 const getBody = () => {
 
@@ -79,6 +80,7 @@ export const App = () => {
     return <div className={ styles.container }>
         <AnimatePresence initial={ false }>
             <div className={ styles.buttons }>
+                <Info/>
                 <div { ...darkModeRef }><Toggle/>{ darkModeTooltip }</div>
             </div>
             <Wordmark/>

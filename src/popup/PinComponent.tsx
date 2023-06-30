@@ -8,6 +8,7 @@ import { Dispatch } from "react"
 import { Pin } from "../types.ts"
 import { Animation } from "./Animation.tsx"
 import { useTooltip } from "./useTooltip.tsx"
+import { Link } from "./Link.tsx"
 
 export const PinComponent = ( { onDelete, pin: init, setVisiblePictures, visiblePictures }: { onDelete: () => void, pin: Pin, setVisiblePictures: Dispatch<SetStateAction<boolean>>, visiblePictures: boolean } ) => {
     const api = useApi()
@@ -16,7 +17,6 @@ export const PinComponent = ( { onDelete, pin: init, setVisiblePictures, visible
     favicon.searchParams.set( "pageUrl", pin?.url ?? "" )
     favicon.searchParams.set( "size", "32" )
     const [ removing, setRemoving ] = useState( true )
-    const { referenceProps: urlRefProps, tooltip: urlTooltip } = useTooltip( pin.url )
     const { referenceProps: bookmarkRefProps, tooltip: bookmarkTooltip } = useTooltip( pin.isPinned ? "Convert to draft" : "Save as pin" )
     const { referenceProps: removeRefProps, tooltip: removeTooltip } = useTooltip( "Delete" )
     const { referenceProps: hideRefProps, tooltip: hideTooltip } = useTooltip( `${ visiblePictures ? "Hide" : "Show" } pictures` )
@@ -24,8 +24,7 @@ export const PinComponent = ( { onDelete, pin: init, setVisiblePictures, visible
         <div className={ styles.header }>
             <Icon of={ <img src={ favicon.toString() }/> } className={ styles.favicon }/>
             <div className={ styles.description }>
-                <a className={ styles.link } href={ pin.url } { ...urlRefProps }>{ pin.url }</a>
-                { urlTooltip }
+                <Link href={ pin.url }>{ pin.url }</Link>
                 <Editor content={ pin.text }
                     onUpdate={ text => api.updatePin( { ...pin, text } ) }
                 />

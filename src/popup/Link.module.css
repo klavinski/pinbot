@@ -1,0 +1,32 @@
+.container {
+    transition: transform 0.2s ease-in-out;
+}
+
+.container:active {
+    transform: translateY( 2px );
+}
+
+.container > * {
+    transition: box-shadow 0.2s ease-in-out;
+    box-shadow: 0 2px 0 var( --shadow );
+}
+
+.prefix {
+    display: inline-flex;
+    vertical-align: bottom;
+}
+
+.text {
+    color: var( --focus );
+    display: inline;
+    padding-bottom: 1.5px;
+}
+
+.container:hover > * {
+    box-shadow: 0 2px 0 var( --focus );
+}
+
+
+.container:active > * {
+    box-shadow: 0 0px 0 var( --shadow );
+}

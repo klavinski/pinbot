@@ -4,3 +4,8 @@
     overflow-wrap: break-word;
     max-width: 100%;
 }
+
+.tooltip {
+    pointer-events: none;
+    --radius: 8px;
+}
