@@ -7,6 +7,7 @@ import Placeholder from "@tiptap/extension-placeholder"
 import History from "@tiptap/extension-history"
 import styles from "./Editor.module.css"
 import { TagExtension } from "./TagExtension.tsx"
+import Focus from "@tiptap/extension-focus"
 
 export const Editor = ( { content = "", onEnter, onUpdate, placeholder = "" }: { content?: string, onEnter?: () => void, onUpdate?: ( text: string ) => void, placeholder?: string } ) => {
     const editor = useEditor( {
@@ -14,6 +15,7 @@ export const Editor = ( { content = "", onEnter, onUpdate, placeholder = "" }: {
         extensions: [
             Document,
             History,
+            Focus,
             Paragraph.extend( {
                 addKeyboardShortcuts: () => ( {
                     Enter: () => {

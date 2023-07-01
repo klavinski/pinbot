@@ -1,10 +1,10 @@
 import { autoUpdate, flip, Placement, shift, useFloating, useHover, useInteractions } from "@floating-ui/react"
-import { ReactNode, useState } from "react"
+import { CSSProperties, ReactNode, useState } from "react"
 import styles from "./useTooltip.module.css"
 import { createPortal } from "react-dom"
 import { Glass } from "./Glass.tsx"
 
-export const useTooltip = ( { content, isOpen: programmaticIsOpen, placement = "top" }: { content: ReactNode, isOpen?: boolean, placement?: Placement } ) => {
+export const useTooltip = ( { content, isOpen: programmaticIsOpen, placement = "top", pointerEvents }: { content: ReactNode, isOpen?: boolean, placement?: Placement, pointerEvents?: CSSProperties["pointerEvents"] } ) => {
     const [ isOpen, setIsOpen ] = useState( false )
     const open = typeof programmaticIsOpen === "boolean" ? programmaticIsOpen : isOpen
     const { context, x, y, strategy, refs } = useFloating( {
@@ -26,7 +26,7 @@ export const useTooltip = ( { content, isOpen: programmaticIsOpen, placement = "
                 left: x ?? 0,
                 zIndex: 3,
                 opacity: open ? 1 : 0,
-                pointerEvents: open ? "all" : "none"
+                pointerEvents: typeof pointerEvents !== "undefined" ? pointerEvents : open ? "all" : "none"
             } }
             { ...getFloatingProps() }
         >

@@ -3,7 +3,7 @@ import styles from "./Link.module.css"
 import { useTooltip } from "./useTooltip"
 
 export const Link = ( { children, className, href, prefix, ...props }: { children: ReactNode, href: string, prefix?: ReactNode } & ComponentPropsWithoutRef<"a"> ) => {
-    const { referenceProps, tooltip } = useTooltip( { content: href } )
+    const { referenceProps, tooltip } = useTooltip( { content: href, pointerEvents: "none" } )
     return <>
         <a
             { ...referenceProps }

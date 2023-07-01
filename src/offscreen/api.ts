@@ -9,13 +9,13 @@ const transformersWorker = new ComlinkWorker<typeof import( "./workers/transform
 const tagsMap = new Map<string, Promise<Float32Array>>()
 
 const classify = async ( text: string ) => {
-    const allTags = [ ...new Set( [ ...( await sqlWorker.sql`SELECT * FROM pins WHERE isPinned = true;` ).map( asPin ).flatMap( _ => parseHtml( _.text ).tags ), ...tags ] ).values() ]
+    const occurrences = [ ...( await sqlWorker.sql`SELECT * FROM pins WHERE isPinned = true;` ).map( asPin ).flatMap( _ => parseHtml( _.text ).tags ) ]
     const textEmbedding = await transformersWorker.embed( text )
-    return ( await Promise.all( allTags.map( async tag => {
+    return ( await Promise.all( [ ...new Set( [ ...occurrences, ...tags ] ).values() ].map( async tag => {
         if ( ! tagsMap.has( tag ) )
             tagsMap.set( tag, transformersWorker.embed( tag ) )
         const tagEmbedding = await tagsMap.get( tag )!
-        return { name: tag, score: cosineSimilarity( textEmbedding, tagEmbedding ) }
+        return { name: tag, score: cosineSimilarity( textEmbedding, tagEmbedding ), count: occurrences.filter( _ => _ === tag ).length }
     } ) ) ).sort( ( a, b ) => b.score - a.score )
 }
 

@@ -7,26 +7,31 @@ import GraphemeSplitter from "grapheme-splitter"
 import { useTooltip } from "../useTooltip.tsx"
 import { useApi } from "../api.tsx"
 import { useEffect, useState } from "react"
+import { z } from "zod"
 
 const splitter = new GraphemeSplitter()
 
-const TagComponent = ( { editor, node }: NodeViewProps ) => {
+const TagComponent = ( { decorations, editor, getPos, node }: NodeViewProps ) => {
     const length = splitter.countGraphemes( node.textContent )
     const api = useApi()
-    const [ suggestions, setSuggestions ] = useState( [] as string[] )
+    const [ suggestions, setSuggestions ] = useState( [] as Awaited<ReturnType<typeof api.classify>> )
     useEffect( () => {
-        api.classify( node.textContent ).then( _ => setSuggestions( _.slice( 0, 4 ).map( _ => _.name ) ) )
+        api.classify( node.textContent ).then( _ => setSuggestions( _.slice( 0, 4 ) ) )
     }, [ node.textContent ] )
+    const [ isMouseDown, setIsMouseDown ] = useState( false )
     const { referenceProps, tooltip } = useTooltip( {
-        content: suggestions.map( _ => <div className={ styles.suggestion } onClick={ () => { editor.chain().selectParentNode().run(); editor.chain().insertContentAt( { from: editor.state.selection.from + 1, to: editor.state.selection.to - 1 }, _ ).run(); editor.chain().setTextSelection( editor.state.selection.to + 1 ).focus().run() } }><Icon of={ _ }/>{ _ }</div> ),
+        content: suggestions.map( _ => <div className={ styles.suggestion } onClick={ () => {
+            editor.chain().insertContentAt( { from: getPos() + 1, to: getPos() + node.nodeSize - 1 }, _.name ).run()
+            editor.chain().setTextSelection( editor.state.selection.to + 1 ).focus().run()
+            setIsMouseDown( false )
+        } } onMouseDown={ () => setIsMouseDown( true ) } onMouseLeave={ () => setIsMouseDown( false ) }><Icon of={ _.name }/>{ _.name } ({ _.count })</div> ),
         isOpen: true,
         placement: "bottom"
     } )
-
     return <NodeViewWrapper className={ styles.tag } { ...referenceProps }>
         { length > 1 && <Icon of={ node.textContent } contentEditable={ false }/> }
         <NodeViewContent className={ [ styles.tagContent, length > 1 ? "" : styles.short ].join( " " ) }/>
-        { length > 1 && tooltip }
+        { ( decorations.some( _ => z.object( { attrs: z.object( { class: z.literal( "has-focus" ) } ) } ).safeParse( _.type ).success ) || isMouseDown ) && length > 1 && tooltip }
     </NodeViewWrapper>
 }
 
@@ -45,7 +50,7 @@ export const TagExtension = Node.create( {
                 .setTextSelection( { from: this.editor.state.selection.from + 1, to: this.editor.state.selection.to + 2 } )
                 .run(),
             "Backspace": () => {
-                if ( splitter.countGraphemes( this.editor.state.selection.$head.parent.textContent ) === 1 && this.editor.state.selection.$head.parent.type.name === "tag" ) {
+                if ( splitter.countGraphemes( this.editor.state.selection.$head.parent.textContent ) === 1 && this.editor.state.selection.$head.parent.type.name === this.name ) {
                     this.editor.chain().selectParentNode().deleteSelection().run()
                     return true
                 }
