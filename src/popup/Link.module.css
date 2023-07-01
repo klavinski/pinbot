@@ -12,14 +12,18 @@
 }
 
 .prefix {
-    display: inline-flex;
-    vertical-align: bottom;
+    display: inline;
+}
+
+.prefix > svg {
+    height: calc( 2em / 3 );
+    transform: scale( 2 );
 }
 
 .text {
     color: var( --focus );
     display: inline;
-    padding-bottom: 1.5px;
+    word-break: break-all;
 }
 
 .container:hover > * {

@@ -9,6 +9,10 @@ import { Pin } from "../types.ts"
 import { Animation } from "./Animation.tsx"
 import { useTooltip } from "./useTooltip.tsx"
 import { Link } from "./Link.tsx"
+import IconTablerPhoto from "~icons/tabler/photo"
+import IconTablerPhotoPlus from "~icons/tabler/photo-plus"
+import IconTablerPhotoMinus from "~icons/tabler/photo-minus"
+import IconTablerPhotoCancel from "~icons/tabler/photo-cancel"
 
 export const PinComponent = ( { onDelete, pin: init, setVisiblePictures, visiblePictures }: { onDelete: () => void, pin: Pin, setVisiblePictures: Dispatch<SetStateAction<boolean>>, visiblePictures: boolean } ) => {
     const api = useApi()
@@ -17,6 +21,7 @@ export const PinComponent = ( { onDelete, pin: init, setVisiblePictures, visible
     favicon.searchParams.set( "pageUrl", pin?.url ?? "" )
     favicon.searchParams.set( "size", "32" )
     const [ removing, setRemoving ] = useState( true )
+    const [ hoveringHiding, setHoveringHiding ] = useState( false )
     const { referenceProps: bookmarkRefProps, tooltip: bookmarkTooltip } = useTooltip( pin.isPinned ? "Convert to draft" : "Save as pin" )
     const { referenceProps: removeRefProps, tooltip: removeTooltip } = useTooltip( "Delete" )
     const { referenceProps: hideRefProps, tooltip: hideTooltip } = useTooltip( `${ visiblePictures ? "Hide" : "Show" } pictures` )
@@ -43,8 +48,14 @@ export const PinComponent = ( { onDelete, pin: init, setVisiblePictures, visible
                     <Icon of={ <Animation of="remove" direction={ removing ? - 1 : 1 }/> }/>
                     { removeTooltip }
                 </div>
-                <div onClick={ () => setVisiblePictures( ! visiblePictures ) } { ...hideRefProps }>
-                    <Icon of={ <Animation of="hide" direction={ visiblePictures ? - 1 : 1 }/> }/>
+                <div onClick={ () => setVisiblePictures( ! visiblePictures ) } { ...hideRefProps }
+                    onMouseEnter={ () => setHoveringHiding( true ) }
+                    onMouseLeave={ () => setHoveringHiding( false ) }
+                >
+                    { <Icon of={ <IconTablerPhoto/> } style={ { opacity: visiblePictures && ! hoveringHiding ? 1 : 0 } }/> }
+                    { <Icon of={ <IconTablerPhotoMinus/> } style={ { opacity: visiblePictures && hoveringHiding ? 1 : 0 } }/> }
+                    { <Icon of={ <IconTablerPhotoPlus/> } style={ { opacity: ! visiblePictures && hoveringHiding ? 1 : 0 } }/> }
+                    { <Icon of={ <IconTablerPhotoCancel/> } style={ { opacity: ! visiblePictures && ! hoveringHiding ? 1 : 0 } }/> }
                     { hideTooltip }
                 </div>
             </div>

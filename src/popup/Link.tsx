@@ -18,6 +18,6 @@ export const Link = ( { children, className, href, prefix, ...props }: { childre
                 { children }
             </div>
         </a>
-        { tooltip }
+        { href !== children && tooltip }
     </>
 }

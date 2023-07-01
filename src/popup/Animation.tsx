@@ -6,14 +6,16 @@ import hide from "./visibility-V3.json"
 import { Lottie } from "@crello/react-lottie"
 import styles from "./Animation.module.css"
 import info from "react-useanimations/lib/info"
+import subscriptions from "react-useanimations/lib/mail"
 import { ComponentPropsWithRef } from "react"
 const animations = {
     bookmark: { animationData: bookmark },
     check,
     hide: { animationData: hide },
     info,
-    search,
-    remove
+    subscriptions,
+    remove,
+    search
 }
 
 export const Animation = ( { direction, of, ...props }: { of: keyof typeof animations } & Omit<ComponentPropsWithRef<typeof Lottie>, "config"> ) => <Lottie

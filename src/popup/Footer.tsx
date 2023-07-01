@@ -8,7 +8,7 @@ import { Glass } from "./Glass.tsx"
 
 export const Footer = ( { query, setQuery }: { query: { text: string, tags: string[] }, setQuery: Dispatch<SetStateAction<{ text: string, tags: string[] }>> } ) => {
     const [ content, setContent ] = useState( { text: "", tags: [] as string[] } )
-    return <Glass className={ styles.container }>
+    return <Glass className={ styles.container } bottomBorder={ false }leftBorder={ false } rightBorder={ false }>
         <div className={ styles.content }>
             <Editor
                 placeholder="Search your pins (# for tags)"

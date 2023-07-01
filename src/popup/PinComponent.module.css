@@ -19,6 +19,11 @@
     transform: scale( 0.9 );
 }
 
+.actions > *:nth-child( 3 ) > * {
+    transition: opacity 0.2s ease-in-out;
+    position: absolute;
+}
+
 .container {
     padding-top: 4px;
 }

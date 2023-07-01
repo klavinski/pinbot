@@ -27,10 +27,15 @@
     color: #fff;
     left: calc( 4em / 18 );
     position: absolute;
+    transition: opacity 0.2s ease-in-out;
 }
 
 .moon:not( .dark .moon ) {
     transform: translateY( calc( -32em / 18 ) );
+}
+
+.sun:hover {
+    animation: rotation 3.2s linear infinite;
 }
 
 .sun {
@@ -39,4 +44,13 @@
 
 .dark .sun {
     transform: translateY( calc( 32em / 18 ) );
+}
+
+@keyframes rotation {
+    from {
+        transform: rotate( 0deg );
+    }
+    to {
+        transform: rotate( 360deg );
+    }
 }

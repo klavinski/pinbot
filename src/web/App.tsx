@@ -11,7 +11,7 @@ import filter from "./filter.png"
 import kamil from "./kamil.jpg"
 import { UI } from "../popup/UI.tsx"
 import { Wordmark } from "../popup/Wordmark.tsx"
-import { Toggle } from "../popup/Toggle/index.tsx"
+import { DarkMode } from "../popup/header/DarkMode.tsx"
 import { ReactNode } from "react"
 
 const Install = ( { suffix }: { suffix?: ReactNode } ) => <div className={ styles.install }>
@@ -27,7 +27,7 @@ export const App = () => <>
                 <a className="clickableIcon" onClick={ () => document.querySelector( `.${ styles.features }` )?.scrollIntoView( { behavior: "smooth" } ) }>Features</a>
                 <a className="clickableIcon" onClick={ () => document.querySelector( `.${ styles.about }` )?.scrollIntoView( { behavior: "smooth" } ) }>About</a>
             </div>
-            <Wordmark/><Toggle/>
+            <Wordmark/><DarkMode/>
         </div>
         <div className={ styles.background }/>
         <div className={ styles.container }>

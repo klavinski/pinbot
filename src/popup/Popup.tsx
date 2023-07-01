@@ -9,7 +9,7 @@ import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { Calendar } from "./Calendar.tsx"
 import { Query } from "../types.ts"
 import { UI } from "./UI.tsx"
-import { Toggle } from "./Toggle/index.tsx"
+import { DarkMode } from "./header/DarkMode.tsx"
 import { Clock } from "./Clock.tsx"
 import { AccountButton } from "./Account.tsx"
 import { Tooltip } from "./useTooltip.tsx"
@@ -67,7 +67,7 @@ export const Popup = () => {
             <div/>
             <Wordmark/>
             <div className={ styles.buttons }>
-                <Tooltip content="Light/dark mode"><Toggle/></Tooltip>
+                <Tooltip content="Light/dark mode"><DarkMode/></Tooltip>
                 <Tooltip content="Alerts"><AlertsButton/></Tooltip>
                 <Tooltip content="Account settings"><AccountButton/></Tooltip>
             </div>

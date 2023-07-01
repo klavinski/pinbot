@@ -3,7 +3,7 @@ import { useState } from "react"
 import { PinComponent } from "./PinComponent.js"
 import { Footer } from "./Footer.tsx"
 import { Wordmark } from "./Wordmark.tsx"
-import { Toggle } from "./Toggle/index.tsx"
+import { DarkMode } from "./header/DarkMode.tsx"
 import { useTooltip } from "./useTooltip.tsx"
 import styles from "./App.module.css"
 import { useApi } from "./api.tsx"
@@ -16,7 +16,8 @@ import { Pin } from "../types.ts"
 import { AnimatePresence } from "framer-motion"
 import { Transition } from "./Transition.tsx"
 import { Animation } from "./Animation.tsx"
-import { Info } from "./Info.tsx"
+import { Info } from "./header/Info.tsx"
+import { Subscriptions } from "./header/Subscriptions.tsx"
 
 const getBody = () => {
 
@@ -80,8 +81,9 @@ export const App = () => {
     return <div className={ styles.container }>
         <AnimatePresence initial={ false }>
             <div className={ styles.buttons }>
+                <Subscriptions/>
                 <Info/>
-                <div { ...darkModeRef }><Toggle/>{ darkModeTooltip }</div>
+                <div { ...darkModeRef }><DarkMode/>{ darkModeTooltip }</div>
             </div>
             <Wordmark/>
             <div className={ styles.addPin }>
@@ -97,7 +99,7 @@ export const App = () => {
                     setVisiblePictures={ setVisiblePictures }
                     visiblePictures={ visiblePictures }
                 />
-            </Transition> ) : <Transition key={ `empty-${ query.text ? "pins" : "drafts" }` }>
+            </Transition> ) : <Transition key={ `empty-${ query.text ? "pins" : "drafts" }` } style={ { margin: "16px" } }>
                 <div className={ styles.empty }>No { query.text ? "pins" : "drafts" }</div>
             </Transition> }
             <Footer query={ query } setQuery={ setQuery }/>

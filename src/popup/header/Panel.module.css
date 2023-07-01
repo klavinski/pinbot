@@ -1,5 +1,5 @@
 .button {
-    background-color: var( --gold );
+    background-color: var( --shadow );
     transition: transform 0.2s ease-in-out;
     cursor: pointer;
     width: 32px;
@@ -14,7 +14,7 @@
 }
 
 .button > * {
-    opacity: 0.5;
+    filter: contrast( 0 ) sepia( .3 ) hue-rotate( -20deg ) brightness( 1.1 );
 }
 
 .container {
@@ -30,6 +30,7 @@
     cursor: pointer;
     z-index: 2;
     overflow: hidden;
+    padding: 24px;
 }
 
 .panel {

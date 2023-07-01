@@ -1,0 +1,19 @@
+.input {
+    resize: none;
+    border: solid 2px var( --shadow );
+    font-family: inherit;
+    font-size: inherit;
+    border-radius: 4px;
+    transition: border-color 0.2s ease-in-out;
+    width: 100%;
+    color: inherit;
+    background: var( --background );
+}
+
+:root[data-isDark="false"] .input {
+    background: #fff;
+}
+
+.input:focus {
+    border-color: var( --focus );
+}

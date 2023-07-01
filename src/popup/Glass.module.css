@@ -16,7 +16,7 @@
 
 .content {
     border-radius: var( --radius );
-    filter: drop-shadow( 0 1px 1px #0004 );
+    filter: drop-shadow( 0 -0.5px 0.5px #fff ) drop-shadow( 0 2px .5px #0003 );
     margin: 2px;
     width: 100%;
 }

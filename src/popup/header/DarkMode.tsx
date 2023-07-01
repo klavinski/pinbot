@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react"
-import styles from "./index.module.css"
-import IconMoon from "~icons/tabler/moon"
-import IconSunFilled from "~icons/tabler/sun-filled"
+import styles from "./DarkMode.module.css"
+import IconTablerMoon from "~icons/tabler/moon"
+import IconTablerSunFilled from "~icons/tabler/sun-filled"
+import IconTablerMoonStars from "~icons/tabler/moon-stars"
 
-export const Toggle = () => {
+export const DarkMode = () => {
     const [ isDark, setIsDark ] = useState( () => window.matchMedia( "( prefers-color-scheme: dark )" ).matches )
     const updateStyle = ( isDark: boolean ) => {
         document.querySelector( ":root" )!.setAttribute( "data-isDark", `${ isDark }` )
         setIsDark( isDark )
     }
+    const [ isHovering, setIsHovering ] = useState( false )
     useEffect( () => {
         const darkModePreference = window.matchMedia( "( prefers-color-scheme: dark )" )
         const updateFromOSPreference = async () => {
@@ -24,8 +26,12 @@ export const Toggle = () => {
         onClick={ () => {
             "chrome" in self && chrome?.storage?.sync.set( { isDark: ! isDark } )
             updateStyle( ! isDark )
-        } }>
-        <IconSunFilled className={ styles.sun }/>
-        <IconMoon className={ styles.moon }/>
+        } }
+        onMouseEnter={ () => setIsHovering( true ) }
+        onMouseLeave={ () => setIsHovering( false ) }
+    >
+        <IconTablerSunFilled className={ styles.sun }/>
+        <IconTablerMoon className={ styles.moon } style={ { opacity: isHovering ? 0 : 1 } }/>
+        <IconTablerMoonStars className={ styles.moon }style={ { opacity: isHovering ? 1 : 0 } }/>
     </div>
 }
