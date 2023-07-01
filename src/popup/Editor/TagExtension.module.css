@@ -1,31 +1,19 @@
-@font-face {
-    font-family: "Linotte";
-    src: url( "./linotte.woff2" );
-}
-
-.container {
-    min-width: 0;
-}
-
-.empty:first-child::before {
-    opacity: 0.4;
-    content: attr(data-placeholder);
-    float: left;
-    height: 0;
-    pointer-events: none;
-}
-
-.paragraph {
-    margin: 0;
-    line-height: 24px;
-}
-
-.paragraph:nth-child( n + 2 ) {
-    color: #777;
-}
-
 .short {
     font-family: "Linotte", "Pretendard", "Twemoji";
+}
+
+.suggestion {
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+    display: flex;
+}
+
+.suggestion:hover {
+    color: var( --focus );
+}
+
+.suggestion:active {
+    transform: scale( 0.9 );
 }
 
 .tag {

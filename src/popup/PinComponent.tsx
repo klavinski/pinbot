@@ -1,7 +1,7 @@
 import { useState } from "react"
 import styles from "./PinComponent.module.css"
 import { Icon } from "./Icon.tsx"
-import { Editor } from "./Editor.tsx"
+import { Editor } from "./Editor/Editor.tsx"
 import { useApi } from "./api.tsx"
 import { SetStateAction } from "react"
 import { Dispatch } from "react"
@@ -22,9 +22,9 @@ export const PinComponent = ( { onDelete, pin: init, setVisiblePictures, visible
     favicon.searchParams.set( "size", "32" )
     const [ removing, setRemoving ] = useState( true )
     const [ hoveringHiding, setHoveringHiding ] = useState( false )
-    const { referenceProps: bookmarkRefProps, tooltip: bookmarkTooltip } = useTooltip( pin.isPinned ? "Convert to draft" : "Save as pin" )
-    const { referenceProps: removeRefProps, tooltip: removeTooltip } = useTooltip( "Delete" )
-    const { referenceProps: hideRefProps, tooltip: hideTooltip } = useTooltip( `${ visiblePictures ? "Hide" : "Show" } pictures` )
+    const { referenceProps: bookmarkRefProps, tooltip: bookmarkTooltip } = useTooltip( { content: pin.isPinned ? "Convert to draft" : "Save as pin" } )
+    const { referenceProps: removeRefProps, tooltip: removeTooltip } = useTooltip( { content: "Delete" } )
+    const { referenceProps: hideRefProps, tooltip: hideTooltip } = useTooltip( { content: `${ visiblePictures ? "Hide" : "Show" } pictures` } )
     return pin ? <div className={ styles.container }>
         <div className={ styles.header }>
             <Icon of={ <img src={ favicon.toString() }/> } className={ styles.favicon }/>

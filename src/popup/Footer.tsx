@@ -1,7 +1,7 @@
 import { Icon } from "./Icon.tsx"
 import styles from "./Footer.module.css"
 import { Dispatch, SetStateAction, useState } from "react"
-import { Editor } from "./Editor.tsx"
+import { Editor } from "./Editor/Editor.tsx"
 import { parseHtml } from "../utils.ts"
 import { Animation } from "./Animation.tsx"
 import { Glass } from "./Glass.tsx"

@@ -7,7 +7,7 @@ import { useTooltip } from "../useTooltip"
 export const Panel = ( { children, icon: iconMaker, tooltip: tooltipText }: { children: ReactNode, icon: ( isHovered: boolean ) => ReactNode, tooltip: ReactNode } ) => {
     const [ isOpen, setIsOpen ] = useState( false )
     const [ isHovering, setIsHovering ] = useState( false )
-    const { referenceProps, tooltip } = useTooltip( tooltipText )
+    const { referenceProps, tooltip } = useTooltip( { content: tooltipText } )
     return <>
         <div className={ styles.button }
             onClick={ () => setIsOpen( ! isOpen ) }

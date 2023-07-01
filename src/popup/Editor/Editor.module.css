@@ -1,0 +1,25 @@
+@font-face {
+    font-family: "Linotte";
+    src: url( "./linotte.woff2" );
+}
+
+.container {
+    min-width: 0;
+}
+
+.empty:first-child::before {
+    opacity: 0.4;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+}
+
+.paragraph {
+    margin: 0;
+    line-height: 24px;
+}
+
+.paragraph:nth-child( n + 2 ) {
+    color: #777;
+}

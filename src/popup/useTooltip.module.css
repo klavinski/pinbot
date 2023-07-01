@@ -6,6 +6,5 @@
 }
 
 .tooltip {
-    pointer-events: none;
     --radius: 8px;
 }

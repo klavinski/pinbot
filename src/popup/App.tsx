@@ -77,7 +77,7 @@ export const App = () => {
         } else
             setIcon( <Icon of={ <IconForbidden/> }/> )
     } )() }, [] )
-    const { referenceProps: darkModeRef, tooltip: darkModeTooltip } = useTooltip( "Light/dark mode" )
+    const { referenceProps: darkModeRef, tooltip: darkModeTooltip } = useTooltip( { content: "Light/dark mode" } )
     return <div className={ styles.container }>
         <AnimatePresence initial={ false }>
             <div className={ styles.buttons }>
