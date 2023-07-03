@@ -17,7 +17,7 @@ const init = async () => {
             url TEXT NOT NULL,
             PRIMARY KEY ( timestamp, url )
         );
-        INSERT INTO pins ( embedding, isPinned, text, timestamp, screenshot, url ) VALUES ( $1, 0, '<p>Automatically generated title</p><p>and summary with <tag>tags</tag>.</p><p>And a screenshot below</p>', datetime( 'now' ), '${ exampleImage }', 'https://example.com' );`, { bind: [ new Float32Array().buffer ] } )
+        INSERT INTO pins ( embedding, isPinned, text, timestamp, screenshot, url ) VALUES ( $1, 0, '<p>Automatically generated title</p><p>and summary with <tag>tags</tag>.</p><p>And a screenshot below</p>', datetime( 'now' ), '${ exampleImage }', 'https://example.com' );`, { bind: [ new Float32Array( Array.from( { length: 384 } ).map( _ => 0 ) ).buffer ] } )
         return db
     } else
         throw new Error( "No OPFS." )

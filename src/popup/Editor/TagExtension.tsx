@@ -31,7 +31,7 @@ const TagComponent = ( { decorations, editor, getPos, node }: NodeViewProps ) =>
     return <NodeViewWrapper className={ styles.tag } { ...referenceProps }>
         { length > 1 && <Icon of={ node.textContent } contentEditable={ false }/> }
         <NodeViewContent className={ [ styles.tagContent, length > 1 ? "" : styles.short ].join( " " ) }/>
-        { ( decorations.some( _ => z.object( { attrs: z.object( { class: z.literal( "has-focus" ) } ) } ).safeParse( _.type ).success ) || isMouseDown ) && length > 1 && tooltip }
+        { ( decorations.some( _ => z.object( { attrs: z.object( { class: z.literal( "has-focus" ) } ) } ).safeParse( _.type ).success ) || isMouseDown ) && node.textContent !== "#" && tooltip }
     </NodeViewWrapper>
 }
 

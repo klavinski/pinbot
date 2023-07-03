@@ -37,16 +37,13 @@
     transition: transform 0.2s ease-in-out, filter 0.2s ease-in-out;
 }
 
-.container:hover .sun {
-}
-
 .dark .sun {
     transform: translateY( calc( 32em / 18 ) );
 }
 
 .cloud1, .cloud2 {
     position: absolute;
-    transition: transform 0.6s ease-in-out;
+    transition: transform 0.4s ease-in-out;
     color: #fff;
 }
 

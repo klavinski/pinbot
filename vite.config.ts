@@ -5,6 +5,8 @@ import { crx, ManifestV3Export } from "@crxjs/vite-plugin"
 import manifest from "./manifest.json"
 import { version } from "./package.json"
 import { comlink } from "vite-plugin-comlink"
+import IconsResolver from "unplugin-icons/resolver"
+import AutoImport from "unplugin-auto-import/vite"
 
 export default defineConfig( ( { mode } ) => {
     const configs = {
@@ -17,6 +19,15 @@ export default defineConfig( ( { mode } ) => {
             plugins: [
                 comlink(),
                 react(),
+                AutoImport( {
+                    resolvers: [
+                        name => name.startsWith( "IconUui" ) ? { name: `Icon${ name.slice( 7 ) }`, from: `untitled-ui-icons/icons/Icon${ name.slice( 7 ) }` } : null,
+                        IconsResolver( {
+                            prefix: "Icon",
+                            extension: "jsx",
+                        } ),
+                    ],
+                } ),
                 Icons( { compiler: "jsx", scale: 24 / 18 } ),
                 crx( { manifest: { ...manifest, version } as ManifestV3Export } )
             ],
