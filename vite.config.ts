@@ -7,6 +7,7 @@ import { version } from "./package.json"
 import { comlink } from "vite-plugin-comlink"
 import IconsResolver from "unplugin-icons/resolver"
 import AutoImport from "unplugin-auto-import/vite"
+import svgr from "vite-plugin-svgr"
 
 export default defineConfig( ( { mode } ) => {
     const configs = {
@@ -29,7 +30,8 @@ export default defineConfig( ( { mode } ) => {
                     ],
                 } ),
                 Icons( { compiler: "jsx", scale: 24 / 18 } ),
-                crx( { manifest: { ...manifest, version } as ManifestV3Export } )
+                crx( { manifest: { ...manifest, version } as ManifestV3Export } ),
+                svgr(),
             ],
             worker: {
                 plugins: [
