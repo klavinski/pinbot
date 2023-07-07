@@ -51,10 +51,10 @@ export const App = () => {
     const [ icon, setIcon ] = useState( <Icon of={ <IconPin/> }/> )
     const [ addPin, setAddPin ] = useState( undefined as ( () => () => unknown ) | undefined )
     const [ visiblePictures, setVisiblePictures ] = useState( true )
-    const [ query, setQuery ] = useState( { tags: [], text: "" } as { tags: string[], text: string } )
+    const [ query, setQuery ] = useState( null as { tags: string[], text: string } | null )
     const api = useApi()
     useEffect( () => { ( async () => {
-        setPins( query.text ? await api.search( query ) : await api.getDrafts() )
+        setPins( query ? await api.search( query ) : await api.getDrafts() )
     } )() }, [ query ] )
     useEffect( () => { ( async () => {
         const [ tab ] = await chrome.tabs.query( { active: true, currentWindow: true } )
@@ -99,8 +99,8 @@ export const App = () => {
                     setVisiblePictures={ setVisiblePictures }
                     visiblePictures={ visiblePictures }
                 />
-            </Transition> ) : <Transition key={ `empty-${ query.text ? "pins" : "drafts" }` } style={ { margin: "16px" } }>
-                <div className={ styles.empty }>No { query.text ? "pins" : "drafts" }</div>
+            </Transition> ) : <Transition key={ `empty-${ query ? "pins" : "drafts" }` } style={ { margin: "16px" } }>
+                <div className={ styles.empty }>No { query ? "pins" : "drafts" }</div>
             </Transition> }
             <Footer query={ query } setQuery={ setQuery }/>
         </AnimatePresence>

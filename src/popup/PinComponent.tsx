@@ -13,6 +13,8 @@ import IconTablerPhoto from "~icons/tabler/photo"
 import IconTablerPhotoPlus from "~icons/tabler/photo-plus"
 import IconTablerPhotoMinus from "~icons/tabler/photo-minus"
 import IconTablerPhotoCancel from "~icons/tabler/photo-cancel"
+import { AnimatePresence } from "framer-motion"
+import { Transition } from "./Transition.tsx"
 
 export const PinComponent = ( { onDelete, pin: init, setVisiblePictures, visiblePictures }: { onDelete: () => void, pin: Pin, setVisiblePictures: Dispatch<SetStateAction<boolean>>, visiblePictures: boolean } ) => {
     const api = useApi()
@@ -22,17 +24,34 @@ export const PinComponent = ( { onDelete, pin: init, setVisiblePictures, visible
     favicon.searchParams.set( "size", "32" )
     const [ removing, setRemoving ] = useState( true )
     const [ hoveringHiding, setHoveringHiding ] = useState( false )
+    const [ hoveringSwitching, setHoveringSwitching ] = useState( false )
+    const [ showingSnippet, setShowingSnippet ] = useState( !! pin.snippet )
     const { referenceProps: bookmarkRefProps, tooltip: bookmarkTooltip } = useTooltip( { content: pin.isPinned ? "Convert to draft" : "Save as pin", pointerEvents: "none" } )
     const { referenceProps: removeRefProps, tooltip: removeTooltip } = useTooltip( { content: "Delete", pointerEvents: "none" } )
     const { referenceProps: hideRefProps, tooltip: hideTooltip } = useTooltip( { content: `${ visiblePictures ? "Hide" : "Show" } pictures`, pointerEvents: "none" } )
+    const { referenceProps: switchRefProps, tooltip: switchTooltip } = useTooltip( { content: showingSnippet ? "Show notes" : "Show search results", pointerEvents: "none" } )
     return pin ? <div className={ styles.container }>
         <div className={ styles.header }>
-            <Icon of={ <img src={ favicon.toString() }/> } className={ styles.favicon }/>
+            <div className={ styles.favicon }>
+                <Icon of={ <img src={ favicon.toString() }/> } style={ { transform: "scale( 0.5 )" } }/>
+                <div onMouseEnter={ () => setHoveringSwitching( true ) } onMouseLeave={ () => setHoveringSwitching( false ) } { ...switchRefProps }>
+                    { pin.snippet && <>
+                        <Icon of={ <IconMingcuteFileMoreLine/> } onClick={ () => setShowingSnippet( ! showingSnippet ) } style={ { opacity: showingSnippet && hoveringSwitching ? 1 : 0, rotate: `y ${ showingSnippet ? 0 : 180 }deg` } }/>
+                        <Icon of={ <IconMingcuteFileMoreLine/> } onClick={ () => setShowingSnippet( ! showingSnippet ) } style={ { opacity: ! showingSnippet && hoveringSwitching ? 1 : 0, rotate: `y ${ showingSnippet ? 180 : 0 }deg` } }/>
+                        <Icon of={ <IconMingcuteFileInfoLine/> } onClick={ () => setShowingSnippet( ! showingSnippet ) } style={ { opacity: ! showingSnippet && ! hoveringSwitching ? 1 : 0 } }/>
+                        <Icon of={ <IconMingcuteFileSearchLine/> } onClick={ () => setShowingSnippet( ! showingSnippet ) } style={ { opacity: showingSnippet && ! hoveringSwitching ? 1 : 0 } }/>
+                    </> }
+                    { switchTooltip }
+                </div>
+            </div>
             <div className={ styles.description }>
                 <Link href={ pin.url }>{ pin.url }</Link>
-                <Editor content={ pin.text }
+                { pin.snippet && showingSnippet && <div className={ styles.snippet } key="snippet">
+                    { pin.snippet.split( "\n" ).map( _ => <span>{ _ }</span> ) }
+                </div> }
+                { ! showingSnippet && <Editor content={ pin.text }
                     onUpdate={ text => api.updatePin( { ...pin, text } ) }
-                />
+                /> }
             </div>
             <div className={ styles.actions }>
                 <div onClick={ async () => setPin( await api.togglePin( pin ) ) } { ...bookmarkRefProps }>

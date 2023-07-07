@@ -16,6 +16,11 @@
     transform: translateX( 4px ) scale( 0.95 );
 }
 
+.suggestions {
+    max-height: 84px;
+    overflow-y: auto;
+}
+
 .tag {
     backdrop-filter: brightness( 1.4 );
     color: var( --text );

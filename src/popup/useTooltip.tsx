@@ -12,7 +12,7 @@ export const useTooltip = ( { content, isOpen: programmaticIsOpen, placement = "
         open: typeof programmaticIsOpen === "boolean" ? programmaticIsOpen : isOpen,
         onOpenChange: setIsOpen,
         placement,
-        whileElementsMounted: ( ...args ) => autoUpdate( ...args )
+        whileElementsMounted: ( ...args ) => autoUpdate( ...args, { animationFrame: true } )
     } )
     const hover = useHover( context )
     const { getReferenceProps, getFloatingProps } = useInteractions( [ hover ] )

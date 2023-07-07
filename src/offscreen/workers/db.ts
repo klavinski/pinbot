@@ -4,8 +4,8 @@ import { exampleImage } from "./exampleImage.ts"
 const init = async () => {
     const sqlite = await initSyncSQLite()
     if ( "OpfsDb" in sqlite.oo1 && typeof sqlite.oo1.OpfsDb === "function" ) {
-        // const db = new ( sqlite.oo1.OpfsDb as new ( filename: string, mode: string ) => DB )( "db1", "c" )
-        const db = new sqlite.oo1.DB()
+        const db = new ( sqlite.oo1.OpfsDb as new ( filename: string, mode: string ) => DB )( "db2", "c" )
+        // const db = new sqlite.oo1.DB()
         db.exec( "PRAGMA journal_mode = WAL; PRAGMA synchronous = normal; PRAGMA temp_store = memory; PRAGMA mmap_size = 30000000000;" )
         db.exec( `
         CREATE TABLE IF NOT EXISTS pins (
@@ -16,6 +16,13 @@ const init = async () => {
             timestamp TEXT NOT NULL,
             url TEXT NOT NULL,
             PRIMARY KEY ( timestamp, url )
+        );
+        CREATE TABLE IF NOT EXISTS pages (
+            embedding BLOB NOT NULL,
+            text TEXT NOT NULL,
+            timestamp TEXT NOT NULL,
+            url TEXT NOT NULL,
+            PRIMARY KEY ( text, timestamp, url )
         );
         INSERT INTO pins ( embedding, isPinned, text, timestamp, screenshot, url ) VALUES ( $1, 0, '<p>Automatically generated title</p><p>and summary with <tag>tags</tag>.</p><p>And a screenshot below</p>', datetime( 'now' ), '${ exampleImage }', 'https://example.com' );`, { bind: [ new Float32Array( Array.from( { length: 384 } ).map( _ => 0 ) ).buffer ] } )
         return db

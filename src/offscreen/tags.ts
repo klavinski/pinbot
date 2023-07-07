@@ -3,8 +3,8 @@
 //
 // InteractiveAdvertisingBureau
 // https://iabtechlab.com/standards/content-taxonomy/
-
-export const tags = `Attractions
+export const tags = []
+export const preMadetags = `Attractions
 Amusement and Theme Parks
 Bars & Restaurants
 Casinos & Gambling

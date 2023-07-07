@@ -1,3 +1,11 @@
+.button {
+    transition: transform 0.2s ease-in-out;
+}
+
+:not( *:focus-within ) + .button[ data-noQuery="true"] {
+    transform: translateX( 32px );
+}
+
 .container {
     position: sticky;
     z-index: 1;

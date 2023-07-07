@@ -1,6 +1,6 @@
 @font-face {
     font-family: "Linotte";
-    src: url( "./linotte.woff2" );
+    src: url( "../linotte.woff2" );
 }
 
 .container {
@@ -9,7 +9,7 @@
 
 .empty:first-child::before {
     opacity: 0.4;
-    content: attr(data-placeholder);
+    content: attr( data-placeholder );
     float: left;
     height: 0;
     pointer-events: none;

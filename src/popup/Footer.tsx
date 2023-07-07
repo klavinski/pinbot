@@ -6,7 +6,7 @@ import { parseHtml } from "../utils.ts"
 import { Animation } from "./Animation.tsx"
 import { Glass } from "./Glass.tsx"
 
-export const Footer = ( { query, setQuery }: { query: { text: string, tags: string[] }, setQuery: Dispatch<SetStateAction<{ text: string, tags: string[] }>> } ) => {
+export const Footer = ( { query, setQuery }: { query: { text: string, tags: string[] } | null, setQuery: Dispatch<SetStateAction<{ text: string, tags: string[] } | null>> } ) => {
     const [ content, setContent ] = useState( { text: "", tags: [] as string[] } )
     return <Glass className={ styles.container } bottomBorder={ false }leftBorder={ false } rightBorder={ false }>
         <div className={ styles.content }>
@@ -16,13 +16,13 @@ export const Footer = ( { query, setQuery }: { query: { text: string, tags: stri
                 onEnter={ () => {
                     let currentContent = null as null | typeof content
                     setContent( _ => { currentContent = _; return _ } )
-                    setQuery( query.text ? { tags: [], text: "" } : currentContent! )
+                    setQuery( query => query && query.text === currentContent!.text ? null : currentContent )
                 } }
             />
-            <div style={ { transform: `translateX( ${ query.text === "" && content.text === "" ? 32 : 0 }px )`, transition: "all 0.2s ease-in-out" } }>
+            <div className={ styles.button } data-noQuery={ query === null }>
                 <Icon
-                    of={ <Animation of="search" direction={ query.text ? 1 : - 1 }/> }
-                    onClick={ () => setQuery( query.text ? { tags: [], text: "" } : content ) }
+                    of={ <Animation of="search" direction={ query && query.text === content.text ? 1 : - 1 }/> }
+                    onClick={ () => setQuery( query && query.text === content.text ? null : content ) }
                 />
             </div>
         </div>

@@ -41,7 +41,19 @@
 .favicon {
     position: sticky;
     top: 0;
-    transform: scale( 0.5 );
+}
+
+.favicon > *:nth-child( 2 ) {
+    transition: transform 0.2s ease-in-out;
+}
+
+.favicon > *:nth-child( 2 ):active {
+    transform: scale( 0.9 );
+}
+
+.favicon > *:nth-child( 2 ) > * {
+    transition: opacity 0.2s ease-in-out, rotate 0.2s ease-in-out;
+    position: absolute;
 }
 
 .header {
@@ -55,4 +67,17 @@
     min-width: 0;
     width: 100%;
     margin-bottom: -4px;
+}
+
+.snippet {
+    opacity: 0.5;
+    padding: 4px 0;
+}
+
+.snippet > *:nth-child( 2 ) {
+    font-weight: bold;
+}
+
+.snippet > *:nth-child( 1 )::after, .snippet > *:nth-child( 3 )::before {
+    content: '...';
 }

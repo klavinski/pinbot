@@ -20,18 +20,18 @@ const TagComponent = ( { decorations, editor, getPos, node }: NodeViewProps ) =>
     }, [ node.textContent ] )
     const [ isMouseDown, setIsMouseDown ] = useState( false )
     const { referenceProps, tooltip } = useTooltip( {
-        content: suggestions.map( _ => <div className={ styles.suggestion } onClick={ () => {
+        content: suggestions.length > 0 ? <div className={ styles.suggestions }>{ suggestions.map( _ => <div className={ styles.suggestion } onClick={ () => {
             editor.chain().insertContentAt( { from: getPos() + 1, to: getPos() + node.nodeSize - 1 }, _.name ).run()
             editor.chain().setTextSelection( editor.state.selection.to + 1 ).focus().run()
             setIsMouseDown( false )
-        } } onMouseDown={ () => setIsMouseDown( true ) } onMouseLeave={ () => setIsMouseDown( false ) }><Icon of={ _.name }/>{ _.name } ({ _.count })</div> ),
+        } } onMouseDown={ () => setIsMouseDown( true ) } onMouseLeave={ () => setIsMouseDown( false ) }><Icon of={ _.name }/>{ _.name } ({ _.count })</div> ) }</div> : <div>Tags from saved pins will be<br/>used for future suggestions.</div>,
         isOpen: true,
         placement: "bottom"
     } )
     return <NodeViewWrapper className={ styles.tag } { ...referenceProps }>
         { length > 1 && <Icon of={ node.textContent } contentEditable={ false }/> }
         <NodeViewContent className={ [ styles.tagContent, length > 1 ? "" : styles.short ].join( " " ) }/>
-        { ( decorations.some( _ => z.object( { attrs: z.object( { class: z.literal( "has-focus" ) } ) } ).safeParse( _.type ).success ) || isMouseDown ) && node.textContent !== "#" && tooltip }
+        { ( decorations.some( _ => z.object( { attrs: z.object( { class: z.literal( "has-focus" ) } ) } ).safeParse( _.type ).success ) || isMouseDown ) && node.textContent && tooltip }
     </NodeViewWrapper>
 }
 
