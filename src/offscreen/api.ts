@@ -36,7 +36,7 @@ export const api = {
         const tags = await classify( [ title, body ].join( "\n" ) )
         const text = `<p>${ title }</p><p>${ summary }</p><p>${ tags.slice( 0, 3 ).filter( _ => _.score > 0.23 ).map( _ => `<tag>${ _.name }</tag>` ).join( " " ) }</p>`
         const embedding = await transformersWorker.embed( parseHtml( text ).text )
-        const pin = asPin( ( await dbWorker.sql`INSERT OR REPLACE INTO pins ( embedding, isPinned, screenshot, text, timestamp, url ) VALUES ( ${ embedding.buffer }, 1, ${ screenshot }, ${ text }, datetime( 'now' ), ${ url } ) RETURNING *;` )[ 0 ] )
+        const pin = asPin( ( await dbWorker.sql`INSERT OR REPLACE INTO pins ( embedding, isPinned, screenshot, text, timestamp, url ) VALUES ( ${ embedding.buffer }, 0, ${ screenshot }, ${ text }, datetime( 'now' ), ${ url } ) RETURNING *;` )[ 0 ] )
         const sentences = readDoc( body ).sentences().out().flatMap( _ => _.split( "\n" ) ).filter( _ => ! [ "", "\t", " " ].includes( _ ) )
         await Promise.all( sentences.map( async _ => embeddings.set( _, await transformersWorker.embed( _ ) ) ) )
         const triplets = [ [ "", title, "" ] as const, ...sentences.map( ( _, i ) => [ sentences[ i - 1 ] ?? "", _, sentences[ i + 1 ] ?? "" ] as const ) ]
@@ -47,9 +47,10 @@ export const api = {
     getDrafts: async () => ( await dbWorker.sql`SELECT * FROM pins WHERE isPinned = false ORDER BY timestamp DESC;` ).map( asPin ),
     getIcon: async ( query: string ) => {
         const queryEmbedding = await transformersWorker.embed( query )
-        return ( await iconEmbeddings )
+        const results = ( await iconEmbeddings )
             .map( ( { name, embedding } ) => ( { name, score: name === "Clock" && parseDate( query ).length > 0 ? 1 : cosineSimilarity( embedding, queryEmbedding ) } ) )
-            .reduce( ( best, current ) => best.score > current.score ? best : current ).name
+        console.log( results )
+        return results.reduce( ( best, current ) => best.score > current.score ? best : current, { name: "Tag" as const, score: 0.5 } ).name
     },
     getPin: async ( { timestamp, url }: { timestamp: string, url: string } ) => asPin( ( await dbWorker.sql`SELECT * FROM pins WHERE timestamp = ${ timestamp } AND url = ${ url }` )[ 0 ] ),
     removePin: async ( { timestamp, url }: { timestamp: string, url: string } ) => {
@@ -59,15 +60,18 @@ export const api = {
     },
     search: async ( { text, tags }: { text: string, tags: string[] } ) => {
         const embedding = await transformersWorker.embed( text )
-        const results = ( await dbWorker.sql( [ `SELECT * FROM pins WHERE isPinned = true ${ tags.map( _ => `AND text LIKE '%<tag>${ _ }</tag>%'` ).join( " " ) };` ] ) ).map( asPin )
-        return ( ( await Promise.all( results.map( async pin => {
+        const results = ( await dbWorker.sql( [ `SELECT * FROM pins WHERE isPinned = true ${ tags.map( _ => `AND text LIKE '%<tag>${ _ }</tag>%' ORDER BY timestamp DESC` ).join( " " ) };` ] ) ).map( asPin )
+        const pins = ( ( await Promise.all( results.map( async pin => {
             const sentences = ( await dbWorker.sql`SELECT * FROM pages WHERE timestamp = ${ pin.timestamp } AND url = ${ pin.url };` )
                 .map( _ => ( { ..._, score: cosineSimilarity( embedding, new Float32Array( ( _.embedding as Uint8Array ).buffer ) ) } ) )
             sentences.sort( ( a, b ) => b.score - a.score )
             const commentScore = cosineSimilarity( pin.embedding, embedding )
-            console.log( commentScore, sentences[ 0 ].score, commentScore > sentences[ 0 ].score, sentences )
-            return { ...pin, score: Math.max( commentScore, sentences[ 0 ].score ), snippet: commentScore > sentences[ 0 ].score ? null : sentences[ 0 ].text }
-        } ) ) ) ).sort( ( a, b ) => b.score - a.score )
+            console.log( commentScore, sentences[ 0 ]?.score ?? 0, commentScore > ( sentences[ 0 ]?.score ?? 0 ), sentences )
+            return { ...pin, score: Math.max( commentScore, sentences[ 0 ]?.score ?? 0 ), snippet: commentScore > ( sentences[ 0 ]?.score ?? 0 ) ? null : sentences[ 0 ].text }
+        } ) ) ) )
+        if ( tags.reduce( ( text, tag ) => text.replace( tag, "" ), text ).replace( " ", "" ) !== "" )
+            pins.sort( ( a, b ) => b.score - a.score )
+        return pins
     },
     sql: dbWorker.sql,
     togglePin: async ( { timestamp, url }: { timestamp: string, url: string } ) => asPin( ( await dbWorker.sql`UPDATE pins SET isPinned = NOT isPinned WHERE timestamp = ${ timestamp } AND url = ${ url } RETURNING *;` )[ 0 ] ),
