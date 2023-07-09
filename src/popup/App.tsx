@@ -9,9 +9,7 @@ import styles from "./App.module.css"
 import { useApi } from "./api.tsx"
 import { useEffect } from "react"
 import { Icon } from "./Icon.tsx"
-import IconPin from "~icons/tabler/pin"
 import { Clock } from "./Clock.tsx"
-import IconForbidden from "~icons/eva/slash-outline"
 import { Pin } from "../types.ts"
 import { AnimatePresence } from "framer-motion"
 import { Transition } from "./Transition.tsx"
@@ -47,35 +45,32 @@ const getBody = () => {
 }
 
 export const App = () => {
-    const [ pins, setPins ] = useState( [] as Pin[] )
-    const [ icon, setIcon ] = useState( <Icon of={ <IconPin/> }/> )
-    const [ addPin, setAddPin ] = useState( undefined as ( () => () => unknown ) | undefined )
     const [ visiblePictures, setVisiblePictures ] = useState( true )
     const [ query, setQuery ] = useState( null as { tags: string[], text: string } | null )
     const api = useApi()
+    const [ pins, setPins ] = useState( [] as Pin[] )
     useEffect( () => { ( async () => {
         setPins( query ? await api.search( query ) : await api.getDrafts() )
     } )() }, [ query ] )
+    const [ state, setState ] = useState( "loading" as "loading" | Parameters<typeof api.addPin>[ 0 ] | "done" | "error" )
     useEffect( () => { ( async () => {
-        const [ tab ] = await chrome.tabs.query( { active: true, currentWindow: true } )
-        if ( tab?.url && tab.id && tab.title !== undefined && ! tab.url.startsWith( "chrome://" ) ) {
-            const args = {
-                body: ( await chrome.scripting.executeScript( {
-                    target: { tabId: tab.id },
-                    func: getBody,
-                } ) )[ 0 ].result as ReturnType<typeof getBody>,
-                screenshot: await chrome.tabs.captureVisibleTab( { format: "png", quality: 100 } ),
-                title: tab.title,
-                url: tab.url
-            }
-            setAddPin( () => async () => {
-                setIcon( <Clock/> )
-                setAddPin( undefined )
-                setPins( [ await api.addPin( args ), ...pins ] )
-                setIcon( <Icon of={ <Animation of="check"/> }/> )
-            } )
-        } else
-            setIcon( <Icon of={ <IconForbidden/> }/> )
+        const newPins = await api.awaitPinning()
+        if ( newPins.length > 0 ) {
+            setPins( _ => [ ...newPins, ..._ ] )
+            setState( "done" )
+        } else {
+            const [ tab ] = await chrome.tabs.query( { active: true, currentWindow: true } )
+            setState( tab?.url && tab.id && tab.title !== undefined && ! tab.url.startsWith( "chrome://" ) ?
+                {
+                    body: ( await chrome.scripting.executeScript( {
+                        target: { tabId: tab.id },
+                        func: getBody,
+                    } ) )[ 0 ].result as ReturnType<typeof getBody>,
+                    screenshot: await chrome.tabs.captureVisibleTab( { format: "png", quality: 100 } ),
+                    title: tab.title,
+                    url: tab.url
+                } : "error" )
+        }
     } )() }, [] )
     const { referenceProps: darkModeRef, tooltip: darkModeTooltip } = useTooltip( { content: "Light/dark mode", pointerEvents: "none" } )
     return <div className={ styles.container }>
@@ -87,14 +82,20 @@ export const App = () => {
             </div>
             <Wordmark/>
             <div className={ styles.addPin }>
-                <div className={ [ styles.button, addPin ? "" : styles.disabled ].join( " " ) }
-                    onClick={ addPin }>
-                    { icon }Pin the current page
+                <div className={ [ styles.button, typeof state === "object" ? "" : styles.disabled ].join( " " ) }
+                    onClick={ typeof state === "object" ? async () => {
+                        const pageToPin = state
+                        setState( "loading" )
+                        api.addPin( pageToPin )
+                        setPins( [ ...await api.awaitPinning(), ...pins ] )
+                        setState( "done" )
+                    } : undefined }>
+                    { state === "loading" ? <Clock/> : <Icon of={ state === "done" ? <Animation of="check" direction={ 1 }/> : state === "error" ? <IconEvaSlashOutline/> : <IconTablerPin/> }/> }Pin the current page
                 </div>
             </div>
             { pins.length > 0 ? pins.map( _ => <Transition key={ `${ _.timestamp }${ _.url }` } style={ { boxShadow: "0 -4px 4px -4px #0001, 0 -8px 8px -8px #0001" } }>
                 <PinComponent
-                    onDelete={ () => setPins( pins.filter( p => p !== _ ) ) }
+                    onDelete={ async () => setPins( pins => pins.filter( pin => pin !== _ ) ) }
                     pin={ _ }
                     setVisiblePictures={ setVisiblePictures }
                     visiblePictures={ visiblePictures }

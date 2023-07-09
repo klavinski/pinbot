@@ -13,8 +13,6 @@ import IconTablerPhoto from "~icons/tabler/photo"
 import IconTablerPhotoPlus from "~icons/tabler/photo-plus"
 import IconTablerPhotoMinus from "~icons/tabler/photo-minus"
 import IconTablerPhotoCancel from "~icons/tabler/photo-cancel"
-import { AnimatePresence } from "framer-motion"
-import { Transition } from "./Transition.tsx"
 
 export const PinComponent = ( { onDelete, pin: init, setVisiblePictures, visiblePictures }: { onDelete: () => void, pin: Pin, setVisiblePictures: Dispatch<SetStateAction<boolean>>, visiblePictures: boolean } ) => {
     const api = useApi()

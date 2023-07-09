@@ -29,20 +29,28 @@ const emptyEmbedding = new Float32Array( 384 ).fill( 0 )
 
 const mixEmbeddings = ( [ a = emptyEmbedding, b = emptyEmbedding, c = emptyEmbedding ]: [ Float32Array | undefined, Float32Array | undefined, Float32Array | undefined ] ) => new Float32Array ( Array.from( { length: a.length }, ( _, i ) => ( 0 * a[ i ] + 1 * b[ i ] + 0 * c[ i ] ) / 3 ) )
 
+const addPin = async ( { body, screenshot, title, url }: { body: string, screenshot: string, title: string, url: string } ) => {
+    const embeddings = new Map<string, Float32Array>()
+    const summary = await transformersWorker.summarize( body )
+    const tags = await classify( [ title, body ].join( "\n" ) )
+    const text = `<p>${ title }</p><p>${ summary }</p><p>${ tags.slice( 0, 3 ).filter( _ => _.score > 0.23 ).map( _ => `<tag>${ _.name }</tag>` ).join( " " ) }</p>`
+    const embedding = await transformersWorker.embed( parseHtml( text ).text )
+    const pin = asPin( ( await dbWorker.sql`INSERT OR REPLACE INTO pins ( embedding, isPinned, screenshot, text, timestamp, url ) VALUES ( ${ embedding.buffer }, 0, ${ screenshot }, ${ text }, datetime( 'now' ), ${ url } ) RETURNING *;` )[ 0 ] )
+    const sentences = readDoc( body ).sentences().out().flatMap( _ => _.split( "\n" ) ).filter( _ => ! [ "", "\t", " " ].includes( _ ) )
+    await Promise.all( sentences.map( async _ => embeddings.set( _, await transformersWorker.embed( _ ) ) ) )
+    const triplets = [ [ "", title, "" ] as const, ...sentences.map( ( _, i ) => [ sentences[ i - 1 ] ?? "", _, sentences[ i + 1 ] ?? "" ] as const ) ]
+    await Promise.all( triplets.map( async _ => await dbWorker.sql`INSERT OR REPLACE INTO pages ( embedding, text, timestamp, url ) VALUES ( ${ mixEmbeddings( _.map( _ => embeddings.get( _ ) ) as Parameters<typeof mixEmbeddings>[ 0 ] ).buffer }, ${ _.join( "\n" ) }, ${ pin.timestamp }, ${ pin.url } )` ) )
+    return pin
+}
+
+let awaitedPins = Promise.resolve( [] as ReturnType<typeof asPin>[] )
+
 export const api = {
-    addPin: async ( { body, screenshot, title, url }: { body: string, screenshot: string, title: string, url: string } ) => {
-        const embeddings = new Map<string, Float32Array>()
-        const summary = await transformersWorker.summarize( body )
-        const tags = await classify( [ title, body ].join( "\n" ) )
-        const text = `<p>${ title }</p><p>${ summary }</p><p>${ tags.slice( 0, 3 ).filter( _ => _.score > 0.23 ).map( _ => `<tag>${ _.name }</tag>` ).join( " " ) }</p>`
-        const embedding = await transformersWorker.embed( parseHtml( text ).text )
-        const pin = asPin( ( await dbWorker.sql`INSERT OR REPLACE INTO pins ( embedding, isPinned, screenshot, text, timestamp, url ) VALUES ( ${ embedding.buffer }, 0, ${ screenshot }, ${ text }, datetime( 'now' ), ${ url } ) RETURNING *;` )[ 0 ] )
-        const sentences = readDoc( body ).sentences().out().flatMap( _ => _.split( "\n" ) ).filter( _ => ! [ "", "\t", " " ].includes( _ ) )
-        await Promise.all( sentences.map( async _ => embeddings.set( _, await transformersWorker.embed( _ ) ) ) )
-        const triplets = [ [ "", title, "" ] as const, ...sentences.map( ( _, i ) => [ sentences[ i - 1 ] ?? "", _, sentences[ i + 1 ] ?? "" ] as const ) ]
-        await Promise.all( triplets.map( async _ => await dbWorker.sql`INSERT OR REPLACE INTO pages ( embedding, text, timestamp, url ) VALUES ( ${ mixEmbeddings( _.map( _ => embeddings.get( _ ) ) as Parameters<typeof mixEmbeddings>[ 0 ] ).buffer }, ${ _.join( "\n" ) }, ${ pin.timestamp }, ${ pin.url } )` ) )
-        return pin
+    addPin: ( ...args: Parameters<typeof addPin> ) => {
+        awaitedPins = addPin( ...args ).then( _ => [ _ ] )
+        awaitedPins.then( _ => awaitedPins = Promise.resolve( [] ) )
     },
+    awaitPinning: async () => await awaitedPins,
     classify,
     getDrafts: async () => ( await dbWorker.sql`SELECT * FROM pins WHERE isPinned = false ORDER BY timestamp DESC;` ).map( asPin ),
     getIcon: async ( query: string ) => {
