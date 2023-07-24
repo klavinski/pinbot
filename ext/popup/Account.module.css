@@ -1,8 +1,0 @@
-.button {
-    background-color: var( --shadow );
-    width: calc( 32em / 18 );
-    height: calc( 32em / 18 );
-    padding: calc( 4em / 18 );
-    border-radius: calc( 16em / 18 );
-    color: var( --gold );
-}

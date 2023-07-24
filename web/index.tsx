@@ -9,15 +9,15 @@ import offline from "./offline.png"
 import search from "./search.png"
 import kamil from "./kamil.jpg"
 import tags from "./tags.png"
-import { UI } from "../ext/popup/UI"
 import { Wordmark } from "../ext/popup/Wordmark"
 import { DarkMode } from "../ext/popup/header/DarkMode"
 import { ReactNode } from "react"
 import { Glass } from "../ext/popup/Glass"
+import { Link } from "../ext/popup/Link"
 
 const Install = ( { suffix }: { suffix?: ReactNode } ) => <div className={ styles.install }>
     Install the{ " " }
-    <UI prefix={ <IconBrandChrome/> } href="https://chrome.google.com/webstore/detail/pinbot/jbijbbnkaeclpmednjodmbdeobebiobg">extension for Chrome</UI>
+    <Link prefix={ <IconBrandChrome/> } href="https://chrome.google.com/webstore/detail/pinbot/jbijbbnkaeclpmednjodmbdeobebiobg">extension for Chrome</Link>
     { suffix }
 </div>
 
@@ -72,7 +72,7 @@ export default () => <>
                     So far, most of the recent AI developments have been limited to big players with little concern for privacy. My goal is to make these developments available to everyone, without compromising your privacy.
                 </p>
                 <p>
-                    The current extension is only the starting point: I want to build Pinbot for and with its users. Your{ " " }<UI href="https://tally.so/r/3NravQ" prefix={ <IconMessageDots/> }> feedback</UI>{ " " }is welcome; if you want to discuss, I'll be happy to see you on Pinbot's{ " " }<UI href="https://discord.gg/NetMteXfjf" prefix={ <IconMessages/> }>Discord server</UI>!
+                    The current extension is only the starting point: I want to build Pinbot for and with its users. Your{ " " }<Link href="https://tally.so/r/3NravQ" prefix={ <IconMessageDots/> }> feedback</Link>{ " " }is welcome; if you want to discuss, I'll be happy to see you on Pinbot's{ " " }<Link href="https://discord.gg/NetMteXfjf" prefix={ <IconMessages/> }>Discord server</Link>!
                 </p>
             </div>
         </div>
