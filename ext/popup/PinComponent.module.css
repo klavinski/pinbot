@@ -46,10 +46,13 @@
 
 .favicon > *:nth-child( 2 ) {
     transition: transform 0.2s ease-in-out;
+    display: flex;
+    justify-content: center;
 }
 
 .favicon > *:nth-child( 2 ):active {
     transform: scale( 0.9 );
+    text-align: center;
 }
 
 .favicon > *:nth-child( 2 ) > * {

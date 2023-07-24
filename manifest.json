@@ -9,10 +9,10 @@
         "default_icon": {
             "128": "icons/128.png"
         },
-        "default_popup": "src/popup/index.html"
+        "default_popup": "ext/popup/index.html"
     },
     "background": {
-        "service_worker": "src/background.ts",
+        "service_worker": "ext/background.ts",
         "type": "module"
     },
     "content_security_policy": {

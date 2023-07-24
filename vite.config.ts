@@ -14,7 +14,7 @@ export default defineConfig( ( { mode } ) => {
         extension: {
             build: {
                 rollupOptions: {
-                    input: [ "src/offscreen/index.html" ],
+                    input: [ "ext/offscreen/index.html" ],
                 },
             },
             plugins: [
@@ -40,7 +40,20 @@ export default defineConfig( ( { mode } ) => {
             },
         },
         web: {
-            plugins: [ react(), Icons( { compiler: "jsx" } ) ]
+            plugins: [
+                react(),
+                AutoImport( {
+                    resolvers: [
+                        name => name.startsWith( "IconUui" ) ? { name: `Icon${ name.slice( 7 ) }`, from: `untitled-ui-icons/icons/Icon${ name.slice( 7 ) }` } : null,
+                        IconsResolver( {
+                            prefix: "Icon",
+                            extension: "jsx",
+                        } ),
+                    ],
+                } ),
+                Icons( { compiler: "jsx", scale: 24 / 18 } ),
+                svgr()
+            ]
         }
     }
     if ( mode in configs )

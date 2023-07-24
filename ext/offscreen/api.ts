@@ -67,15 +67,17 @@ export const api = {
         return null
     },
     search: async ( { text, tags }: { text: string, tags: string[] } ) => {
-        const embedding = await transformersWorker.embed( text )
+        const queryEmbedding = await transformersWorker.embed( text )
         const results = ( await dbWorker.sql( [ `SELECT * FROM pins WHERE isPinned = true ${ tags.map( _ => `AND text LIKE '%<tag>${ _ }</tag>%' ORDER BY timestamp DESC` ).join( " " ) };` ] ) ).map( asPin )
         const pins = ( ( await Promise.all( results.map( async pin => {
             const sentences = ( await dbWorker.sql`SELECT * FROM pages WHERE timestamp = ${ pin.timestamp } AND url = ${ pin.url };` )
-                .map( _ => ( { ..._, score: cosineSimilarity( embedding, new Float32Array( ( _.embedding as Uint8Array ).buffer ) ) } ) )
+                .map( _ => ( { ..._, score: cosineSimilarity( queryEmbedding, new Float32Array( ( _.embedding as Uint8Array ).buffer ) ) } ) )
             sentences.sort( ( a, b ) => b.score - a.score )
-            const commentScore = cosineSimilarity( pin.embedding, embedding )
-            console.log( commentScore, sentences[ 0 ]?.score ?? 0, commentScore > ( sentences[ 0 ]?.score ?? 0 ), sentences )
-            return { ...pin, score: Math.max( commentScore, sentences[ 0 ]?.score ?? 0 ), snippet: commentScore > ( sentences[ 0 ]?.score ?? 0 ) ? null : sentences[ 0 ].text }
+            const documentScore = cosineSimilarity( pin.embedding, queryEmbedding )
+            const textScore = cosineSimilarity( queryEmbedding, new Float32Array( await transformersWorker.embed( parseHtml( pin.text ).text ) ) )
+            const score = Math.max( documentScore, textScore, sentences[ 0 ]?.score ?? 0 )
+            console.log( documentScore, sentences[ 0 ]?.score ?? 0, documentScore > ( sentences[ 0 ]?.score ?? 0 ), sentences )
+            return { ...pin, score, snippet: ( sentences[ 0 ]?.score ?? 0 ) === score ? sentences[ 0 ].text : null }
         } ) ) ) )
         if ( tags.reduce( ( text, tag ) => text.replace( tag, "" ), text ).replace( " ", "" ) !== "" )
             pins.sort( ( a, b ) => b.score - a.score )

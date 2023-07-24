@@ -1,5 +1,5 @@
 ( async () => {
-    const url = chrome.runtime.getURL( "src/offscreen/index.html" )
+    const url = chrome.runtime.getURL( "ext/offscreen/index.html" )
     if ( ( await clients.matchAll() ).every( _ => _.url !== url ) )
         chrome.offscreen.createDocument( {
             justification: "Workers",
