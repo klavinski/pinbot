@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client"
 import { StrictMode } from "react"
-import "../ext/index.css"
+import "./index.css"
 
 ( {
     ext: () => import( "../ext/popup/App" ),
