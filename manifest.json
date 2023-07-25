@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Pinbot",
-    "description": "Manage your bookmarks with AI.",
+    "description": "Privately manage your bookmarks with AI.",
     "icons": {
       "128": "icons/128.png"
     },
@@ -24,7 +24,6 @@
     "cross_origin_opener_policy": {
         "value": "same-origin"
     },
-    "host_permissions": ["<all_urls>"],
     "permissions": ["activeTab", "favicon", "offscreen", "scripting", "storage"],
     "web_accessible_resources": [
         {
