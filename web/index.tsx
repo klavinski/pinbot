@@ -14,6 +14,7 @@ import { DarkMode } from "../ext/popup/header/DarkMode"
 import { ReactNode } from "react"
 import { Glass } from "../ext/popup/Glass"
 import { Link } from "../ext/popup/Link"
+import Comment from "../icons/comment.svg"
 
 const Install = ( { suffix }: { suffix?: ReactNode } ) => <div className={ styles.install }>
     Install the{ " " }
@@ -73,6 +74,9 @@ export default () => <>
                 </p>
                 <p>
                     The current extension is only the starting point: I want to build Pinbot for and with its users. Your{ " " }<Link href="https://tally.so/r/3NravQ" prefix={ <IconMessageDots/> }> feedback</Link>{ " " }is welcome; if you want to discuss, I'll be happy to see you on Pinbot's{ " " }<Link href="https://discord.gg/NetMteXfjf" prefix={ <IconMessages/> }>Discord server</Link>!
+                </p>
+                <p>
+                    You can find my latest explorations on my <Link href="https://withcomment.com/kamil" prefix={ <img src={ Comment } style={ { height: "24px", verticalAlign: "middle" } }/> }>website</Link>.
                 </p>
             </div>
         </div>
